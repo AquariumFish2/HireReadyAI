@@ -8,6 +8,8 @@ import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
 import { USER_ROLE } from "@/shared/constants/enums";
 import ApplicantPage from "@/features/applicant/pages/ApplicantPage";
 import JobsPage from "@/features/jobs/pages/JobsPage";
+import JobDetailsPage from "@/features/jobs/pages/JobDetailsPage";
+import ApplyJobPage from "@/features/applications/pages/ApplyJobPage";
 
 function RootRedirect() {
   const { user, profile, loading } = useUser();
@@ -59,18 +61,26 @@ function App() {
         }
       />
 
+      <Route path="/companies" element={<ProtectedRoute></ProtectedRoute>} />
+
       <Route
-        path="/companies"
+        path="/companies/:id"
+        element={<ProtectedRoute></ProtectedRoute>}
+      />
+      <Route
+        path="/jobs/:id"
         element={
           <ProtectedRoute>
+            <JobDetailsPage />
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/companies/:id"
+        path="/jobs/:id/apply"
         element={
           <ProtectedRoute>
+            <ApplyJobPage />
           </ProtectedRoute>
         }
       />

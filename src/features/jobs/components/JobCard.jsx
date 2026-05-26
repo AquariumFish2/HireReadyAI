@@ -3,9 +3,12 @@
 import { useCompanyDetailsViewModel } from "@/features/companies/hooks/useCompanyDetails";
 import { Card, CardContent } from "@/shared/ui/Card";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function JobCard({ job }) {
   const { company } = useCompanyDetailsViewModel(job.company_id);
+  const navigate = useNavigate();
+
   return (
     <Card className="bg-white border border-gray-200 hover:shadow-md transition-all">
       <CardContent className="p-5 space-y-4">
@@ -30,7 +33,10 @@ export default function JobCard({ job }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-2">
-          <button className="text-sm font-medium text-violet-600 hover:text-violet-700">
+          <button
+            onClick={() => navigate(`/jobs/${job.id}`)}
+            className="text-sm font-medium text-violet-600 hover:text-violet-700"
+          >
             View Job →
           </button>
         </div>
