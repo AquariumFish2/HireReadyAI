@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
 @theme {
   --color-dark-amethyst-50: #efe5ff;
   --color-dark-amethyst-100: #dfccff;

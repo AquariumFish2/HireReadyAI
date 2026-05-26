@@ -10,7 +10,7 @@ function App() {
       const email = "mohamed@gmail.com";
       const password = "12345678";
       const userProfile = new User("Mohamed Mabrouk", USER_ROLE.recruiter, "01013767382", true);
-      
+
       console.log("Signing up...");
       await signUpUser(email, password, userProfile);
       console.log("Sign up & profile creation successful!");
@@ -23,7 +23,7 @@ function App() {
     try {
       const email = "mohamed@gmail.com";
       const password = "12345678";
-      
+
       console.log("Signing in...");
       await signInUser(email, password);
       console.log("Sign in successful!");
@@ -49,7 +49,7 @@ function App() {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Supabase Auth & Context Test</h1>
-      
+
       {user ? (
         <div style={{ background: "#f0fdf4", padding: "15px", borderRadius: "8px", border: "1px solid #bbf7d0", marginBottom: "15px" }}>
           <h3>Welcome, {profile?.full_name || user.email}!</h3>
@@ -78,3 +78,11 @@ function App() {
 
 export default App;
 
+// import JobsPage from "./pages/jobs/JobsPage";
+// import ApplicantPage from "./pages/applicant/ApplicantPage";
+// function App() {
+//   return <JobsPage />;
+//   // return <ApplicantPage />;
+// }
+
+// export default App;
