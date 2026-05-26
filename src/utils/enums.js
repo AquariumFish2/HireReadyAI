@@ -6,5 +6,9 @@ export const USER_ROLE = Object.freeze({
 
 // intern, junior, mid, senior, lead
 export const SENIORITY_LEVEL = Object.freeze({
-  intern, junior, mid, senior, lead
+  intern: "intern",
+  junior: "junior",
+  mid: "mid",
+  senior: "senior",
+  lead: "lead"
 })
