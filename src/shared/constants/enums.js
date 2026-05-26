@@ -21,3 +21,9 @@ export const APPLICATION_STAGE = Object.freeze({
   hired: 'hired',
   rejected: 'rejected',
 })
+
+export const JobType =Object.freeze({
+  FULL_TIME : "full_time",
+  PART_TIME : "part_time",
+  FREELANCE : "freelance",
+})

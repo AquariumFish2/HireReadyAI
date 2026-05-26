@@ -1,8 +1,13 @@
 // components/jobs/JobCard.jsx
 
 import { Card, CardContent } from "@/shared/ui/Card";
+import { useEffect, useState } from "react";
 
 export default function JobCard({ job }) {
+  const [company,setCompany]=useState("")
+  useEffect(()=>{
+    //TODO:get company by the id
+  },[])
   return (
     <Card className="bg-white border border-gray-200 hover:shadow-md transition-all">
       <CardContent className="p-5 space-y-4">
@@ -11,18 +16,21 @@ export default function JobCard({ job }) {
           <h2 className="text-lg font-semibold text-gray-900">{job.title}</h2>
 
           <p className="text-sm text-gray-500">
-            {job.company} • {job.location}
+            {company}
+          </p>
+          <p className="text-sm text-gray-500">
+            {job.description}
           </p>
         </div>
 
         {/* Tags */}
         <div className="flex gap-2 flex-wrap">
-          <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
-            {job.type}
+          <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-violet-700">
+            {job.job_type}
           </span>
 
           <span className="px-2 py-1 text-xs rounded-full bg-violet-100 text-violet-700">
-            {job.level.charAt(0).toUpperCase() + job.level.slice(1)}
+            {job.seniority_level}
           </span>
         </div>
 

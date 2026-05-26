@@ -2,6 +2,7 @@
 //       created_by_profile_id: "profile-uuid",
 //       title: "Frontend Developer",
 //       seniority_level: "mid",
+//       job_type: "full_time",
 //       description: "React developer needed",
 
 // create table public.job_postings (
@@ -10,6 +11,7 @@
 //   created_by_profile_id uuid null,
 //   title text not null,
 //   seniority_level public.seniority_level null,
+//   job_type public.job_type null,
 //   description text not null,
 //   created_at timestamp with time zone not null default now(),
 //   closed_at timestamp with time zone not null default (now() + '14 days'::interval),
@@ -19,11 +21,12 @@
 // ) TABLESPACE pg_default;
 
 class JobPosting {
-    constructor(companyId = "8c60f346-38e9-47ea-a29a-052625690240", profileId, title, seniorityLevel, description) {
+    constructor(companyId = "8c60f346-38e9-47ea-a29a-052625690240", profileId, title, seniorityLevel, jobType, description) {
         this.companyId = companyId,
             this.profileId = profileId,
             this.title = title,
             this.seniorityLevel = seniorityLevel,
+            this.jobType = jobType,
             this.description = description
     }
     toSupaBaseForm() {
@@ -32,6 +35,7 @@ class JobPosting {
             created_by_profile_id: this.profileId,
             title: this.title,
             seniority_level: this.seniorityLevel,
+            job_type: this.jobType,
             description: this.description
         }
     }
