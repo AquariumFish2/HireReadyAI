@@ -1,14 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useUser } from "./context/userContext";
-import { USER_ROLE } from "./utils/enums";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import SignInPage from "./pages/auth/SignInPage";
-import SignUpPage from "./pages/auth/SignUpPage";
-import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
-import ApplicantPage from "./pages/applicant/ApplicantPage";
-import JobsPage from "./pages/jobs/JobsPage";
-
+import { useUser } from "@/features/auth/context/user.context";
+import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
+import SignInPage from "@/features/auth/pages/SignInPage";
+import SignUpPage from "@/features/auth/pages/SignUpPage";
+import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
+import { USER_ROLE } from "@/shared/constants/enums";
+import ApplicantPage from "@/features/applicant/pages/ApplicantPage";
+import JobsPage from "@/features/jobs/pages/JobsPage";
 
 function RootRedirect() {
   const { user, profile, loading } = useUser();
@@ -65,7 +64,6 @@ function App() {
         path="/companies"
         element={
           <ProtectedRoute>
-          
           </ProtectedRoute>
         }
       />
@@ -74,7 +72,6 @@ function App() {
         path="/companies/:id"
         element={
           <ProtectedRoute>
-          
           </ProtectedRoute>
         }
       />
