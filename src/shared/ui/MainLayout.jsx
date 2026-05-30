@@ -3,10 +3,9 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
 import { USER_ROLE } from "@/shared/constants/enums";
 import { Briefcase, Building2, Menu, X, FileCheck, LogOut } from "lucide-react";
-import { logOut } from "@/features/auth/services/auth.service";
 
 export default function MainLayout() {
-    const { profile } = useUser();
+    const { profile, signOutUser } = useUser();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const location = useLocation();
     const isApplicant = profile?.role === USER_ROLE.applicant;
@@ -81,7 +80,7 @@ export default function MainLayout() {
 
                     <div className="px-3 py-2 border-t border-white/10 mt-auto">
                         <button
-                            onClick={logOut}
+                            onClick={signOutUser}
                             className="w-full flex items-center gap-3 text-sm font-medium text-red-400 hover:text-red-300 transition-colors py-2 cursor-pointer"
                         >
                             <LogOut className="w-4 h-4" />

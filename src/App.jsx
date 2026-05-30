@@ -27,8 +27,12 @@ function RootRedirect() {
     return <Navigate to="/auth/sign-in" replace />;
   }
 
-  if (profile?.role === USER_ROLE.applicant) {
-    return <Navigate to="/jobs" replace />;
+  if (!profile) {
+    return <Navigate to="/auth/sign-in" replace />;
+  }
+
+  if (profile.role === USER_ROLE.applicant) {
+    return <Navigate to="/applicant" replace />;
   }
 
   return <Navigate to="/companies" replace />;
@@ -50,11 +54,25 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/applicant" element={<ApplicantPage />} />
+        <Route
+          path="/applicant"
+          element={
+            <ProtectedRoute allowedRoles={USER_ROLE.applicant}>
+              <ApplicantPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/jobs" element={<JobsPage />} />
 
-        <Route path="/companies/*" element={<CompanyLayout />} />
+        <Route
+          path="/companies/*"
+          element={
+            <ProtectedRoute allowedRoles={[USER_ROLE.recruiter, USER_ROLE.hrManager]}>
+              <CompanyLayout />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
