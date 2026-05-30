@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-
-const MOCK_QUESTIONS = [
-  { id: 1, text: "Tell us about a challenging frontend problem you solved recently using React or Next.js." },
-  { id: 2, text: "Why do you think you are the perfect fit for this software engineering role?" },
-  { id: 3, text: "How do you handle working under tight deadlines with a cross-functional team?" }
-];
+import { useParams } from "react-router-dom";
+import useInterviewQuestions from "../hooks/useInterviewQuestions";
 
 export default function InterviewPage() {
-  const [questions] = useState(MOCK_QUESTIONS);
+  const { applicationId } = useParams();
+  const { questions, loading, error } = useInterviewQuestions(applicationId);
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [permissionGranted, setPermissionGranted] = useState(false);
@@ -23,14 +21,19 @@ export default function InterviewPage() {
 
   const requestPermissions = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
       setPermissionGranted(true);
     } catch (err) {
-      alert("Camera and Microphone permissions are required to start the interview simulation.");
+      alert(
+        "Camera and Microphone permissions are required to start the interview simulation.",
+      );
       console.error("Permission error:", err);
     }
   };
@@ -76,7 +79,10 @@ export default function InterviewPage() {
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
       mediaRecorderRef.current.stop();
     }
     if (timerRef.current) {
@@ -88,7 +94,7 @@ export default function InterviewPage() {
   useEffect(() => {
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -102,14 +108,31 @@ export default function InterviewPage() {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">questions are being loaded</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center">{error}</div>;
+  }
+  if (!questions.length)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        No questions found for this interview.
+      </div>
+    );
+
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 flex flex-col items-center justify-center font-sans">
       <div className="w-full max-w-4xl space-y-6">
-
         <div className="bg-slate-900 text-white p-5 rounded-2xl flex justify-between items-center shadow-lg transition-all duration-300">
           <div>
-            <h2 className="font-bold text-lg tracking-tight">AI Automated Interview Session</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Testing Environment · Video & Sound Check</p>
+            <h2 className="font-bold text-lg tracking-tight">
+              AI Automated Interview Session
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Testing Environment · Video & Sound Check
+            </p>
           </div>
           {isRecording && (
             <div className="bg-red-600 px-4 py-1.5 rounded-full text-xs md:text-sm font-bold animate-pulse flex items-center gap-2 shadow-sm border border-red-500">
@@ -125,9 +148,12 @@ export default function InterviewPage() {
               📹
             </div>
             <div className="space-y-2">
-              <h3 className="font-bold text-xl text-gray-800 tracking-tight">Hardware Verification Required</h3>
+              <h3 className="font-bold text-xl text-gray-800 tracking-tight">
+                Hardware Verification Required
+              </h3>
               <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-                This platform requires temporary access to your camera and microphone to simulation-test the AI video response feature.
+                This platform requires temporary access to your camera and
+                microphone to simulation-test the AI video response feature.
               </p>
             </div>
             <button
@@ -139,7 +165,6 @@ export default function InterviewPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-
             <div className="space-y-4 flex flex-col justify-between bg-white border border-gray-200 rounded-2xl p-6 shadow-xs min-h-[360px]">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -148,7 +173,7 @@ export default function InterviewPage() {
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 leading-relaxed tracking-tight pt-2">
-                  {questions[currentQuestionIndex]?.text}
+                  {questions[currentQuestionIndex]}
                 </h3>
               </div>
 
@@ -158,7 +183,8 @@ export default function InterviewPage() {
                     onClick={startRecording}
                     className="w-full bg-red-600 text-white py-3.5 rounded-xl font-semibold hover:bg-red-700 active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 text-sm"
                   >
-                    <span className="text-base">🔴</span> Start Recording Answer (Max 3 Mins)
+                    <span className="text-base">🔴</span> Start Recording Answer
+                    (Max 3 Mins)
                   </button>
                 )}
 
@@ -174,7 +200,8 @@ export default function InterviewPage() {
                 {videoUrl && (
                   <div className="space-y-3">
                     <div className="bg-emerald-50 border border-emerald-100 text-emerald-700 p-2.5 rounded-xl text-xs font-semibold text-center flex items-center justify-center gap-1.5">
-                      <span>✓</span> Answer captured successfully! Review it on the player.
+                      <span>✓</span> Answer captured successfully! Review it on
+                      the player.
                     </div>
                     <div className="flex gap-3">
                       <button
@@ -187,10 +214,12 @@ export default function InterviewPage() {
                       <button
                         onClick={() => {
                           if (currentQuestionIndex < questions.length - 1) {
-                            setCurrentQuestionIndex(prev => prev + 1);
+                            setCurrentQuestionIndex((prev) => prev + 1);
                             setVideoUrl(null);
                           } else {
-                            alert("Excellent! You've simulated all mock questions perfectly.");
+                            alert(
+                              "Excellent! You've simulated all mock questions perfectly.",
+                            );
                           }
                         }}
                         className="flex-1 bg-violet-600 text-white py-3 rounded-xl text-xs font-semibold hover:bg-violet-700 active:scale-[0.98] transition-all flex items-center justify-center gap-1 shadow-sm"
@@ -205,12 +234,22 @@ export default function InterviewPage() {
 
             <div className="bg-slate-950 rounded-2xl overflow-hidden shadow-2xl aspect-video flex items-center justify-center relative border border-slate-800 min-h-[260px]">
               {videoUrl ? (
-                <video src={videoUrl} controls autoPlay className="w-full h-full object-cover" />
+                <video
+                  src={videoUrl}
+                  controls
+                  autoPlay
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
               )}
             </div>
-
           </div>
         )}
       </div>

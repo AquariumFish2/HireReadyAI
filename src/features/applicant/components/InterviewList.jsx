@@ -91,6 +91,7 @@ export default function InterviewList({ applications }) {
                     </p>
                 ) : (
                     filteredInterviews.map((app) => {
+                        console.log(app)
                         const job = app.job_postings;
                         const company = job?.companies;
                         const currentStage = app.current_stage;
@@ -127,7 +128,7 @@ export default function InterviewList({ applications }) {
                                 <div className="flex items-center gap-3 shrink-0">
                                     {currentStage === APPLICATION_STAGE.interview && (
                                         <button
-                                            onClick={() => navigate("/interview")}
+                                            onClick={() => navigate(`/interview/${app.id}`,)}
                                             className="bg-indigo-600 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-xs hover:bg-indigo-700 transition-all"
                                         >
                                             Start AI Interview
