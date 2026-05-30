@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useInterviewQuestions from "../hooks/useInterviewQuestions";
+import { updateInterview } from "../services/interview_database_service";
+import { INTERVIEW_STATUS } from "@/shared/constants/enums";
 
 export default function InterviewPage() {
   const { applicationId } = useParams();
-  const { questions, loading, error } = useInterviewQuestions(applicationId);
+  const navigate = useNavigate();
+  const { interview ,questions, loading, error } = useInterviewQuestions(applicationId);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
@@ -12,6 +15,7 @@ export default function InterviewPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [timeLeft, setTimeLeft] = useState(180);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [isFinished, setIsFinished] = useState(false);
 
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -115,12 +119,36 @@ export default function InterviewPage() {
   if (error) {
     return <div className="min-h-screen flex items-center justify-center">{error}</div>;
   }
+
   if (!questions.length)
     return (
       <div className="min-h-screen flex items-center justify-center">
         No questions found for this interview.
       </div>
     );
+
+  if (isFinished) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 p-6 flex flex-col items-center justify-center font-sans">
+        <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl p-8 text-center space-y-5 shadow-lg">
+          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl animate-bounce">
+            ✓
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-bold text-xl text-gray-800 tracking-tight">
+              Interview Completed!
+            </h3>
+            <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
+              Your responses have been successfully captured and recorded.
+            </p>
+          </div>
+          <div className="pt-2 text-xs text-slate-400 animate-pulse">
+            Redirecting to dashboard...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6 flex flex-col items-center justify-center font-sans">
@@ -212,14 +240,22 @@ export default function InterviewPage() {
                       </button>
 
                       <button
-                        onClick={() => {
+                        onClick={async() => {
                           if (currentQuestionIndex < questions.length - 1) {
                             setCurrentQuestionIndex((prev) => prev + 1);
                             setVideoUrl(null);
                           } else {
-                            alert(
-                              "Excellent! You've simulated all mock questions perfectly.",
-                            );
+                            if (streamRef.current) {
+                              streamRef.current.getTracks().forEach((track) => track.stop());
+                            }
+                            if (applicationId) {
+                              localStorage.setItem(`interview_completed_${applicationId}`, "true");
+                            }
+                            setIsFinished(true);
+                            await updateInterview(interview.id,{status:INTERVIEW_STATUS.completed})
+                            setTimeout(() => {
+                              navigate("/applicant");
+                            }, 2500);
                           }
                         }}
                         className="flex-1 bg-violet-600 text-white py-3 rounded-xl text-xs font-semibold hover:bg-violet-700 active:scale-[0.98] transition-all flex items-center justify-center gap-1 shadow-sm"
