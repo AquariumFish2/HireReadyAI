@@ -20,6 +20,7 @@ export const APPLICATION_STAGE = Object.freeze({
   interview: "interview",
   hired: "hired",
   rejected: "rejected",
+  shorListed: "short_listed"
 });
 
 export const JOB_TYPE = Object.freeze({

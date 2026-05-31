@@ -6,7 +6,8 @@ import JobPostings from "./JobPostings";
 import CompanyProfile from "./CompanyProfile";
 import AddJobModal from "./AddJobModal";
 import NoCompanyView from "./NoCompanyView";
-import { Briefcase, Building2 } from "lucide-react";
+import { Briefcase, Building2, LayoutDashboard } from "lucide-react";
+import RecruiterDashboardPage from "../../recruiter/pages/RecruiterDashboardPage";
 import {
   fetchCompanyByProfileId,
   fetchJobsByCompanyId,
@@ -151,6 +152,13 @@ function CompanyLayout() {
 
           <nav className="space-y-1">
             <Link
+              to="/companies/dashboard"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors"
+            >
+              <LayoutDashboard className="w-4 h-4 text-mauve-magic-300" />
+              Dashboard
+            </Link>
+            <Link
               to="/companies/profile"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors"
             >
@@ -178,7 +186,8 @@ function CompanyLayout() {
 
         <div className="flex-1 overflow-y-auto">
           <Routes>
-            <Route path="/" element={<Navigate to="profile" replace />} />
+            <Route path="/" element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<RecruiterDashboardPage />} />
             <Route
               path="profile"
               element={
