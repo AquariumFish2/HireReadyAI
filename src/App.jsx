@@ -63,6 +63,23 @@ function App() {
       />
 
       <Route
+        path="/jobs/:id"
+        element={
+          <ProtectedRoute>
+            <JobDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/jobs/:id/apply"
+        element={
+          <ProtectedRoute>
+            <ApplyJobPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/companies/*"
         element={
           <ProtectedRoute
