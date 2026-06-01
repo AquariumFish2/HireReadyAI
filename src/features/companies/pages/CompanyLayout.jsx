@@ -122,7 +122,7 @@ function CompanyLayout() {
       <Navbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        onAddJobClick={() => navigate("companies/jd-generator")}
+        onAddJobClick={() => navigate("/companies/jd-generator")}
       />
 
       <div className="flex-1 overflow-y-auto">

@@ -11,6 +11,7 @@ import {
   LogOut,
   LayoutDashboard,
   CheckCircle,
+  Wand2,
 } from "lucide-react";
 
 export default function MainLayout() {
@@ -25,10 +26,15 @@ export default function MainLayout() {
         { to: "/applicant", label: "My Applications", icon: FileCheck },
       ]
     : [
-        { to: "/companies/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        {
+          to: "/companies/dashboard",
+          label: "Dashboard",
+          icon: LayoutDashboard,
+        },
         { to: "/companies/profile", label: "Company Profile", icon: Building2 },
         { to: "/companies/jobs", label: "Job Postings", icon: Briefcase },
         { to: "/companies/shortlists", label: "Shortlists", icon: CheckCircle },
+        { to: "/companies/jd-generator", label: "JD Generator", icon: Wand2 },
       ];
 
   const isActive = (path) => {
