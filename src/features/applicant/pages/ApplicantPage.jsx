@@ -11,7 +11,15 @@ import InterviewsList from "../components/InterviewList";
 
 export default function ApplicantPage() {
   const { profile, user } = useUser();
-  const { loading, applications, error, getAllApplications, updateApplicationStage } = useApplications();
+  const {
+    loading,
+    applications,
+    error,
+    getAllApplications,
+    updateApplicationStage,
+  } = useApplications();
+
+  const { signOutUser } = useUser();
 
   useEffect(() => {
     if (user?.id) {
@@ -36,9 +44,7 @@ export default function ApplicantPage() {
       <StatsCards applications={applications} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <div className="lg:col-span-2 space-y-6">
-
           <ApplicationsList applications={applications} />
 
           <InterviewsList
@@ -55,7 +61,14 @@ export default function ApplicantPage() {
           <ProfileStrength />
           <RecommendedJobs />
         </div>
-
+        <button
+          className="fixed bottom-2 right-2 bg-dark-amethyst-600 text-royal-violet-100 px-5 py-2 rounded-2xl cursor-pointer"
+          onClick={() => {
+            signOutUser();
+          }}
+        >
+          LogOut
+        </button>
       </div>
     </div>
   );

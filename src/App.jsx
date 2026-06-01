@@ -66,7 +66,7 @@ function App() {
         path="/recruiter"
         element={
           <ProtectedRoute allowedRoles={[USER_ROLE.recruiter]}>
-            <Recruiterscreen/>
+            <Recruiterscreen />
           </ProtectedRoute>
         }
       />
@@ -83,7 +83,7 @@ function App() {
       <Route
         path="/companies/*"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={[USER_ROLE.recruiter]}>
             <CompanyLayout />
           </ProtectedRoute>
         }

@@ -17,7 +17,7 @@ export const fetchDashboardData = async (profileId) => {
     .from("job_postings")
     .select(`
       *,
-      companies(name),
+      companies(id,name),
       applications(
         id,
         current_stage,

@@ -77,10 +77,10 @@ export default function DashboardJobsTable({ jobs }) {
               </td>
               <td className="px-6 py-4 text-right">
                 <Link
-                  to={`/jobs/${job.id}`}
+                  to={`/companies/shortlists/${job.id}`}
                   className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-mauve-magic-600 bg-mauve-magic-50 hover:bg-mauve-magic-100 rounded-lg transition-colors"
                 >
-                  View Applicants <ChevronRight className="w-3 h-3" />
+                  View ShortList <ChevronRight className="w-3 h-3" />
                 </Link>
               </td>
             </tr>

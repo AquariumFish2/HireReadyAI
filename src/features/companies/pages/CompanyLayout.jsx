@@ -6,8 +6,14 @@ import JobPostings from "./JobPostings";
 import CompanyProfile from "./CompanyProfile";
 import AddJobModal from "./AddJobModal";
 import NoCompanyView from "./NoCompanyView";
-import { Briefcase, Building2, LayoutDashboard } from "lucide-react";
+import {
+  Briefcase,
+  Building2,
+  LayoutDashboard,
+  ClipboardCheck,
+} from "lucide-react";
 import RecruiterDashboardPage from "../../recruiter/pages/RecruiterDashboardPage";
+import ShortlistsPage from "../../shortlist/pages/ShortlistsPage";
 import {
   fetchCompanyByProfileId,
   fetchJobsByCompanyId,
@@ -172,6 +178,13 @@ function CompanyLayout() {
               <Briefcase className="w-4 h-4 text-mauve-magic-300" />
               Job Postings
             </Link>
+            <Link
+              to="/companies/shortlists"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors"
+            >
+              <ClipboardCheck className="w-4 h-4 text-mauve-magic-300" />
+              Shortlists
+            </Link>
             <button onClick={logOut}>Logout</button>
           </nav>
         </div>
@@ -203,6 +216,11 @@ function CompanyLayout() {
             <Route
               path="jobs"
               element={<JobPostings jobs={jobs} searchQuery={searchQuery} />}
+            />
+            <Route path="shortlists" element={<ShortlistsPage jobs={jobs} />} />
+            <Route
+              path="shortlists/:jobId"
+              element={<ShortlistsPage jobs={jobs} />}
             />
           </Routes>
         </div>

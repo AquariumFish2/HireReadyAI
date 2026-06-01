@@ -25,51 +25,52 @@ export const useDashboardData = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       if (!profile?.id) return;
-      
+
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const data = await fetchDashboardData(profile.id);
-        
+
         if (data && data.length > 0) {
           // Process jobs data
           const processedJobs = data.map(job => {
             const apps = job.applications || [];
-            
+
             let testedCount = 0;
             let interviewCount = 0;
             let waitingActionCount = 0;
             let shortlistedCount = 0;
-            
+
             apps.forEach(app => {
               // Not applied or screening means it's tested
               if (
-                app.current_stage !== APPLICATION_STAGE.applied && 
+                app.current_stage !== APPLICATION_STAGE.applied &&
                 app.current_stage !== APPLICATION_STAGE.screening
               ) {
                 testedCount++;
               }
-              
+
               // Waiting action = interviewed
               if (app.current_stage === APPLICATION_STAGE.interviewed) {
                 waitingActionCount++;
               }
-              
+
               // Shortlisted = short_listed
               if (app.current_stage === APPLICATION_STAGE.shorListed) {
                 shortlistedCount++;
               }
-              
+
               // Interview count = has an interview record
               if (app.interviews) {
                 interviewCount++;
               }
             });
-            
+
             return {
               id: job.id,
               job_title: job.title,
+              company_id: job.companies?.id || "",
               company: job.companies?.name || "Unknown Company",
               applicants_count: apps.length,
               tested_count: testedCount,
@@ -78,13 +79,13 @@ export const useDashboardData = () => {
               shortlisted_count: shortlistedCount,
             };
           });
-          
+
           setJobs(processedJobs);
-          
+
           // Process stats
           const totalJobs = data.length;
           const totalActiveJobs = data.filter(j => !j.closed_at).length;
-          
+
           let totalApplicants = 0;
           let totalInterviewed = 0;
           let totalWaitingAction = 0;
@@ -113,7 +114,7 @@ export const useDashboardData = () => {
               if (app.current_stage === APPLICATION_STAGE.hired) totalAccepted++;
               if (app.current_stage === APPLICATION_STAGE.shorListed) totalAccepted++; // Map shortlisted to accepted metric for stats
               if (app.current_stage === APPLICATION_STAGE.rejected) totalRejected++;
-              
+
               if (app.current_stage !== APPLICATION_STAGE.applied) totalScreened++;
               if (app.current_stage !== APPLICATION_STAGE.applied && app.current_stage !== APPLICATION_STAGE.screening) totalTested++;
 
@@ -147,7 +148,7 @@ export const useDashboardData = () => {
             interviewed: totalInterviewed,
             shortlisted: totalAccepted
           });
-          
+
           setStats({
             totalJobs,
             totalActiveJobs,
@@ -157,7 +158,7 @@ export const useDashboardData = () => {
             totalAccepted,
             totalRejected
           });
-          
+
           setPipelineData([
             { name: "Applicants", count: totalApplicants, fill: "#8400ff" },
             { name: "Interviewed", count: totalInterviewed, fill: "#4f0099" },
@@ -165,7 +166,7 @@ export const useDashboardData = () => {
             { name: "Accepted", count: totalAccepted, fill: "#22c55e" },
             { name: "Rejected", count: totalRejected, fill: "#ef4444" },
           ]);
-          
+
           const sortedJobs = [...data].sort((a, b) => (b.applications?.length || 0) - (a.applications?.length || 0));
           setTopJobsData(
             sortedJobs.slice(0, 5).map(job => ({
@@ -174,7 +175,7 @@ export const useDashboardData = () => {
             }))
           );
         }
-        
+
       } catch (err) {
         console.error("Failed to load dashboard data", err);
         setError(err.message);
