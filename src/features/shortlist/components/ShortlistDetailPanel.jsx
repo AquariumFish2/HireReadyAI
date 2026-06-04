@@ -10,7 +10,6 @@ import {
   Clock,
   UserCheck,
 } from "lucide-react";
-import { useUser } from "@/features/auth/context/user.context";
 
 function getInitials(name = "") {
   return name
@@ -87,7 +86,6 @@ export default function ShortlistDetailPanel({
   onPostNote,
   isOverlay,
 }) {
-  const { profile } = useUser();
   const [noteBody, setNoteBody] = useState("");
   const [visibleToTeam, setVisibleToTeam] = useState(true);
   const [showRejectInput, setShowRejectInput] = useState(false);
@@ -96,7 +94,7 @@ export default function ShortlistDetailPanel({
   const [rejecting, setRejecting] = useState(false);
   const notesEndRef = useRef(null);
 
-  const { applications: app, tags = [], rank } = entry;
+  const { applications: app, tags = [] } = entry;
   const {
     profiles: candidate,
     shortlist_votes: votes = [],
@@ -107,12 +105,7 @@ export default function ShortlistDetailPanel({
     rejection_reason,
   } = app;
 
-  // Pre-fill reject reason with AI rationale
-  useEffect(() => {
-    if (showRejectInput && !rejectReason && ai_rationale) {
-      setRejectReason(ai_rationale);
-    }
-  }, [showRejectInput]);
+
 
   useEffect(() => {
     notesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -453,7 +446,10 @@ export default function ShortlistDetailPanel({
                   Advance to offer
                 </button>
                 <button
-                  onClick={() => setShowRejectInput(true)}
+                  onClick={() => {
+                    setShowRejectInput(true);
+                    if (!rejectReason && ai_rationale) setRejectReason(ai_rationale);
+                  }}
                   className="flex-1 py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl text-sm font-medium transition-colors"
                 >
                   Move to rejected

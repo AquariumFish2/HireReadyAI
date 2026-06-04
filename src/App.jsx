@@ -88,7 +88,11 @@ function App() {
 
       <Route
         path="/recruiter/candidatespipline"
-        element={<PipelineCandidatesPage />}
+        element={
+          <ProtectedRoute>
+            <PipelineCandidatesPage />
+          </ProtectedRoute>
+        }
       />
       <Route
         element={

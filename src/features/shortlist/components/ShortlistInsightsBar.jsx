@@ -1,6 +1,6 @@
 import { ThumbsUp, ThumbsDown, Minus, Sparkles } from "lucide-react";
 
-export default function ShortlistInsightsBar({ insightsSummary, selectedJobTitle }) {
+export default function ShortlistInsightsBar({ insightsSummary }) {
   const { up, neutral, down, awaitingVote, total } = insightsSummary;
   const topAdvanceCount = Math.max(1, Math.round(total * 0.3));
 

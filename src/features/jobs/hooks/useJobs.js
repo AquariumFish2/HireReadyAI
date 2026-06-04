@@ -21,9 +21,11 @@ export const useJobs = () => {
 
   const createJob = async (job) => {
     try {
-      await addJob(job);
+      const newJob = await addJob(job);
+      return newJob; // returns { id, ...jobData }
     } catch (error) {
       console.log(error.message);
+      throw error;
     }
   };
 

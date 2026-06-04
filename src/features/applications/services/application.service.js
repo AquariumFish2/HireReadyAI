@@ -60,13 +60,35 @@ export const fetchApplicationById = async (applicationId) => {
 
 //apply
 export const createApplication = async (applicationData) => {
-  const { data, error } = await supabase
+  const { data: application, error } = await supabase
     .from("applications")
     .insert([applicationData])
     .select()
     .single();
   if (error) throw error;
-  return data;
+
+  // Find the CV Review stage for this job to auto-assign the applicant
+  const { data: cvReviewStage } = await supabase
+    .from("recruitment_stages")
+    .select("id")
+    .eq("job_id", applicationData.job_id)
+    .eq("stage_type", "cv_review")
+    .limit(1)
+    .single();
+
+  if (cvReviewStage) {
+    await supabase.from("application_stages").upsert(
+      {
+        application_id: application.id,
+        stage_id: cvReviewStage.id,
+        status: "in_progress",
+        started_at: new Date().toISOString(),
+      },
+      { onConflict: "application_id,stage_id" }
+    );
+  }
+
+  return application;
 };
 
 //update stage for recuiter not accissable by applicant

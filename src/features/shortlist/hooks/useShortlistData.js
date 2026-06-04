@@ -14,7 +14,6 @@ export const useShortlistData = (jobs) => {
   const { profile } = useUser();
   const params = useParams();
 
-  const [selectedJobId, setSelectedJobId] = useState("");
   const [shortlistEntries, setShortlistEntries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
@@ -22,11 +21,14 @@ export const useShortlistData = (jobs) => {
   const [notes, setNotes] = useState([]);
   const [notesLoading, setNotesLoading] = useState(false);
 
-  // Initialize from URL param or first job
+  const [selectedJobId, setSelectedJobId] = useState(() => {
+    if (params.jobId) return params.jobId;
+    return jobs && jobs.length > 0 ? jobs[0].id : null;
+  });
+
+  // Sync selectedJobId if jobs load later and none is selected
   useEffect(() => {
-    if (params.jobId) {
-      setSelectedJobId(params.jobId);
-    } else if (jobs && jobs.length > 0 && !selectedJobId) {
+    if (!selectedJobId && jobs && jobs.length > 0 && !params.jobId) {
       setSelectedJobId(jobs[0].id);
     }
   }, [jobs, params.jobId, selectedJobId]);
@@ -131,7 +133,7 @@ export const useShortlistData = (jobs) => {
       (v) => v.voter_id === profile.id
     );
     return myVoteRecord?.vote || null;
-  }, [selectedEntry, profile?.id]);
+  }, [selectedEntry, profile]);
 
   // Actions
   const castVote = async (applicationId, vote) => {

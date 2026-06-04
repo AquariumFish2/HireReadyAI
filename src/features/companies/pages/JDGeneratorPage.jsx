@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SENIORITY_LEVEL } from "@/shared/constants/enums";
 import { useJobs } from "@/features/jobs/hooks/useJobs";
 import { supabase } from "@/shared/services/supabase";
+import { seedAnchorStages } from "@/features/recruiter/services/candidatesPipline.service";
 import {
   Building2,
   MapPin,
@@ -132,7 +133,8 @@ export default function JDGeneratorPage({ company, profile }) {
     setPublishError(null);
 
     try {
-      await createJob({
+      // Step 1: Create the job posting
+      const newJob = await createJob({
         company_id: company.id,
         created_by_profile_id: profile?.id || null,
         title,
@@ -147,6 +149,11 @@ export default function JDGeneratorPage({ company, profile }) {
         salary_min: aiResult.salary_min || null,
         salary_max: aiResult.salary_max || null,
       });
+
+      // Step 2: Seed the 3 locked anchor stages (CV Review → Shortlist → Offer)
+      if (newJob?.id) {
+        await seedAnchorStages(newJob.id);
+      }
 
       setPublished(true);
     } catch (err) {

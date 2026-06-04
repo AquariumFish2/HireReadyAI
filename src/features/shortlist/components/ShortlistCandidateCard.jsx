@@ -1,4 +1,4 @@
-import { ThumbsUp, ThumbsDown, Minus, Sparkles, Calendar } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Sparkles, Calendar } from "lucide-react";
 
 const TAG_COLORS = {
   "Strong Fit": "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -33,7 +33,7 @@ function timeAgo(dateString) {
   return "Just now";
 }
 
-export default function ShortlistCandidateCard({ entry, index, isSelected, onClick }) {
+export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
   const { applications: app, tags = [], rank } = entry;
   const { profiles: candidate, shortlist_votes: votes = [], composite_score, ai_rationale, applied_at, is_rejected } = app;
 

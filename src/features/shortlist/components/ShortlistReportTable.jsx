@@ -1,4 +1,3 @@
-import React from "react";
 import { ThumbsUp, ThumbsDown, Minus } from "lucide-react";
 
 export default function ShortlistReportTable({ entries, selectedIds, onToggleSelect }) {

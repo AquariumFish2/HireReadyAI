@@ -40,7 +40,18 @@ export const usePipeline = (jobId) => {
 
   // Add a stage from the library — optimistic local update then persist
   const handleAddStage = async (libraryItem) => {
-    const nextIndex = stages.length; // 0-based order_index
+    // Find the Shortlist stage (order_index 20) to insert before it
+    const shortlistStage = stages.find((s) => s.stage_type === "shortlist");
+    
+    // Default to end of custom stages (before offer) if no shortlist is found
+    const customStages = stages.filter(s => !s.is_locked);
+    const lastCustomIndex = customStages.length > 0 
+      ? customStages[customStages.length - 1].order_index 
+      : 10; // After CV Review (10)
+      
+    // Next index is simply one more than the last custom stage, bounded by Shortlist (20)
+    // If we exceed 19, we have a problem, but for now we'll just increment
+    const nextIndex = lastCustomIndex + 1;
 
     const totalWeight = stages.reduce(
       (sum, s) => sum + (parseFloat(s.weight) || 0),
@@ -110,16 +121,26 @@ export const usePipeline = (jobId) => {
 
   // Reorder stages after drag-and-drop, persist with two-phase upsert (Fix 1)
   const handleReorderStages = async (reorderedList) => {
-    const withNewIndex = reorderedList.map((s, idx) => ({
+    // We only reorder the UNLOCKED stages, keeping the locked ones fixed at their indexes
+    const unlockedOnly = reorderedList.filter((s) => !s.is_locked);
+    const lockedOnly = stages.filter((s) => s.is_locked);
+    
+    // Assign new indexes to unlocked stages starting from 11 (after CV Review)
+    const withNewIndex = unlockedOnly.map((s, idx) => ({
       ...s,
-      order_index: idx,
+      order_index: 11 + idx,
     }));
 
+    // Combine them back for optimistic update
+    const finalStages = [...lockedOnly, ...withNewIndex].sort(
+      (a, b) => a.order_index - b.order_index
+    );
+
     // Optimistic update
-    setStages(withNewIndex);
+    setStages(finalStages);
 
     try {
-      await reorderStages(withNewIndex);
+      await reorderStages(withNewIndex); // Only send the changed ones
     } catch (err) {
       console.error("Failed to reorder stages:", err);
       setError(err.message);

@@ -9,7 +9,7 @@ import JobInfoGrid from "../components/job-postings/JobInfoGrid";
 import JobContentCards from "../components/job-postings/JobContentCards";
 import JobPipelinePreview from "../components/job-postings/JobPipelinePreview";
 
-export default function JobPostings({ jobs, searchQuery }) {
+export default function JobPostings({ jobs, searchQuery, company }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Open");
   const [localJobs, setLocalJobs] = useState(jobs);
@@ -135,6 +135,7 @@ export default function JobPostings({ jobs, searchQuery }) {
               isEditing={isEditing}
               editForm={editForm}
               setEditForm={setEditForm}
+              company={company}
             />
 
             <div className="space-y-6">

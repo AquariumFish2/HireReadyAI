@@ -1,4 +1,3 @@
-import React from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ComparisonCard from "./ComparisonCard";
 

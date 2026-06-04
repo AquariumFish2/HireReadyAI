@@ -1,5 +1,5 @@
 import React from "react";
-import { GripVertical, Trash2 } from "lucide-react";
+import { GripVertical, Trash2, Lock } from "lucide-react";
 
 export default function StageCard({
   stage,
@@ -23,13 +23,21 @@ export default function StageCard({
             : "border-gray-200 bg-white hover:border-dark-amethyst-300 hover:shadow-sm"
       }`}
     >
-      {/* Drag Handle */}
+      {/* Drag Handle or Lock */}
       <div
         {...provided.dragHandleProps}
         onClick={(e) => e.stopPropagation()}
-        className="text-gray-300 hover:text-gray-500 shrink-0 cursor-grab active:cursor-grabbing"
+        className={`shrink-0 ${
+          stage.is_locked
+            ? "text-gray-300 cursor-not-allowed"
+            : "text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing"
+        }`}
       >
-        <GripVertical className="w-4 h-4" />
+        {stage.is_locked ? (
+          <Lock className="w-4 h-4" />
+        ) : (
+          <GripVertical className="w-4 h-4" />
+        )}
       </div>
 
       {/* Stage Info */}
@@ -53,17 +61,19 @@ export default function StageCard({
         </span>
       )}
 
-      {/* Delete button — visible on hover or when selected */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(stage.id);
-        }}
-        className="shrink-0 p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-        title="Delete stage"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </button>
+      {/* Delete button — visible on hover or when selected (only if not locked) */}
+      {!stage.is_locked && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(stage.id);
+          }}
+          className="shrink-0 p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+          title="Delete stage"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      )}
     </div>
   );
 }

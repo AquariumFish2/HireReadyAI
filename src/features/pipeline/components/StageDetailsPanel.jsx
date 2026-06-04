@@ -74,8 +74,9 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         <p className="text-[10px] font-semibold text-dark-amethyst-600 tracking-widest uppercase mb-0.5">
           Stage Settings
         </p>
-        <p className="text-sm font-semibold text-gray-900 leading-tight truncate">
+        <p className="text-sm font-semibold text-gray-900 leading-tight truncate flex items-center gap-1.5">
           {form.name || "Untitled Stage"}
+          {stage.is_locked && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">Locked</span>}
         </p>
         <p className="text-xs text-gray-400 truncate">
           {form.stage_type?.replace(/_/g, " ")}
@@ -91,8 +92,9 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
           <input
             type="text"
             value={form.name}
+            disabled={stage.is_locked}
             onChange={(e) => handleImmediateChange("name", e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
           />
         </div>
 
@@ -103,8 +105,9 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
           </label>
           <select
             value={form.stage_type}
+            disabled={stage.is_locked}
             onChange={(e) => handleImmediateChange("stage_type", e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow bg-white cursor-pointer"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500 cursor-pointer disabled:cursor-not-allowed"
           >
             <option value="">Select type…</option>
             {STAGE_TYPE_OPTIONS.map((opt) => (
@@ -112,6 +115,9 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
                 {opt.label}
               </option>
             ))}
+            {stage.is_locked && !STAGE_TYPE_OPTIONS.some(o => o.value === form.stage_type) && (
+              <option value={form.stage_type}>{form.stage_type.replace(/_/g, " ")}</option>
+            )}
           </select>
         </div>
 
@@ -144,8 +150,9 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
           <textarea
             rows={3}
             value={form.description}
+            disabled={stage.is_locked}
             onChange={(e) => handleImmediateChange("description", e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow resize-none"
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow resize-none disabled:bg-gray-50 disabled:text-gray-500"
             placeholder="Describe what happens in this stage…"
           />
         </div>

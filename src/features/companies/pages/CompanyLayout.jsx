@@ -15,6 +15,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import RecruiterDashboardPage from "../../recruiter/pages/RecruiterDashboardPage";
+import PipelineCandidatesPage from "../../recruiter/pages/PipelineCandidatesPage";
 import ShortlistsPage from "../../shortlist/pages/ShortlistsPage";
 import PipelineBuilderPage from "../../pipeline/pages/PipelineBuilderPage";
 import {
@@ -145,12 +146,16 @@ function CompanyLayout() {
           />
           <Route
             path="jobs"
-            element={<JobPostings jobs={jobs} searchQuery={searchQuery} />}
+            element={<JobPostings jobs={jobs} searchQuery={searchQuery} company={company} />}
           />
           <Route path="shortlists" element={<ShortlistsPage jobs={jobs} />} />
           <Route
             path="shortlists/:jobId"
             element={<ShortlistsPage jobs={jobs} />}
+          />
+          <Route
+            path="candidates"
+            element={<PipelineCandidatesPage company={company} jobs={jobs} />}
           />
           <Route path="pipelines/:jobId" element={<PipelineBuilderPage />} />
           <Route

@@ -147,6 +147,7 @@ export default function PipelineBuilder({
                           key={stage.id}
                           draggableId={stage.id}
                           index={index}
+                          isDragDisabled={stage.is_locked}
                         >
                           {(provided, snapshot) => (
                             <StageCard
@@ -230,6 +231,7 @@ export default function PipelineBuilder({
                         key={stage.id}
                         draggableId={stage.id}
                         index={index}
+                        isDragDisabled={stage.is_locked}
                       >
                         {(provided, snapshot) => (
                           <StageCard
