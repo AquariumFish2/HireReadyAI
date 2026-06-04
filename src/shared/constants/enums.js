@@ -14,13 +14,26 @@ export const SENIORITY_LEVEL = Object.freeze({
 });
 
 export const APPLICATION_STAGE = Object.freeze({
+  // Legacy & General
   applied: "applied",
   screening: "screening",
   interviewed: "interviewed",
   interview: "interview",
   hired: "hired",
   rejected: "rejected",
-  shorListed: "short_listed"
+  shorListed: "short_listed",
+
+  // New Pipeline Stages
+  cv_screening: "cv_screening",
+  ai_screening: "ai_screening",
+  assessment_test: "assessment_test",
+  coding_test: "coding_test",
+  video_interview: "video_interview",
+  technical_interview: "technical_interview",
+  hr_interview: "hr_interview",
+  manager_interview: "manager_interview",
+  background_check: "background_check",
+  offer: "offer",
 });
 
 export const JOB_TYPE = Object.freeze({

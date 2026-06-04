@@ -5,6 +5,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
 import { fetchQuestionsByJobId } from "../services/application.service";
 import { createApplication } from "../services/application.service";
+import { triggerCvReview } from "../services/cv-review.service";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 import { supabase } from "@/shared/services/supabase";
 import QuestionCard from "../components/apply/QuestionCard";
 
@@ -173,11 +178,28 @@ export default function ApplyJobPage() {
       let cvUrl = null;
       let cvName = null;
 
+      let cvText = "";
+
       if (form.resume) {
         const file = form.resume;
 
         cvUrl = await uploadResume(file);
         cvName = file.name;
+        
+        // Extract text client-side
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdfDocument = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          for (let i = 1; i <= pdfDocument.numPages; i++) {
+            const page = await pdfDocument.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map((item) => item.str).join(" ");
+            cvText += pageText + "\n";
+          }
+        } catch (extractErr) {
+          console.error("Client-side PDF extraction failed:", extractErr);
+          // If we fail to extract, we still let the application go through
+        }
       }
       const { data: existing } = await supabase
         .from("applications")
@@ -211,7 +233,10 @@ export default function ApplyJobPage() {
         applied_at: new Date().toISOString(),
       };
 
-      await createApplication(payload);
+      const application = await createApplication(payload);
+
+      // Fire and forget CV review
+      triggerCvReview(application.id, cvText.trim());
 
       setToast({
         type: "success",

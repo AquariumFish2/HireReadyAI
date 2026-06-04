@@ -13,7 +13,7 @@ const HF_API_URL =
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 5000;
 
-async function transcribeWithRetry(audioBlob, apiKey, retries = MAX_RETRIES) {
+async function transcribeWithRetry(audioBlob: Blob, apiKey: string, retries = MAX_RETRIES) {
     for (let attempt = 0; attempt < retries; attempt++) {
         const response = await fetch(HF_API_URL, {
             method: "POST",
@@ -49,17 +49,43 @@ async function transcribeWithRetry(audioBlob, apiKey, retries = MAX_RETRIES) {
     throw new Error("Max retries exceeded — model failed to load");
 }
 
-function extractText(result) {
+// deno-lint-ignore no-explicit-any
+function extractText(result: any): string | null {
     if (typeof result.text === "string") return result.text.trim();
     if (Array.isArray(result) && result[0]?.text) return result[0].text.trim();
     return null;
 }
 
-function extractConfidence(result) {
+// deno-lint-ignore no-explicit-any
+function extractConfidence(result: any): number | null {
     if (result.confidence !== undefined) return result.confidence;
     if (Array.isArray(result) && result[0]?.confidence !== undefined)
         return result[0].confidence;
     return null;
+}
+
+/**
+ * Helper: patch the generation_context JSONB on application_questions
+ * without overwriting other keys already stored there.
+ */
+async function patchGenerationContext(
+    supabase: ReturnType<typeof createClient>,
+    questionId: string,
+    patch: Record<string, unknown>,
+) {
+    // Fetch current context first to merge
+    const { data } = await supabase
+        .from("application_questions")
+        .select("generation_context")
+        .eq("id", questionId)
+        .single();
+
+    const current = data?.generation_context ?? {};
+
+    await supabase
+        .from("application_questions")
+        .update({ generation_context: { ...current, ...patch } })
+        .eq("id", questionId);
 }
 
 serve(async (req) => {
@@ -74,7 +100,9 @@ serve(async (req) => {
         });
     }
 
+    // questionId is now application_questions.id
     const { audioPath, questionId } = await req.json();
+
     if (!audioPath) {
         return new Response(JSON.stringify({ error: "audioPath is required" }), {
             status: 400,
@@ -87,23 +115,23 @@ serve(async (req) => {
         Deno.env.get("SB_SERVICE_KEY") ?? "",
     );
 
+    // Mark as processing in generation_context
     if (questionId) {
-        await supabase
-            .from("interview_questions")
-            .update({ transcription_status: "processing" })
-            .eq("id", questionId);
+        await patchGenerationContext(supabase, questionId, {
+            transcription_status: "processing",
+        });
     }
 
+    // Download the audio from storage
     const { data: audioBlob, error: downloadError } = await supabase.storage
         .from("interview-recordings")
         .download(audioPath);
 
     if (downloadError || !audioBlob) {
         if (questionId) {
-            await supabase
-                .from("interview_questions")
-                .update({ transcription_status: "failed" })
-                .eq("id", questionId);
+            await patchGenerationContext(supabase, questionId, {
+                transcription_status: "failed",
+            });
         }
         return new Response(
             JSON.stringify({
@@ -127,10 +155,9 @@ serve(async (req) => {
         const text = extractText(result);
         if (!text) {
             if (questionId) {
-                await supabase
-                    .from("interview_questions")
-                    .update({ transcription_status: "failed" })
-                    .eq("id", questionId);
+                await patchGenerationContext(supabase, questionId, {
+                    transcription_status: "failed",
+                });
             }
             return new Response(
                 JSON.stringify({
@@ -147,14 +174,20 @@ serve(async (req) => {
         const confidence = extractConfidence(result);
 
         if (questionId) {
+            // 1. Update generation_context with completion status + whisper confidence
+            await patchGenerationContext(supabase, questionId, {
+                transcription_status: "completed",
+                whisper_confidence: confidence,
+            });
+
+            // 2. Upsert the transcript text into application_answers
+            //    Uses the UNIQUE constraint on question_id
             await supabase
-                .from("interview_questions")
-                .update({
-                    transcript: text,
-                    whisper_confidence: confidence,
-                    transcription_status: "completed",
-                })
-                .eq("id", questionId);
+                .from("application_answers")
+                .upsert(
+                    { question_id: questionId, answer_text: text },
+                    { onConflict: "question_id" },
+                );
         }
 
         return new Response(
@@ -167,13 +200,12 @@ serve(async (req) => {
         );
     } catch (err) {
         if (questionId) {
-            await supabase
-                .from("interview_questions")
-                .update({ transcription_status: "failed" })
-                .eq("id", questionId);
+            await patchGenerationContext(supabase, questionId, {
+                transcription_status: "failed",
+            });
         }
         return new Response(
-            JSON.stringify({ error: err.message }),
+            JSON.stringify({ error: (err as Error).message }),
             {
                 status: 502,
                 headers: { "Content-Type": "application/json", ...corsHeaders },

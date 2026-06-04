@@ -1,201 +1,211 @@
 import { supabase } from "@/shared/services/supabase";
 
-// ─── Interviews ──────────────────────────────────────────────
+// ─── Application Stage (Interview) ──────────────────────────────────────────
 
-export const fetchInterviewById = async (interviewId) => {
+/**
+ * Find the interview application_stage for a given application.
+ * Matches any recruitment_stage whose stage_type = 'interview'.
+ */
+export const fetchInterviewStageByApplicationId = async (applicationId) => {
   const { data, error } = await supabase
-    .from("interviews")
+    .from("application_stages")
     .select(`
       *,
+      recruitment_stages!inner (
+        id,
+        name,
+        stage_type,
+        job_id,
+        description
+      ),
       applications (
         id,
         candidate_profile_id,
-        current_stage,
-        composite_score
-      )
-    `)
-    .eq("id", interviewId)
-    .single();
-  if (error) throw error;
-  return data;
-};
-
-export const fetchInterviewByApplicationId = async (applicationId) => {
-  const { data, error } = await supabase
-    .from("interviews")
-    .select(`
-      *,
-      applications (
-        id,
-        candidate_profile_id,
-        current_stage,
         composite_score
       )
     `)
     .eq("application_id", applicationId)
-    .single();
+    .eq("recruitment_stages.stage_type", "interview")
+    .maybeSingle();
+
   if (error) throw error;
   return data;
 };
 
-export const createInterview = async (interviewData) => {
+/**
+ * Update status / score / timestamps on an application_stage row.
+ */
+export const updateApplicationStageStatus = async (applicationStageId, updates) => {
   const { data, error } = await supabase
-    .from("interviews")
-    .insert([interviewData])
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
-};
-
-export const updateInterview = async (interviewId, updates) => {
-  const { data, error } = await supabase
-    .from("interviews")
+    .from("application_stages")
     .update(updates)
-    .eq("id", interviewId)
+    .eq("id", applicationStageId)
     .select()
     .single();
+
   if (error) throw error;
   return data;
 };
 
-export const deleteInterview = async (interviewId) => {
-  const { error } = await supabase
-    .from("interviews")
-    .delete()
-    .eq("id", interviewId);
-  if (error) throw error;
-};
+// ─── Application Questions ───────────────────────────────────────────────────
 
-// ─── Interview Questions ─────────────────────────────────────
-
-export const fetchQuestionsByInterviewId = async (interviewId) => {
+/**
+ * Fetch all questions for a given application_stage, ordered by order_index.
+ * Each question includes its answer (if any) via the nested application_answers join.
+ */
+export const fetchQuestionsByApplicationStageId = async (applicationStageId) => {
   const { data, error } = await supabase
-    .from("interview_questions")
+    .from("application_questions")
     .select(`
       *,
-      interview_question_scores (*)
+      application_answers (
+        id,
+        answer_text,
+        score,
+        feedback,
+        created_at
+      )
     `)
-    .eq("interview_id", interviewId)
-    .order("sort_order", { ascending: true });
+    .eq("application_stage_id", applicationStageId)
+    .order("order_index", { ascending: true });
+
   if (error) throw error;
   return data;
 };
 
-export const fetchQuestionById = async (questionId) => {
+/**
+ * Fetch a single question by id (with its answer).
+ */
+export const fetchApplicationQuestionById = async (questionId) => {
   const { data, error } = await supabase
-    .from("interview_questions")
+    .from("application_questions")
     .select(`
       *,
-      interview_question_scores (*)
+      application_answers (*)
     `)
     .eq("id", questionId)
     .single();
+
   if (error) throw error;
   return data;
 };
 
-export const createQuestion = async (questionData) => {
+/**
+ * Insert a single question for an application stage.
+ */
+export const createApplicationQuestion = async (questionData) => {
   const { data, error } = await supabase
-    .from("interview_questions")
+    .from("application_questions")
     .insert([questionData])
     .select()
     .single();
+
   if (error) throw error;
   return data;
 };
 
-export const bulkCreateQuestions = async (questionsData) => {
+/**
+ * Insert multiple questions for an application stage in one request.
+ */
+export const bulkCreateApplicationQuestions = async (questionsData) => {
   const { data, error } = await supabase
-    .from("interview_questions")
+    .from("application_questions")
     .insert(questionsData)
     .select();
+
   if (error) throw error;
   return data;
 };
 
-export const updateQuestion = async (questionId, updates) => {
+/**
+ * Update fields on an application_question (e.g. generation_context for
+ * recording_url / storage_path / transcription_status).
+ */
+export const updateApplicationQuestion = async (questionId, updates) => {
   const { data, error } = await supabase
-    .from("interview_questions")
+    .from("application_questions")
     .update(updates)
     .eq("id", questionId)
     .select()
     .single();
+
   if (error) throw error;
   return data;
 };
 
-export const deleteQuestion = async (questionId) => {
+export const deleteApplicationQuestion = async (questionId) => {
   const { error } = await supabase
-    .from("interview_questions")
+    .from("application_questions")
     .delete()
     .eq("id", questionId);
+
   if (error) throw error;
 };
 
-// ─── Interview Question Scores ───────────────────────────────
+// ─── Application Answers ─────────────────────────────────────────────────────
 
-export const fetchScoresByQuestionId = async (questionId) => {
+/**
+ * Upsert a candidate's answer (transcript text) for a question.
+ * Uses the UNIQUE constraint on question_id.
+ */
+export const upsertApplicationAnswer = async (questionId, answerText, extra = {}) => {
   const { data, error } = await supabase
-    .from("interview_question_scores")
-    .select("*")
-    .eq("interview_question_id", questionId);
-  if (error) throw error;
-  return data;
-};
-
-export const fetchScoreById = async (scoreId) => {
-  const { data, error } = await supabase
-    .from("interview_question_scores")
-    .select("*")
-    .eq("id", scoreId)
-    .single();
-  if (error) throw error;
-  return data;
-};
-
-export const createScore = async (scoreData) => {
-  const { data, error } = await supabase
-    .from("interview_question_scores")
-    .insert([scoreData])
+    .from("application_answers")
+    .upsert(
+      { question_id: questionId, answer_text: answerText, ...extra },
+      { onConflict: "question_id" }
+    )
     .select()
     .single();
+
   if (error) throw error;
   return data;
 };
 
-export const bulkCreateScores = async (scoresData) => {
+/**
+ * Fetch the answer for a specific question.
+ */
+export const fetchAnswerByQuestionId = async (questionId) => {
   const { data, error } = await supabase
-    .from("interview_question_scores")
-    .insert(scoresData)
-    .select();
+    .from("application_answers")
+    .select("*")
+    .eq("question_id", questionId)
+    .maybeSingle();
+
   if (error) throw error;
   return data;
 };
 
-export const updateScore = async (scoreId, updates) => {
+// ─── Application Stage Evaluations ───────────────────────────────────────────
+
+/**
+ * Upsert an AI evaluation result for a completed interview stage.
+ * Uses the UNIQUE constraint on application_stage_id.
+ */
+export const upsertStageEvaluation = async (applicationStageId, evalData) => {
   const { data, error } = await supabase
-    .from("interview_question_scores")
-    .update(updates)
-    .eq("id", scoreId)
+    .from("application_stage_evaluations")
+    .upsert(
+      { application_stage_id: applicationStageId, ...evalData },
+      { onConflict: "application_stage_id" }
+    )
     .select()
     .single();
+
   if (error) throw error;
   return data;
 };
 
-export const deleteScore = async (scoreId) => {
-  const { error } = await supabase
-    .from("interview_question_scores")
-    .delete()
-    .eq("id", scoreId);
-  if (error) throw error;
-};
+/**
+ * Fetch the AI evaluation for an interview stage.
+ */
+export const fetchStageEvaluation = async (applicationStageId) => {
+  const { data, error } = await supabase
+    .from("application_stage_evaluations")
+    .select("*")
+    .eq("application_stage_id", applicationStageId)
+    .maybeSingle();
 
-export const deleteScoresByQuestionId = async (questionId) => {
-  const { error } = await supabase
-    .from("interview_question_scores")
-    .delete()
-    .eq("interview_question_id", questionId);
   if (error) throw error;
+  return data;
 };

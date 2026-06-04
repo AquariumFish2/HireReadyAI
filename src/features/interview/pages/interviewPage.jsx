@@ -1,324 +1,371 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useInterviewQuestions from "../hooks/useInterviewQuestions";
-import { updateInterview } from "../services/interview_database_service";
-import { uploadRecording, retryPendingTranscriptions } from "../services/video_storage_service";
-import { supabase } from "@/shared/services/supabase";
-import { INTERVIEW_STATUS } from "@/shared/constants/enums";
+import VideoQuestion from "../components/VideoQuestion";
+import TextQuestion from "../components/TextQuestion";
+import MultipleChoiceQuestion from "../components/MultipleChoiceQuestion";
+import CodeQuestion from "../components/CodeQuestion";
+import {
+  fetchActiveInterviewStage,
+  fetchStageQuestions,
+  generateNextQuestion,
+} from "../services/interview.service";
 
+// ─── Phase constants ──────────────────────────────────────────────────────────
+const PHASE = {
+  INIT: "init",        // loading stage + existing questions
+  LOADING: "loading",  // calling AI edge function
+  ANSWERING: "answering",
+  EVALUATING: "evaluating", // waiting for AI to evaluate + generate next
+  FINISHED: "finished",
+  ERROR: "error",
+};
+
+// ─── Stage type label ─────────────────────────────────────────────────────────
+const stageTypeLabel = {
+  hr_interview: "HR Interview",
+  technical_interview: "Technical Interview",
+  assessment: "Assessment",
+  interview: "Interview",
+};
+
+// ─── Question component map ───────────────────────────────────────────────────
+function QuestionComponent({ question, applicationStageId, onAnswer }) {
+  const props = { question, onAnswer };
+  switch (question?.type) {
+    case "video":
+      return <VideoQuestion {...props} applicationStageId={applicationStageId} />;
+    case "multiple_choice":
+      return <MultipleChoiceQuestion {...props} />;
+    case "code":
+      return <CodeQuestion {...props} />;
+    case "text":
+    default:
+      return <TextQuestion {...props} />;
+  }
+}
+
+// ─── Progress bar ─────────────────────────────────────────────────────────────
+function ProgressBar({ current, max }) {
+  const pct = Math.min((current / max) * 100, 100);
+  return (
+    <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+      <div
+        className="h-full bg-primary rounded-full transition-all duration-500"
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
+}
+
+// ─── Loading spinner ──────────────────────────────────────────────────────────
+function Spinner({ label }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 py-16">
+      <div className="relative size-12">
+        <div className="size-12 rounded-full border-4 border-secondary" />
+        <div className="absolute inset-0 size-12 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+      </div>
+      <p className="text-sm text-muted-foreground">{label}</p>
+    </div>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 export default function InterviewPage() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  const { interview ,questions, loading, error } = useInterviewQuestions(applicationId);
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [phase, setPhase] = useState(PHASE.INIT);
+  const [applicationStage, setApplicationStage] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [questionNumber, setQuestionNumber] = useState(0);
+  const [maxQuestions, setMaxQuestions] = useState(8);
+  const [sessionSummary, setSessionSummary] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
-  const [permissionGranted, setPermissionGranted] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(180);
-  const [videoUrl, setVideoUrl] = useState(null);
-  const [isFinished, setIsFinished] = useState(false);
-
-  const videoRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const streamRef = useRef(null);
-  const chunksRef = useRef([]);
-  const timerRef = useRef(null);
-  const blobRef = useRef(null);
-
-  const requestPermissions = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      setPermissionGranted(true);
-    } catch (err) {
-      alert(
-        "Camera and Microphone permissions are required to start the interview simulation.",
-      );
-      console.error("Permission error:", err);
-    }
-  };
-
-  const startRecording = () => {
-    setVideoUrl(null);
-    chunksRef.current = [];
-
-    const options = { mimeType: "video/webm; codecs=vp9" };
-    let recorder;
-    try {
-      recorder = new MediaRecorder(streamRef.current, options);
-    } catch (e) {
-      recorder = new MediaRecorder(streamRef.current);
-    }
-
-    recorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
-    };
-
-    recorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "video/webm" });
-      blobRef.current = blob;
-      const url = URL.createObjectURL(blob);
-      setVideoUrl(url);
-    };
-
-    mediaRecorderRef.current = recorder;
-    recorder.start();
-    setIsRecording(true);
-    setTimeLeft(180);
-
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          stopRecording();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const stopRecording = () => {
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state !== "inactive"
-    ) {
-      mediaRecorderRef.current.stop();
-    }
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    setIsRecording(false);
-  };
-
+  // ── Init: find the active stage, check for resume ──────────────────────────
   useEffect(() => {
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
+    if (!applicationId) return;
+    (async () => {
+      try {
+        const stage = await fetchActiveInterviewStage(applicationId);
+        if (!stage) {
+          setErrorMsg("No active interview stage found for this application.");
+          setPhase(PHASE.ERROR);
+          return;
+        }
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+        setApplicationStage(stage);
+        const mq = stage.recruitment_stages.evaluation_criteria?.max_questions ?? 8;
+        setMaxQuestions(mq);
+
+        // Check for existing questions (resume scenario)
+        // NOTE: application_answers is a single object (one-to-one join), NOT an array.
+        const existingQuestions = await fetchStageQuestions(stage.id);
+
+        // Helper: does this question have a saved answer?
+        const hasAnswer = (q) => {
+          const ans = q.application_answers;
+          if (!ans) return false;
+          if (Array.isArray(ans)) return ans.length > 0 && ans[0]?.answer_text != null;
+          return ans.answer_text != null;
+        };
+
+        const getAnswerText = (q) => {
+          const ans = q.application_answers;
+          if (!ans) return null;
+          if (Array.isArray(ans)) return ans[0]?.answer_text ?? null;
+          return ans.answer_text ?? null;
+        };
+
+        const answered = existingQuestions.filter(hasAnswer);
+        const unanswered = existingQuestions.find((q) => !hasAnswer(q));
+
+        if (existingQuestions.length === 0) {
+          // Fresh session — get first question
+          await requestNextQuestion(stage.id, null, 0);
+        } else if (unanswered) {
+          // Resume: show the first unanswered question already in DB (no AI call needed)
+          setCurrentQuestion({
+            id: unanswered.id,
+            text: unanswered.question_text,
+            type: unanswered.question_type,
+            options: unanswered.generation_context?.options ?? null,
+            language: unanswered.generation_context?.language ?? null,
+            orderIndex: unanswered.order_index,
+          });
+          setQuestionNumber(unanswered.order_index ?? answered.length + 1);
+          setPhase(PHASE.ANSWERING);
+        } else {
+          // All existing questions have answers — ask AI for the next question
+          const lastAnswered = answered[answered.length - 1];
+          const lastAnswerText = getAnswerText(lastAnswered);
+          await requestNextQuestion(
+            stage.id,
+            { questionId: lastAnswered.id, answerText: lastAnswerText ?? "" },
+            answered.length
+          );
+        }
+      } catch (err) {
+        console.error("Interview init error:", err);
+        setErrorMsg(err.message ?? "Failed to load interview session.");
+        setPhase(PHASE.ERROR);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applicationId]);
+
+  // ── Request the next question from AI ─────────────────────────────────────
+  const requestNextQuestion = async (stageId, previousAnswer, currentAnsweredCount) => {
+    setPhase(previousAnswer ? PHASE.EVALUATING : PHASE.LOADING);
+
+    try {
+      const result = await generateNextQuestion(stageId, previousAnswer);
+
+      if (result.isFinal) {
+        setSessionSummary(result.stageSummary);
+        setPhase(PHASE.FINISHED);
+        return;
+      }
+
+      setCurrentQuestion(result.question);
+      setQuestionNumber(result.question?.orderIndex ?? currentAnsweredCount + 1);
+      setPhase(PHASE.ANSWERING);
+    } catch (err) {
+      console.error("generate-question error:", err);
+      setErrorMsg(err.message ?? "Failed to generate interview question.");
+      setPhase(PHASE.ERROR);
+    }
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">questions are being loaded</div>;
-  }
-
-  if (error) {
-    return <div className="min-h-screen flex items-center justify-center">{error}</div>;
-  }
-
-  if (!questions.length)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        No questions found for this interview.
-      </div>
+  // ── Handle answer submission ───────────────────────────────────────────────
+  const handleAnswer = async (answerText) => {
+    if (!currentQuestion || !applicationStage) return;
+    await requestNextQuestion(
+      applicationStage.id,
+      { questionId: currentQuestion.id, answerText },
+      questionNumber
     );
+  };
 
-  if (isFinished) {
-    return (
-      <div className="min-h-screen bg-gray-50/50 p-6 flex flex-col items-center justify-center font-sans">
-        <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl p-8 text-center space-y-5 shadow-lg">
-          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl animate-bounce">
-            ✓
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-bold text-xl text-gray-800 tracking-tight">
-              Interview Completed!
-            </h3>
-            <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-              Your responses have been successfully captured and recorded.
-            </p>
-          </div>
-          <div className="pt-2 text-xs text-slate-400 animate-pulse">
-            Redirecting to dashboard...
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  const stage = applicationStage?.recruitment_stages;
+  const stageLabel = stageTypeLabel[stage?.stage_type] ?? stage?.name ?? "Interview";
+  const scoreColor =
+    sessionSummary?.overall_score >= 70
+      ? "text-success"
+      : sessionSummary?.overall_score >= 50
+      ? "text-warning"
+      : "text-destructive";
 
+  // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6 flex flex-col items-center justify-center font-sans">
-      <div className="w-full max-w-4xl space-y-6">
-        <div className="bg-slate-900 text-white p-5 rounded-2xl flex justify-between items-center shadow-lg transition-all duration-300">
-          <div>
-            <h2 className="font-bold text-lg tracking-tight">
-              AI Automated Interview Session
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Testing Environment · Video & Sound Check
-            </p>
-          </div>
-          {isRecording && (
-            <div className="bg-red-600 px-4 py-1.5 rounded-full text-xs md:text-sm font-bold animate-pulse flex items-center gap-2 shadow-sm border border-red-500">
-              <span className="w-2 h-2 rounded-full bg-white"></span>
-              Recording | {formatTime(timeLeft)}
-            </div>
+    <div className="min-h-screen bg-secondary flex flex-col">
+      {/* Top bar */}
+      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border h-14 flex items-center px-6 gap-4">
+        {/* Logo mark */}
+        <div className="size-8 rounded-lg bg-primary flex items-center justify-center flex-none">
+          <span className="text-white text-sm font-bold font-display">H</span>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center">
+          <span className="text-xs text-muted-foreground">
+            {stage?.name ?? "Interview"}
+          </span>
+          {phase === PHASE.ANSWERING && (
+            <ProgressBar current={questionNumber} max={maxQuestions} />
           )}
         </div>
 
-        {!permissionGranted ? (
-          <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center space-y-5 shadow-sm max-w-xl mx-auto">
-            <div className="w-16 h-16 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center mx-auto text-3xl">
-              📹
+        {/* Stage badge */}
+        <span className="rounded-full border px-2.5 py-0.5 text-xs font-medium bg-[#2c7da0]/10 text-[#2c7da0] border-[#2c7da0]/20">
+          {stageLabel}
+        </span>
+      </header>
+
+      {/* Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
+        <div className="w-full max-w-2xl space-y-6">
+
+          {/* ── INIT / LOADING ─────────────────────────────────────────── */}
+          {(phase === PHASE.INIT || phase === PHASE.LOADING) && (
+            <div className="bg-card rounded-2xl border shadow-[var(--shadow-card)] p-8">
+              <Spinner label="Preparing your first question…" />
             </div>
-            <div className="space-y-2">
-              <h3 className="font-bold text-xl text-gray-800 tracking-tight">
-                Hardware Verification Required
-              </h3>
-              <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-                This platform requires temporary access to your camera and
-                microphone to simulation-test the AI video response feature.
-              </p>
+          )}
+
+          {/* ── EVALUATING ─────────────────────────────────────────────── */}
+          {phase === PHASE.EVALUATING && (
+            <div className="bg-card rounded-2xl border shadow-[var(--shadow-card)] p-8">
+              <Spinner label="Evaluating your answer and generating the next question…" />
             </div>
-            <button
-              onClick={requestPermissions}
-              className="bg-violet-600 text-white px-7 py-3 rounded-xl font-semibold hover:bg-violet-700 active:scale-95 transition-all shadow-md text-sm"
-            >
-              Enable Camera & Microphone
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-            <div className="space-y-4 flex flex-col justify-between bg-white border border-gray-200 rounded-2xl p-6 shadow-xs min-h-[360px]">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-violet-600 uppercase tracking-widest bg-violet-50 px-2.5 py-1 rounded-md">
-                    Question {currentQuestionIndex + 1} of {questions.length}
+          )}
+
+          {/* ── ANSWERING ──────────────────────────────────────────────── */}
+          {phase === PHASE.ANSWERING && currentQuestion && (
+            <>
+              {/* Question header */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-primary/10 text-primary text-xs font-semibold px-2.5 py-0.5 border border-primary/20">
+                    Q{questionNumber} / {maxQuestions}
+                  </span>
+                  <span className="rounded-full border px-2 py-0.5 text-xs font-medium text-muted-foreground capitalize">
+                    {currentQuestion.type.replace("_", " ")}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 leading-relaxed tracking-tight pt-2">
-                  {questions[currentQuestionIndex]?.text}
-                </h3>
+                <h2 className="font-display text-xl font-semibold text-foreground leading-snug">
+                  {currentQuestion.text}
+                </h2>
               </div>
 
-              <div className="pt-6 border-t border-gray-100 space-y-3">
-                {!isRecording && !videoUrl && (
-                  <button
-                    onClick={startRecording}
-                    className="w-full bg-red-600 text-white py-3.5 rounded-xl font-semibold hover:bg-red-700 active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 text-sm"
-                  >
-                    <span className="text-base">🔴</span> Start Recording Answer
-                    (Max 3 Mins)
-                  </button>
-                )}
+              {/* Answer card */}
+              <div className="bg-card rounded-2xl border shadow-[var(--shadow-card)] p-6">
+                <QuestionComponent
+                  question={currentQuestion}
+                  applicationStageId={applicationStage?.id}
+                  onAnswer={handleAnswer}
+                />
+              </div>
 
-                {isRecording && (
-                  <button
-                    onClick={stopRecording}
-                    className="w-full bg-slate-800 text-white py-3.5 rounded-xl font-semibold hover:bg-slate-900 active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 text-sm"
-                  >
-                    <span className="text-base">⏹️</span> Stop & Review Answer
-                  </button>
-                )}
+              {/* Progress context */}
+              <p className="text-center text-xs text-muted-foreground">
+                {maxQuestions - questionNumber > 0
+                  ? `${maxQuestions - questionNumber} question${maxQuestions - questionNumber !== 1 ? "s" : ""} remaining`
+                  : "This is the final question"}
+              </p>
+            </>
+          )}
 
-                {videoUrl && (
-                  <div className="space-y-3">
-                    <div className="bg-emerald-50 border border-emerald-100 text-emerald-700 p-2.5 rounded-xl text-xs font-semibold text-center flex items-center justify-center gap-1.5">
-                      <span>✓</span> Answer captured successfully! Review it on
-                      the player.
-                    </div>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={startRecording}
-                        className="flex-1 border border-red-200 text-red-600 bg-red-50/40 py-3 rounded-xl text-xs font-semibold hover:bg-red-50 active:scale-[0.98] transition-all"
-                      >
-                        🔄 Retake / Re-record
-                      </button>
+          {/* ── FINISHED ───────────────────────────────────────────────── */}
+          {phase === PHASE.FINISHED && (
+            <div className="bg-card rounded-2xl border shadow-[var(--shadow-card)] p-8 space-y-8 text-center">
+              {/* Icon */}
+              <div className="flex justify-center">
+                <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <svg className="size-8 text-primary" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
 
-                      <button
-                        onClick={async() => {
-                          const question = questions[currentQuestionIndex];
+              {/* Heading */}
+              <div className="space-y-2">
+                <h2 className="font-display text-2xl font-semibold text-foreground">
+                  Interview Complete
+                </h2>
+                <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                  Your responses have been submitted and evaluated. The hiring team will review the results.
+                </p>
+              </div>
 
-                          if (blobRef.current && interview?.id) {
-                            try {
-                              const { fileName } = await uploadRecording(
-                                blobRef.current,
-                                interview.id,
-                                question.id,
-                              );
-
-                              supabase.functions.invoke("whisper-api", {
-                                body: { audioPath: fileName, questionId: question.id },
-                              }).catch((err) => {
-                                console.error("Background transcription failed:", err);
-                              });
-                            } catch (err) {
-                              console.error("Upload failed:", err);
-                            }
-                            blobRef.current = null;
-                          }
-
-                          if (currentQuestionIndex < questions.length - 1) {
-                            setCurrentQuestionIndex((prev) => prev + 1);
-                            setVideoUrl(null);
-                          } else {
-                            if (streamRef.current) {
-                              streamRef.current.getTracks().forEach((track) => track.stop());
-                            }
-                            if (applicationId) {
-                              localStorage.setItem(`interview_completed_${applicationId}`, "true");
-                            }
-
-                            retryPendingTranscriptions(interview.id).catch((err) => {
-                              console.error("Retry transcriptions failed:", err);
-                            });
-
-                            setIsFinished(true);
-                            await updateInterview(interview.id,{status:INTERVIEW_STATUS.completed})
-                            setTimeout(() => {
-                              navigate("/applicant");
-                            }, 2500);
-                          }
-                        }}
-                        className="flex-1 bg-violet-600 text-white py-3 rounded-xl text-xs font-semibold hover:bg-violet-700 active:scale-[0.98] transition-all flex items-center justify-center gap-1 shadow-sm"
-                      >
-                        Next Question ➔
-                      </button>
-                    </div>
+              {/* Score */}
+              {sessionSummary && (
+                <div className="rounded-xl border bg-secondary/50 p-6 space-y-4 text-left">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">Overall Score</span>
+                    <span className={`font-display text-3xl font-semibold tracking-tight ${scoreColor}`}>
+                      {sessionSummary.overall_score}
+                      <span className="text-base font-normal text-muted-foreground">/100</span>
+                    </span>
                   </div>
-                )}
-              </div>
-            </div>
 
-            <div className="bg-slate-950 rounded-2xl overflow-hidden shadow-2xl aspect-video flex items-center justify-center relative border border-slate-800 min-h-[260px]">
-              {videoUrl ? (
-                <video
-                  src={videoUrl}
-                  controls
-                  autoPlay
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
+                  {sessionSummary.recommendation && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">Recommendation:</span>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium border capitalize ${
+                          sessionSummary.recommendation === "proceed"
+                            ? "bg-success/10 text-success border-success/20"
+                            : sessionSummary.recommendation === "reject"
+                            ? "bg-destructive/10 text-destructive border-destructive/20"
+                            : "bg-warning/15 text-[#8a5a00] border-warning/30"
+                        }`}
+                      >
+                        {sessionSummary.recommendation}
+                      </span>
+                    </div>
+                  )}
+
+                  {sessionSummary.reasoning && (
+                    <p className="text-sm text-muted-foreground leading-relaxed border-t border-border pt-4">
+                      {sessionSummary.reasoning}
+                    </p>
+                  )}
+                </div>
               )}
+
+              <button
+                onClick={() => navigate(`/applications/${applicationId}`)}
+                className="w-full bg-primary text-primary-foreground rounded-lg py-3 text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                Back to Application
+              </button>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {/* ── ERROR ──────────────────────────────────────────────────── */}
+          {phase === PHASE.ERROR && (
+            <div className="bg-card rounded-2xl border shadow-[var(--shadow-card)] p-8 space-y-6 text-center">
+              <div className="size-14 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+                <svg className="size-7 text-destructive" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-display text-lg font-semibold text-foreground">Something went wrong</h3>
+                <p className="text-sm text-muted-foreground">{errorMsg}</p>
+              </div>
+              <button
+                onClick={() => navigate(-1)}
+                className="border bg-background text-foreground rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-secondary transition-colors"
+              >
+                Go Back
+              </button>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

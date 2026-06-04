@@ -13,9 +13,6 @@ import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
-import { bulkCreateQuestions, createInterview } from "@/features/interview/services/interview_database_service"
-import InterviewModel from "@/features/interview/models/interview.model"
-import { INTERVIEW_STATUS } from "@/shared/constants/enums"
 import { TextareaField } from "./textArea"
 import InterviewQuestion from "@/features/interview/models/interview-question.model"
 
@@ -40,18 +37,8 @@ export function AddInterviewDialog() {
         const array = questionsText.split(/\r?\n/).filter(q => q.trim() !== "").map(q => q.trim())
         setQuestionList(array)
 
-        const interview = new InterviewModel(
-          applicationID,
-          jobID,
-          INTERVIEW_STATUS.scheduled,
-          new Date().toISOString(),
-          reRecordMins
-        );
-        let data = await createInterview(interview.toSupabaseForm());
-        await bulkCreateQuestions(array.map((q, i) => {
-          const question = new InterviewQuestion(data.id, q, false, null, i + 1);
-          return question.toSupabaseForm();
-        }))
+        // Legacy: Interview creation moved to application stages
+        console.warn("AddInterviewDialog is obsolete in new stage-based schema");
       } catch (err) {
         console.log(err)
         setError(err.message);
