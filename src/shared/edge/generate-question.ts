@@ -475,28 +475,7 @@ serve(async (req) => {
       })
       .eq("id", applicationStageId);
 
-    // If passed, auto-advance candidate to the next stage in the pipeline
-    if (passed) {
-      const { data: nextStage } = await supabase
-        .from("recruitment_stages")
-        .select("id")
-        .eq("job_id", application.job_id)
-        .gt("order_index", stage.order_index)
-        .order("order_index", { ascending: true })
-        .limit(1)
-        .single();
-
-      if (nextStage) {
-        await supabase
-          .from("application_stages")
-          .upsert({
-            application_id: application.id,
-            stage_id: nextStage.id,
-            status: "pending",
-          }, { onConflict: "application_id,stage_id" });
-      }
-    }
-
+    // Return response without auto-advancing
     return new Response(
       JSON.stringify({
         question: null,

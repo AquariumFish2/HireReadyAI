@@ -249,28 +249,6 @@ serve(async (req) => {
       .update({ cv_score: cvScore })
       .eq("id", applicationId);
 
-    // If passed, auto-advance candidate to the next stage in the pipeline
-    if (stageStatus === "passed" && cvStageRow?.recruitment_stages?.order_index !== undefined) {
-      const { data: nextStage } = await supabase
-        .from("recruitment_stages")
-        .select("id")
-        .eq("job_id", application.job_id)
-        .gt("order_index", cvStageRow.recruitment_stages.order_index)
-        .order("order_index", { ascending: true })
-        .limit(1)
-        .single();
-
-      if (nextStage) {
-        await supabase
-          .from("application_stages")
-          .upsert({
-            application_id: applicationId,
-            stage_id: nextStage.id,
-            status: "pending",
-          }, { onConflict: "application_id,stage_id" });
-      }
-    }
-
     return new Response(
       JSON.stringify({
         cv_score: cvScore,
