@@ -8,14 +8,19 @@ export const fetchDashboardData = async (profileId) => {
     .eq("profile_id", profileId);
 
   if (membershipsError) throw membershipsError;
-  if (!memberships || memberships.length === 0) return { jobs: [], stats: { totalJobs: 0, totalActiveJobs: 0, totalApplicants: 0 } };
+  if (!memberships || memberships.length === 0)
+    return {
+      jobs: [],
+      stats: { totalJobs: 0, totalActiveJobs: 0, totalApplicants: 0 },
+    };
 
   const companyIds = memberships.map((m) => m.company_id);
 
   // 2. Fetch job postings for these companies with joined companies and applications (and interviews)
   const { data: jobs, error: jobsError } = await supabase
     .from("job_postings")
-    .select(`
+    .select(
+      `
       *,
       companies(id,name),
       applications(
@@ -24,11 +29,23 @@ export const fetchDashboardData = async (profileId) => {
         applied_at,
         interviews(id)
       )
-    `)
+    `,
+    )
     .in("company_id", companyIds)
     .order("created_at", { ascending: false });
 
   if (jobsError) throw jobsError;
 
   return jobs;
+};
+export const fetchCurrentUserName = async (profileId) => {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", profileId)
+    .single();
+
+  if (error) throw error;
+
+  return data?.full_name;
 };

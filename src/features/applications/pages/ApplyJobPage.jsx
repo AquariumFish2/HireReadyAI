@@ -185,15 +185,18 @@ export default function ApplyJobPage() {
 
         cvUrl = await uploadResume(file);
         cvName = file.name;
-        
+
         // Extract text client-side
         try {
           const arrayBuffer = await file.arrayBuffer();
-          const pdfDocument = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const pdfDocument = await pdfjsLib.getDocument({ data: arrayBuffer })
+            .promise;
           for (let i = 1; i <= pdfDocument.numPages; i++) {
             const page = await pdfDocument.getPage(i);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items.map((item) => item.str).join(" ");
+            const pageText = textContent.items
+              .map((item) => item.str)
+              .join(" ");
             cvText += pageText + "\n";
           }
         } catch (extractErr) {
@@ -263,148 +266,159 @@ export default function ApplyJobPage() {
       {toast && (
         <div className="fixed top-5 right-5 z-50">
           <div
-            className={`px-4 py-3 rounded-xl shadow-lg text-white font-medium ${
-              toast.type === "success" ? "bg-violet-600" : "bg-red-500"
-            }`}
+            className={`px-4 py-3 rounded-xl shadow-md text-sm font-medium border
+            ${
+              toast.type === "success"
+                ? "bg-dark-amethyst-50 text-dark-amethyst-700 border-dark-amethyst-100"
+                : "bg-red-50 text-red-600 border-red-200"
+            }
+          `}
           >
             {toast.type === "success" ? "✅" : "❌"} {toast.message}
           </div>
         </div>
       )}
 
-      {/* PAGE */}
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-sm border overflow-hidden">
+      {/* PAGE WRAPPER */}
+      <div className="min-h-screen bg-dark-amethyst-50 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-3xl bg-white rounded-2xl border border-dark-amethyst-100 shadow-sm overflow-hidden">
           {/* HEADER */}
-          <div className="p-6 border-b bg-white">
-            <h1 className="text-xl font-semibold text-gray-900">
+          <div className="p-6 border-b border-dark-amethyst-100 bg-white">
+            <h1 className="text-2xl font-bold text-dark-amethyst-950">
               Apply for Job
             </h1>
 
-            <div className="mt-4 flex justify-between text-xs text-gray-500">
+            {/* STEPS */}
+            <div className="mt-5 flex justify-between text-xs">
               {steps.map((s, i) => (
                 <span
                   key={i}
-                  className={
-                    i <= step ? "text-violet-600 font-medium" : "text-gray-400"
-                  }
+                  className={`font-medium transition ${
+                    i <= step
+                      ? "text-dark-amethyst-700"
+                      : "text-dark-amethyst-400"
+                  }`}
                 >
                   {s}
                 </span>
               ))}
             </div>
 
-            <div className="w-full bg-gray-100 h-2 rounded-full mt-2">
+            {/* PROGRESS */}
+            <div className="w-full h-2 bg-dark-amethyst-50 rounded-full mt-3 overflow-hidden border border-dark-amethyst-100">
               <div
-                className="bg-violet-600 h-2 rounded-full transition-all"
+                className="h-2 bg-dark-amethyst-600 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
 
           {/* BODY */}
-          <div className="p-6 space-y-4">
-            {/* STEP 1 - INFO */}
+          <div className="p-6 space-y-5">
+            {/* STEP 1 */}
             {step === 0 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
+                {/* FULL NAME */}
                 <div>
-                  <label className="block mb-1 font-medium">
-                    Full Name <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
+                    Full Name *
                   </label>
 
                   <input
-                    placeholder="Full Name"
                     value={form.fullName || ""}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.fullName ? "border-red-500" : "border-gray-300"
+                    className={`w-full h-11 rounded-xl px-4 text-sm bg-dark-amethyst-50 border outline-none transition
+                    ${
+                      errors.fullName
+                        ? "border-red-400"
+                        : "border-dark-amethyst-100 focus:border-[#8400ff]"
                     }`}
                     onChange={(e) => {
-                      const value = e.target.value;
-
                       setForm((prev) => ({
                         ...prev,
-                        fullName: value,
+                        fullName: e.target.value,
                       }));
-
                       if (errors.fullName) clearFieldError("fullName");
                     }}
                   />
 
                   {errors.fullName && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-xs text-red-500 mt-1">
                       {errors.fullName}
                     </p>
                   )}
                 </div>
 
+                {/* EMAIL */}
                 <div>
-                  <label className="block mb-1 font-medium">
-                    Email <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
+                    Email *
                   </label>
 
                   <input
-                    placeholder="Email"
                     value={form.email || ""}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.email ? "border-red-500" : "border-gray-300"
+                    className={`w-full h-11 rounded-xl px-4 text-sm bg-dark-amethyst-50 border outline-none transition
+                    ${
+                      errors.email
+                        ? "border-red-400"
+                        : "border-dark-amethyst-100 focus:border-[#8400ff]"
                     }`}
                     onChange={(e) => {
-                      const value = e.target.value;
-
                       setForm((prev) => ({
                         ...prev,
-                        email: value,
+                        email: e.target.value,
                       }));
-
                       if (errors.email) clearFieldError("email");
                     }}
                   />
 
                   {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                    <p className="text-xs text-red-500 mt-1">{errors.email}</p>
                   )}
                 </div>
 
+                {/* PHONE */}
                 <div>
-                  <label className="block mb-1 font-medium">
-                    Phone <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
+                    Phone *
                   </label>
 
                   <input
-                    placeholder="Phone"
                     value={form.phone || ""}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.phone ? "border-red-500" : "border-gray-300"
+                    className={`w-full h-11 rounded-xl px-4 text-sm bg-dark-amethyst-50 border outline-none transition
+                    ${
+                      errors.phone
+                        ? "border-red-400"
+                        : "border-dark-amethyst-100 focus:border-[#8400ff]"
                     }`}
                     onChange={(e) => {
-                      const value = e.target.value;
-
                       setForm((prev) => ({
                         ...prev,
-                        phone: value,
+                        phone: e.target.value,
                       }));
-
                       if (errors.phone) clearFieldError("phone");
                     }}
                   />
 
                   {errors.phone && (
-                    <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                    <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
                   )}
                 </div>
               </div>
             )}
 
-            {/* STEP 2 - RESUME */}
+            {/* STEP 2 */}
             {step === 1 && (
               <div>
-                <label className="block mb-2 font-medium">
-                  Resume <span className="text-red-500">*</span>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-3">
+                  Resume *
                 </label>
 
                 <label
-                  className={`block border-2 border-dashed p-10 text-center rounded-xl cursor-pointer ${
-                    errors.resume ? "border-red-500" : "border-gray-300"
+                  className={`block border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition
+                  ${
+                    errors.resume
+                      ? "border-red-400 bg-red-50"
+                      : "border-dark-amethyst-200 bg-dark-amethyst-50 hover:border-dark-amethyst-400"
                   }`}
                 >
                   <input
@@ -416,27 +430,28 @@ export default function ApplyJobPage() {
                         ...prev,
                         resume: e.target.files[0],
                       }));
-
                       if (errors.resume) clearFieldError("resume");
                     }}
                   />
 
-                  {form.resume ? (
-                    <p>{form.resume.name}</p>
-                  ) : (
-                    <p>Upload Resume (PDF)</p>
-                  )}
+                  <p className="text-sm text-dark-amethyst-700 font-medium">
+                    {form.resume ? form.resume.name : "Upload Resume (PDF)"}
+                  </p>
+
+                  <p className="text-xs text-dark-amethyst-400 mt-2">
+                    Drag & drop or click to upload
+                  </p>
                 </label>
 
                 {errors.resume && (
-                  <p className="text-red-500 text-sm mt-2">{errors.resume}</p>
+                  <p className="text-xs text-red-500 mt-2">{errors.resume}</p>
                 )}
               </div>
             )}
 
-            {/* STEP 3 - QUESTIONS (FROM SUPABASE) */}
+            {/* STEP 3 */}
             {step === 2 && (
-              <div className="space-y-4 bg-gray-50 p-4 rounded-xl">
+              <div className="space-y-4 bg-dark-amethyst-50 p-4 rounded-2xl border border-dark-amethyst-100">
                 {questions.map((q) => (
                   <QuestionCard
                     key={q.id}
@@ -451,10 +466,10 @@ export default function ApplyJobPage() {
           </div>
 
           {/* FOOTER */}
-          <div className="p-5 border-t flex justify-between">
+          <div className="p-5 border-t border-dark-amethyst-100 flex justify-between bg-white">
             {step > 0 ? (
               <button
-                className="px-4 py-2 border rounded-lg"
+                className="px-4 py-2 rounded-xl border border-dark-amethyst-200 text-dark-amethyst-600 hover:bg-dark-amethyst-50 transition text-sm"
                 onClick={() => setStep(step - 1)}
               >
                 Back
@@ -465,7 +480,7 @@ export default function ApplyJobPage() {
 
             {step < 2 ? (
               <button
-                className="px-5 py-2 bg-violet-600 text-white rounded-lg"
+                className="px-5 py-2 rounded-xl bg-dark-amethyst-600 text-white text-sm font-semibold hover:bg-dark-amethyst-700 transition"
                 onClick={() => {
                   const isValid = validateStep();
                   if (!isValid) {
@@ -484,7 +499,7 @@ export default function ApplyJobPage() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-5 py-2 bg-green-600 text-white rounded-lg"
+                className="px-5 py-2 rounded-xl bg-dark-amethyst-600 text-white text-sm font-semibold hover:bg-dark-amethyst-700 transition disabled:opacity-50"
               >
                 {loading ? "Submitting..." : "Submit Application"}
               </button>

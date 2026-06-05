@@ -25,6 +25,7 @@ export const UserProvider = ({ children }) => {
       role: data.role,
       phone: data.phone,
       isActive: data.is_active,
+      profile_pic: data.profile_pic,
     };
   };
 
