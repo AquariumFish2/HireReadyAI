@@ -1,7 +1,11 @@
+// src\shared\ui\MainLayout.jsx
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
 import { USER_ROLE } from "@/shared/constants/enums";
+import { useEffect } from "react";
+import LanguageSwitcher from "@/shared/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import {
   Briefcase,
   Building2,
@@ -23,20 +27,36 @@ export default function MainLayout() {
 
   const links = isApplicant
     ? [
-        { to: "/jobs", label: "Explore Jobs", icon: Briefcase },
-        { to: "/applicant", label: "My Applications", icon: FileCheck },
+        { to: "/applicant", label: "nav.my_applications", icon: FileCheck },
+        { to: "/jobs", label: "nav.explore_jobs", icon: Briefcase },
       ]
     : [
         {
           to: "/companies/dashboard",
-          label: "Dashboard",
+          label: "nav.dashboard",
           icon: LayoutDashboard,
         },
-        { to: "/companies/profile", label: "Company Profile", icon: Building2 },
-        { to: "/companies/jobs", label: "Job Postings", icon: Briefcase },
-        { to: "/companies/shortlists", label: "Shortlists", icon: CheckCircle },
-        { to: "/companies/candidates", label: "Candidate Pipeline", icon: KanbanSquare },
-        { to: "/companies/jd-generator", label: "JD Generator", icon: Wand2 },
+        {
+          to: "/companies/profile",
+          label: "nav.company_profile",
+          icon: Building2,
+        },
+        { to: "/companies/jobs", label: "nav.job_postings", icon: Briefcase },
+        {
+          to: "/companies/shortlists",
+          label: "nav.shortlists",
+          icon: CheckCircle,
+        },
+        {
+          to: "/companies/candidates",
+          label: "nav.candidate_pipeline",
+          icon: KanbanSquare,
+        },
+        {
+          to: "/companies/jd_generator",
+          label: "nav.jd_generator",
+          icon: Wand2,
+        },
       ];
 
   const isActive = (path) => {
@@ -45,6 +65,14 @@ export default function MainLayout() {
     }
     return location.pathname.startsWith(path);
   };
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    const isArabic = i18n.language === "ar";
+
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   return (
     <div className="flex h-screen bg-gray-50/50 font-sans relative overflow-hidden">
@@ -68,12 +96,8 @@ export default function MainLayout() {
               <span className="text-xl font-bold tracking-tight bg-linear-to-r from-mauve-magic-300 to-dark-amethyst-200 bg-clip-text text-transparent">
                 HireReadyAI
               </span>
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className="text-gray-400 hover:text-white p-1 rounded-lg md:hidden cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              <LanguageSwitcher />
             </div>
 
             <nav className="space-y-1">
@@ -94,7 +118,7 @@ export default function MainLayout() {
                     <Icon
                       className={`w-4 h-4 ${active ? "text-white" : "text-mauve-magic-300"}`}
                     />
-                    {link.label}
+                    {t(link.label)}
                   </Link>
                 );
               })}
@@ -107,7 +131,7 @@ export default function MainLayout() {
               className="w-full flex items-center gap-3 text-sm font-medium text-red-400 hover:text-red-300 transition-colors py-2 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
-              Logout
+              {t("logout")}
             </button>
           </div>
         </div>

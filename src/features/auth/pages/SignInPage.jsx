@@ -1,3 +1,4 @@
+// //src\features\auth\pages\SignInPage.jsx
 import { useState, useEffect } from "react";
 import { useUser } from "../context/user.context";
 import { USER_ROLE } from "@/shared/constants/enums";
@@ -5,14 +6,16 @@ import AuthLayout from "../components/AuthLayout";
 import FormField from "@/shared/ui/FormField";
 import SocialButton from "../components/SocialButton";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function SignInPage() {
+  const { t } = useTranslation();
   const { signInUser, loading, user, profile } = useUser();
   const navigate = useNavigate();
 
-  // Redirect once user + profile are resolved after sign-in
   useEffect(() => {
     if (!user || !profile) return;
+
     if (profile.role === USER_ROLE.applicant) {
       navigate("/applicant", { replace: true });
     } else {
@@ -27,29 +30,33 @@ export default function SignInPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+
     try {
       await signInUser(email, password);
     } catch (err) {
-      setError(err.message || "Invalid email or password. Please try again.");
+      setError(err.message || t("sign_in.errors.generic"));
     }
   }
 
   return (
-    <AuthLayout headline="Welcome back" subheading="Sign in to your workspace">
+    <AuthLayout
+      headline={t("sign_in.headline")}
+      subheading={t("sign_in.subheading")}
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <FormField
-          label="Email"
+          label={t("sign_in.labels.email")}
           type="email"
-          placeholder="you@gmail.com"
+          placeholder={t("sign_in.placeholders.email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
         <FormField
-          label="Password"
+          label={t("sign_in.labels.password")}
           type="password"
-          placeholder="••••••••••"
+          placeholder={t("sign_in.placeholders.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -58,7 +65,7 @@ export default function SignInPage() {
               to="/auth/forgot-password"
               className="text-xs text-dark-amethyst-500 hover:text-dark-amethyst-700 hover:underline"
             >
-              Forgot password?
+              {t("sign_in.forgot_password")}
             </Link>
           }
         />
@@ -74,16 +81,15 @@ export default function SignInPage() {
           type="submit"
           disabled={loading}
           className={`w-full h-11 rounded-xl text-white text-sm font-semibold transition-all duration-200 cursor-pointer bg-dark-amethyst-600
-            ${loading ? "opacity-60 cursor-not-allowed" : "hover:bg-dark-amethyst-700"}`}
-          style={{ boxShadow: "0 2px 12px rgba(132,0,255,0.2)" }}
+          ${loading ? "opacity-60 cursor-not-allowed" : "hover:bg-dark-amethyst-700"}`}
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-              Signing in…
+              {t("sign_in.signing_in")}
             </span>
           ) : (
-            "Sign in"
+            t("sign_in.sign_in")
           )}
         </button>
       </form>
@@ -97,24 +103,23 @@ export default function SignInPage() {
       <SocialButton provider="google" />
 
       <p className="text-center text-xs text-dark-amethyst-300 mt-5">
-        By signing in you agree to our{" "}
+        {t("sign_in.terms_text")}{" "}
         <a href="#" className="underline hover:text-dark-amethyst-500">
-          Terms
+          {t("sign_in.terms")}
         </a>{" "}
-        and{" "}
+        {t("sign_in.and")}{" "}
         <a href="#" className="underline hover:text-dark-amethyst-500">
-          Privacy
+          {t("sign_in.privacy")}
         </a>
-        .
       </p>
 
       <p className="text-center text-xs text-dark-amethyst-400 mt-3">
-        Don't have an account?{" "}
+        {t("sign_in.no_account")}{" "}
         <Link
           to="/auth/sign-up"
           className="text-dark-amethyst-600 font-semibold hover:underline"
         >
-          Create one
+          {t("sign_in.create_account")}
         </Link>
       </p>
     </AuthLayout>

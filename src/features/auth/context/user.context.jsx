@@ -26,6 +26,7 @@ export const UserProvider = ({ children }) => {
       phone: data.phone,
       isActive: data.is_active,
       profile_pic: data.profile_pic,
+      created_at: new Date().toISOString(),
     };
   };
 

@@ -1,3 +1,4 @@
+//src\features\jobs\pages\JobsPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../auth/context/user.context";
@@ -5,8 +6,10 @@ import JobSearch from "../components/JobSearch";
 import JobFilters from "../components/JobFilters";
 import JobCard from "../components/JobCard";
 import { useJobs } from "../hooks/useJobs";
+import { useTranslation } from "react-i18next";
 
 export default function JobsPage() {
+  const { t } = useTranslation();
   const { signOutUser } = useUser();
   const navigate = useNavigate();
   const { jobs, loading, error } = useJobs();
@@ -93,13 +96,19 @@ export default function JobsPage() {
 
           {/* Text */}
           <p className="text-dark-amethyst-800 font-medium text-sm">
-            Loading jobs...
+            {t("jobs_page.loading")}
           </p>
         </div>
       </div>
     );
   }
-  if (error) return <p className="p-8 text-red-500">Error: {error}</p>;
+  if (error)
+    return (
+      <p className="p-8 text-red-500">
+        {" "}
+        {t("jobs_page.error")} {error}
+      </p>
+    );
 
   return (
     <div className="min-h-screen bg-dark-amethyst-50">
@@ -123,7 +132,7 @@ export default function JobsPage() {
 
         <div className="relative z-10 max-w-6xl mx-auto">
           <p className="text-dark-amethyst-300 text-sm font-medium tracking-widest mb-3">
-            HireReadyAI - Job Board
+            HireReadyAI - {t("jobs_page.board")}
           </p>
           <h1
             className="text-white font-black leading-tight mb-3"
@@ -132,11 +141,10 @@ export default function JobsPage() {
               fontSize: "clamp(2rem, 4vw, 3.25rem)",
             }}
           >
-            Find your dream job
+            {t("jobs_page.title")}
           </h1>
           <p className="text-dark-amethyst-200/70 text-base max-w-lg">
-            Browse our latest job openings and apply to the best opportunities
-            today.
+            {t("jobs_page.subtitle")}
           </p>
         </div>
       </div>
@@ -150,7 +158,9 @@ export default function JobsPage() {
           <span className="font-semibold text-dark-amethyst-900">
             {filteredJobs.length}
           </span>{" "}
-          job{filteredJobs.length !== 1 ? "s" : ""} found
+          {filteredJobs.length === 1
+            ? t("jobs_page.job_found")
+            : t("jobs_page.jobs_found")}
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -178,13 +188,13 @@ export default function JobsPage() {
             ) : (
               <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-12 text-center">
                 <p className="text-dark-amethyst-400 text-sm">
-                  No jobs found matching your filters.
+                  {t("jobs_page.no_results")}
                 </p>
                 <button
                   onClick={clearFilters}
                   className="mt-4 text-sm text-dark-amethyst-600 font-medium hover:underline"
                 >
-                  Clear all filters
+                  {t("jobs_page.clear_filters")}
                 </button>
               </div>
             )}

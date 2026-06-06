@@ -1,5 +1,4 @@
 // src/features/applications/pages/ApplyJobPage.jsx
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
@@ -12,12 +11,13 @@ import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js?url";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 import { supabase } from "@/shared/services/supabase";
 import QuestionCard from "../components/apply/QuestionCard";
+import { useTranslation } from "react-i18next";
 
 export default function ApplyJobPage() {
   const { id: jobId } = useParams();
   const navigate = useNavigate();
   const { profile } = useUser();
-
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,11 @@ export default function ApplyJobPage() {
     answers: {},
   });
 
-  const steps = ["Info", "Resume", "Questions"];
+  const steps = [
+    t("apply_job.steps.info"),
+    t("apply_job.steps.resume"),
+    t("apply_job.steps.questions"),
+  ];
   const progress = ((step + 1) / steps.length) * 100;
   const [toast, setToast] = useState(null);
   useEffect(() => {
@@ -250,7 +254,7 @@ export default function ApplyJobPage() {
         navigate("/jobs");
       }, 2000);
     } catch (err) {
-      console.error("❌ Submit error:", err);
+      console.error(" Submit error:", err);
       setToast({
         type: "error",
         message: "Something went wrong!",
@@ -285,7 +289,7 @@ export default function ApplyJobPage() {
           {/* HEADER */}
           <div className="p-6 border-b border-dark-amethyst-100 bg-white">
             <h1 className="text-2xl font-bold text-dark-amethyst-950">
-              Apply for Job
+              {t("apply_job.title")}
             </h1>
 
             {/* STEPS */}
@@ -321,7 +325,7 @@ export default function ApplyJobPage() {
                 {/* FULL NAME */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
-                    Full Name *
+                    {t("apply_job.labels.full_name")} *
                   </label>
 
                   <input
@@ -351,7 +355,7 @@ export default function ApplyJobPage() {
                 {/* EMAIL */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
-                    Email *
+                    {t("apply_job.labels.email")} *
                   </label>
 
                   <input
@@ -379,7 +383,7 @@ export default function ApplyJobPage() {
                 {/* PHONE */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
-                    Phone *
+                    {t("apply_job.labels.phone")} *
                   </label>
 
                   <input
@@ -410,7 +414,7 @@ export default function ApplyJobPage() {
             {step === 1 && (
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-3">
-                  Resume *
+                  {t("apply_job.labels.resume")} *
                 </label>
 
                 <label
@@ -435,11 +439,13 @@ export default function ApplyJobPage() {
                   />
 
                   <p className="text-sm text-dark-amethyst-700 font-medium">
-                    {form.resume ? form.resume.name : "Upload Resume (PDF)"}
+                    {form.resume
+                      ? form.resume.name
+                      : t("apply_job.placeholders.upload_resume")}
                   </p>
 
                   <p className="text-xs text-dark-amethyst-400 mt-2">
-                    Drag & drop or click to upload
+                    {t("apply_job.placeholders.drag_drop")}
                   </p>
                 </label>
 
@@ -472,7 +478,7 @@ export default function ApplyJobPage() {
                 className="px-4 py-2 rounded-xl border border-dark-amethyst-200 text-dark-amethyst-600 hover:bg-dark-amethyst-50 transition text-sm"
                 onClick={() => setStep(step - 1)}
               >
-                Back
+                {t("apply_job.buttons.back")}
               </button>
             ) : (
               <div />
@@ -493,7 +499,7 @@ export default function ApplyJobPage() {
                   setStep(step + 1);
                 }}
               >
-                Next
+                {t("apply_job.buttons.next")}
               </button>
             ) : (
               <button
@@ -501,7 +507,9 @@ export default function ApplyJobPage() {
                 disabled={loading}
                 className="px-5 py-2 rounded-xl bg-dark-amethyst-600 text-white text-sm font-semibold hover:bg-dark-amethyst-700 transition disabled:opacity-50"
               >
-                {loading ? "Submitting..." : "Submit Application"}
+                {loading
+                  ? t("apply_job.buttons.submitting")
+                  : t("apply_job.buttons.submit")}
               </button>
             )}
           </div>
