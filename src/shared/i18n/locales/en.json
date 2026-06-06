@@ -1,0 +1,389 @@
+{
+  "logout": "Logout",
+
+  "nav": {
+    "dashboard": "Dashboard",
+    "explore_jobs": "Explore Jobs",
+    "my_applications": "My Applications",
+    "company_profile": "Company Profile",
+    "job_postings": "Job Postings",
+    "shortlists": "Shortlists",
+    "candidate_pipeline": "Candidate Pipeline",
+    "jd_generator": "JD Generator"
+  },
+
+  "applicant_dashboard": {
+    "title": "Applicant",
+    "joined_since": "Joined since",
+    "loading": "Loading applications…",
+
+    "stats": {
+      "applications": "Applications",
+      "interviews": "Interviews",
+      "offers": "Offers"
+    },
+
+    "active_applications": {
+      "title": "Active Applications",
+      "subtitle": "Roles you're currently being considered for",
+      "empty": "No applications yet"
+    },
+
+    "status_management": {
+      "title": "Status Management",
+      "subtitle": "Track your interview stages and process results",
+      "empty": "No interview processes or status update records found yet."
+    },
+
+    "feedback": {
+      "title": "Feedback & Tips",
+      "subtitle": "From your last submission — {{role}} @ {{company}}",
+
+      "insights": {
+        "strong_pattern": "Strong pattern recognition",
+        "strong_pattern_desc": "You scored in the top 15% for logical sequences.",
+
+        "pacing": "Pacing could improve",
+        "pacing_desc": "Try not to spend more than 90s per question on the next test.",
+
+        "cv_tip": "Add 2 measurable wins to your CV",
+        "cv_tip_desc": "Quantified impact bumps recruiter reply-rate by ~30%."
+      }
+    }
+  },
+
+  "applications": {
+    "title": "Active Applications",
+    "subtitle": "Roles you're currently being considered for",
+    "empty": "No applications yet",
+    "view_all": "View all",
+
+    "unknown_position": "Unknown Position",
+    "unknown_company": "Unknown Company",
+
+    "applied": "Applied {{date}}",
+    "closes": "Closes {{date}}",
+    "view_job": "View Job"
+  },
+
+  "stages": {
+    "applied": "Applied",
+    "screening": "Screening",
+    "shortlisted": "Shortlisted",
+    "interview": "Interview",
+    "hired": "Hired",
+    "rejected": "Rejected",
+    "cv_screening": "CV Screening",
+    "ai_screening": "AI Screening",
+    "assessment_test": "Assessment Test",
+    "coding_test": "Coding Test",
+    "video_interview": "Video Interview",
+    "technical_interview": "Technical Interview",
+    "hr_interview": "HR Interview",
+    "manager_interview": "Manager Interview",
+    "background_check": "Background Check",
+    "offer": "Offer",
+    "processing": "Processing"
+  },
+
+  "avatar_modal": {
+    "title": "Profile Picture",
+    "upload": "Upload / Change",
+    "uploading": "Uploading...",
+    "remove": "Remove",
+    "cancel": "Cancel"
+  },
+
+  "interview_list": {
+    "title": "Status Management",
+    "subtitle": "Track your interview stages and process results",
+    "empty_state": "No interview processes or status update records found yet.",
+    "no_records": "No records found in this section.",
+
+    "tabs": {
+      "all": "All Processes",
+      "active": "Active Interviews",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+
+    "buttons": {
+      "start_ai_interview": "Start AI Interview",
+      "start_stage_interview": "Start {{stage}}",
+      "view_cv": "View Submitted CV"
+    },
+
+    "fields": {
+      "unknown_position": "Unknown Position",
+      "unknown_company": "Unknown Company",
+      "applied": "Applied",
+      "id": "ID"
+    }
+  },
+
+  "apply_job": {
+    "title": "Apply for Job",
+
+    "steps": {
+      "info": "Info",
+      "resume": "Resume",
+      "questions": "Questions"
+    },
+
+    "labels": {
+      "full_name": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "resume": "Resume"
+    },
+
+    "placeholders": {
+      "upload_resume": "Upload Resume (PDF)",
+      "drag_drop": "Drag & drop or click to upload"
+    },
+
+    "buttons": {
+      "back": "Back",
+      "next": "Next",
+      "submit": "Submit Application",
+      "submitting": "Submitting..."
+    },
+
+    "errors": {
+      "required": "This field is required",
+      "invalid_email": "Please enter a valid email",
+      "invalid_phone": "Please enter a valid phone number",
+      "invalid_file": "Only PDF files are allowed",
+      "file_size": "Maximum file size is 5MB",
+      "already_applied": "You have already applied for this job",
+      "fix_errors": "Please fix errors before continuing",
+      "complete_required": "Please complete all required fields",
+      "something_wrong": "Something went wrong!"
+    },
+
+    "toast": {
+      "success": "Application submitted successfully!",
+      "error": "Error"
+    }
+  },
+
+  "auth_layout": {
+    "headline": "Where great hires happen.",
+    "subheading": "The platform that connects serious talent with teams who know what they're looking for.",
+
+    "features": {
+      "match": "Match with top candidates who fit your role",
+      "interviews": "Async interviews scored against your framework",
+      "feedback": "Every single applicant gets a timely comprehensive feedback"
+    }
+  },
+
+  "sign_up": {
+    "headline": "Create account",
+    "subheading": "Fill in your details to get started",
+
+    "labels": {
+      "full_name": "Full name",
+      "current_title": "Current title",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "password": "Password",
+      "confirm_password": "Confirm password"
+    },
+
+    "placeholders": {
+      "full_name": "Your full name",
+      "current_title": "e.g. HR Manager, Frontend Developer",
+      "email": "you@gmail.com",
+      "phone": "+20 10 0000 0000",
+      "password": "Min. 8 characters",
+      "confirm_password": "Repeat your password"
+    },
+
+    "errors": {
+      "password_length": "Password must be at least 8 characters.",
+      "password_match": "Passwords do not match.",
+      "generic": "Something went wrong. Please try again."
+    },
+
+    "create_account": "Create account",
+    "creating": "Creating account…",
+    "already_have": "Already have an account?",
+    "sign_in": "Sign in"
+  },
+
+  "roles": {
+    "applicant": "Applicant",
+    "recruiter": "Recruiter"
+  },
+
+  "sign_in": {
+    "headline": "Welcome back",
+    "subheading": "Sign in to your workspace",
+
+    "labels": {
+      "email": "Email",
+      "password": "Password"
+    },
+
+    "placeholders": {
+      "email": "you@gmail.com",
+      "password": "••••••••••"
+    },
+
+    "forgot_password": "Forgot password?",
+    "sign_in": "Sign in",
+    "signing_in": "Signing in…",
+
+    "terms_text": "By signing in you agree to our",
+    "terms": "Terms",
+    "and": "and",
+    "privacy": "Privacy",
+
+    "no_account": "Don't have an account?",
+    "create_account": "Create one",
+
+    "errors": {
+      "generic": "Invalid email or password. Please try again."
+    }
+  },
+
+  "forgot_password": {
+    "headline": "Forgot password?",
+    "subheading": "Enter your email and we'll send you a reset link",
+
+    "labels": {
+      "email": "Email"
+    },
+
+    "placeholders": {
+      "email": "you@gmail.com"
+    },
+
+    "loading": "Loading...",
+    "send_link": "Send reset link",
+
+    "back_to_sign_in": "Back to sign in",
+
+    "errors": {
+      "generic": "Failed to send reset link. Please try again."
+    },
+
+    "success": {
+      "headline": "Check your inbox",
+      "subheading": "We sent you a password reset link",
+      "message": "We sent a reset link to",
+      "spam_hint": "Didn't get it? Check your spam folder."
+    }
+  },
+
+  "reset_password": {
+    "waiting": {
+      "headline": "Verifying your link…",
+      "subheading": "Please wait while we confirm your reset link",
+      "loading_text": "This only takes a moment."
+    },
+
+    "invalid": {
+      "headline": "Link expired",
+      "subheading": "This password reset link is invalid or has expired",
+      "message": "Reset links expire after a short time and can only be used once.",
+      "request_new": "Request a new link",
+      "back_to_sign_in": "Back to sign in"
+    },
+
+    "success": {
+      "headline": "Password updated!",
+      "subheading": "You can now sign in with your new password",
+      "message": "Your password has been changed successfully. Redirecting you to sign in…",
+      "go_to_sign_in": "Go to sign in"
+    },
+
+    "form": {
+      "headline": "Set a new password",
+      "subheading": "Choose a strong password for your account",
+
+      "labels": {
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password"
+      },
+
+      "placeholders": {
+        "new_password": "Min 8 characters",
+        "confirm_password": "Repeat your new password"
+      },
+
+      "errors": {
+        "min_length": "Password must be at least 8 characters.",
+        "not_match": "Passwords don't match. Please try again.",
+        "generic": "Failed to update password. Please try again."
+      },
+
+      "buttons": {
+        "update": "Update Password",
+        "updating": "Updating…"
+      },
+
+      "back_to_sign_in": "Back to sign in"
+    }
+  },
+
+  "job_details": {
+    "loading": "Loading job details...",
+    "error": "Error:",
+    "not_found": "Job not found",
+
+    "apply_now": "Apply Now",
+    "applied": "Applied",
+
+    "about": "About this role",
+    "qualifications": "Qualifications",
+    "responsibilities": "Responsibilities",
+    "skills": "Skills & Tools",
+
+    "similar_jobs": "Similar Jobs"
+  },
+
+  "jobs_page": {
+    "board": "Job Board",
+    "title": "Find your dream job",
+    "subtitle": "Browse our latest job openings and apply to the best opportunities today.",
+    "loading": "Loading jobs...",
+    "error": "Error:",
+    "job_found": "job found",
+    "jobs_found": "jobs found",
+    "no_results": "No jobs found matching your filters.",
+    "clear_filters": "Clear all filters"
+  },
+  "job_filters": {
+    "title": "Filter",
+    "clear_all": "Clear all",
+
+    "date_posted": "Date Posted",
+    "anytime": "Anytime",
+    "last_24h": "Last 24 hours",
+    "last_week": "Last week",
+    "last_month": "Last month",
+
+    "salary": "Salary Range (EGP)",
+    "min": "Min",
+    "max": "Max",
+    "to": "to",
+
+    "job_type": "Job Type",
+    "full_time": "Full Time",
+    "part_time": "Part Time",
+
+    "work_location": "On-site / Remote",
+    "on_site": "On-site",
+    "remote": "Remote",
+    "hybrid": "Hybrid",
+
+    "seniority": "Seniority Level"
+  },
+
+  "job_search": {
+    "placeholder": "Search job title or keyword...",
+    "button": "Find Jobs"
+  }
+}

@@ -1,6 +1,8 @@
+// src\features\applicant\components\AvatarModal.jsx
 import { useRef, useState } from "react";
 import { uploadAndSaveAvatar } from "@/features/auth/services/avatar.service";
 import { supabase } from "@/shared/services/supabase";
+import { useTranslation } from "react-i18next";
 export default function AvatarModal({
   open,
   onClose,
@@ -11,6 +13,7 @@ export default function AvatarModal({
 }) {
   const fileRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   if (!open) return null;
 
@@ -26,18 +29,16 @@ export default function AvatarModal({
       setLoading(false);
     }
   };
+
   const handleDelete = async () => {
     try {
       setLoading(true);
-
       const { error } = await supabase
         .from("profiles")
         .update({ profile_pic: null })
         .eq("id", userId);
-
       if (error) throw error;
-
-      onDeleted?.(); // UI update
+      onDeleted?.();
       onClose();
     } catch (err) {
       console.error(err);
@@ -46,28 +47,44 @@ export default function AvatarModal({
     }
   };
 
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-5 w-80 space-y-3">
-        <h2 className="text-sm font-semibold">Profile Picture</h2>
+    <div
+      className="fixed inset-0 bg-foreground/40 backdrop-blur-sm flex items-center justify-center z-50"
+      onClick={handleOverlayClick}
+    >
+      <div className="bg-card rounded-2xl border shadow-[var(--shadow-lift)] p-6 max-w-md w-full mx-4">
+        <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+          {t("avatar_modal.title")}
+        </h2>
 
-        <button
-          className="w-full py-2 rounded-lg bg-dark-amethyst-600 text-white"
-          onClick={() => fileRef.current.click()}
-        >
-          {loading ? "Uploading..." : "Upload / Change"}
-        </button>
+        <div className="space-y-3">
+          <button
+            className="w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground px-4 py-2.5 text-sm font-medium transition-all duration-180 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => fileRef.current.click()}
+            disabled={loading}
+          >
+            {loading ? t("avatar_modal.uploading") : t("avatar_modal.upload")}
+          </button>
 
-        <button
-          className="w-full py-2 rounded-lg border text-red-500"
-          onClick={handleDelete}
-        >
-          Remove
-        </button>
+          <button
+            className="w-full rounded-lg border border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground hover:border-destructive px-4 py-2.5 text-sm font-medium transition-all duration-180 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleDelete}
+            disabled={loading}
+          >
+            {t("avatar_modal.remove")}
+          </button>
 
-        <button className="w-full py-2 text-sm text-gray-500" onClick={onClose}>
-          Cancel
-        </button>
+          <button
+            className="w-full rounded-lg border border-border bg-background text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary px-4 py-2.5 text-sm font-medium transition-all duration-180"
+            onClick={onClose}
+          >
+            {t("avatar_modal.cancel")}
+          </button>
+        </div>
 
         <input
           type="file"
