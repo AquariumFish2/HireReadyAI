@@ -1,3 +1,4 @@
+//src\features\auth\pages\SignUpPage.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/user.context";
@@ -6,11 +7,11 @@ import AuthLayout from "../components/AuthLayout";
 import FormField from "@/shared/ui/FormField";
 import RoleToggle from "../components/RoleToggle";
 import SocialButton from "../components/SocialButton";
-
+import { useTranslation } from "react-i18next";
 export default function SignUpPage() {
   const { signUpUser, loading, profile } = useUser();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [role, setRole] = useState(USER_ROLE.applicant);
   const [fullName, setFullName] = useState("");
   const [headline, setHeadLine] = useState("");
@@ -34,11 +35,11 @@ export default function SignUpPage() {
     e.preventDefault();
     setError(null);
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(t("sign_up.errors.password_length"));
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("sign_up.errors.password_match"));
       return;
     }
     try {
@@ -50,66 +51,66 @@ export default function SignUpPage() {
         isActive: true,
       });
     } catch (err) {
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message || t("sign_up.errors.generic"));
     }
   }
 
   return (
     <AuthLayout
-      headline="Create account"
-      subheading="Fill in your details to get started"
+      headline={t("sign_up.create_account")}
+      subheading={t("sign_up.subheading")}
     >
       <RoleToggle value={role} onChange={setRole} />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <FormField
-          label="Full name"
+          label={t("sign_up.labels.full_name")}
+          placeholder={t("sign_up.placeholders.full_name")}
           type="text"
-          placeholder="Your full name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           required
         />
 
         <FormField
-          label="Current title"
+          label={t("sign_up.labels.current_title")}
+          placeholder={t("sign_up.placeholders.current_title")}
           type="text"
-          placeholder="ex.HR Manager, Frontend Developer..."
           value={headline}
           onChange={(e) => setHeadLine(e.target.value)}
           required
         />
 
         <FormField
-          label="Email"
+          label={t("sign_up.labels.email")}
+          placeholder={t("sign_up.placeholders.email")}
           type="email"
-          placeholder="you@gmail.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
         <FormField
-          label="Phone (optional)"
+          label={t("sign_up.labels.password")}
+          placeholder={t("sign_up.placeholders.password")}
           type="tel"
-          placeholder="+20 10 0000 0000"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
 
         <FormField
-          label="Password"
+          label={t("sign_up.labels.password")}
+          placeholder={t("sign_up.placeholders.password")}
           type="password"
-          placeholder="Min. 8 characters"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
 
         <FormField
-          label="Confirm password"
+          label={t("sign_up.labels.confirm_password")}
+          placeholder={t("sign_up.placeholders.confirm_password")}
           type="password"
-          placeholder="Repeat your password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
@@ -132,10 +133,10 @@ export default function SignUpPage() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-              Creating account…
+              t("sign_up.creating")
             </span>
           ) : (
-            "Create account"
+            t("sign_up.create_account")
           )}
         </button>
       </form>
@@ -149,12 +150,12 @@ export default function SignUpPage() {
       <SocialButton provider="google" />
 
       <p className="text-center text-xs text-dark-amethyst-400 mt-6">
-        Already have an account?{" "}
+        {t("sign_up.already_have")}{" "}
         <Link
           to="/auth/sign-in"
           className="text-dark-amethyst-600 font-semibold hover:underline"
         >
-          Sign in
+          {t("sign_up.sign_in")}
         </Link>
       </p>
     </AuthLayout>

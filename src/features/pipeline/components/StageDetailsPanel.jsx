@@ -16,6 +16,7 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
   // Sync local form state when selected stage changes
   useEffect(() => {
     if (stage) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         name: stage.name || "",
         stage_type: stage.stage_type || "",

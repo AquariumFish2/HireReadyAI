@@ -1,12 +1,14 @@
+//src\features\jobs\pages\JobDetailsPage.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchJobById, fetchSimilarJobs } from "../services/jobs.service";
 import { useUser } from "@/features/auth/context/user.context";
 import { supabase } from "@/shared/services/supabase";
+import { useTranslation } from "react-i18next";
 export default function JobDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-
+  const { t } = useTranslation();
   const [job, setJob] = useState(null);
   const [similarJobs, setSimilarJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,14 +78,20 @@ export default function JobDetailsPage() {
 
           {/* Text */}
           <p className="text-dark-amethyst-800 font-medium text-sm">
-            Loading Job Details...
+            {t("job_details.loading")}
           </p>
         </div>
       </div>
     );
   }
-  if (error) return <p className="p-8 text-red-500">Error: {error}</p>;
-  if (!job) return <p className="p-8 text-gray-500">Job not found</p>;
+  if (error)
+    return (
+      <p className="p-8 text-red-500">
+        {t("job_details.error")} {error}
+      </p>
+    );
+  if (!job)
+    return <p className="p-8 text-gray-500">{t("job_details.not_found")}</p>;
 
   const company = job.companies;
 
@@ -121,7 +129,9 @@ export default function JobDetailsPage() {
                       : "0 2px 12px rgba(132,0,255,0.2)",
                   }}
                 >
-                  {hasApplied ? "Applied" : "Apply Now"}
+                  {hasApplied
+                    ? t("job_details.applied")
+                    : t("job_details.apply_now")}
                 </button>
 
                 <button className="w-10 h-10 rounded-xl border border-dark-amethyst-100 bg-white flex items-center justify-center hover:bg-dark-amethyst-50 transition">
@@ -201,7 +211,7 @@ export default function JobDetailsPage() {
 
           <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-7">
             <h2 className="text-base font-bold text-dark-amethyst-950 mb-3">
-              About this role
+              {t("job_details.about")}
             </h2>
             <p className="text-dark-amethyst-700 leading-relaxed text-sm">
               {job.description}
@@ -211,7 +221,7 @@ export default function JobDetailsPage() {
           {job.requirements?.length > 0 && (
             <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-7">
               <h2 className="text-base font-bold text-dark-amethyst-950 mb-3">
-                Qualifications
+                {t("job_details.qualifications")}
               </h2>
               <ul className="space-y-2 text-dark-amethyst-700 text-sm">
                 {job.requirements.map((item, i) => (
@@ -227,7 +237,7 @@ export default function JobDetailsPage() {
           {job.responsibilities?.length > 0 && (
             <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-7">
               <h2 className="text-base font-bold text-dark-amethyst-950 mb-3">
-                Responsibilities
+                {t("job_details.responsibilities")}
               </h2>
               <ul className="space-y-2 text-dark-amethyst-700 text-sm">
                 {job.responsibilities.map((item, i) => (
@@ -243,7 +253,7 @@ export default function JobDetailsPage() {
           {job.skills?.length > 0 && (
             <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-7">
               <h2 className="text-base font-bold text-dark-amethyst-950 mb-3">
-                Skills & Tools
+                {t("job_details.skills")}
               </h2>
               <div className="flex flex-wrap gap-2">
                 {job.skills.map((skill, i) => (
@@ -263,7 +273,7 @@ export default function JobDetailsPage() {
           {similarJobs.length > 0 && (
             <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-5">
               <h2 className="text-sm font-bold text-dark-amethyst-950 mb-4">
-                Similar Jobs
+                {t("job_details.similar_jobs")}
               </h2>
               <div className="flex flex-col gap-4">
                 {similarJobs.map((sj) => (
