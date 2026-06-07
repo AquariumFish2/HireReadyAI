@@ -1,3 +1,4 @@
+//src\features\companies\pages\CompanyLayout.jsx
 import { useState, useEffect } from "react";
 import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 import { Wand2 } from "lucide-react";
@@ -24,6 +25,7 @@ import {
   fetchCompanyMembers,
 } from "../services/companies.service";
 import { addMembership } from "../services/memberships.service";
+import { useTranslation } from "react-i18next";
 
 function CompanyLayout() {
   const { loading, profile } = useUser();
@@ -37,6 +39,7 @@ function CompanyLayout() {
   );
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -95,14 +98,19 @@ function CompanyLayout() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center text-slate-900 font-sans">
         <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-2 text-slate-500 text-sm">Loading...</p>
+        <p className="mt-2 text-slate-500 text-sm">
+          {t("company_layout.loading")}
+        </p>
       </div>
     );
 
   if (error) {
     return (
       <div className="p-8 text-red-500 font-sans">
-        <p>Error: {error}</p>
+        <p>
+          {" "}
+          {t("company_layout.error")} {error}
+        </p>
       </div>
     );
   }
@@ -146,7 +154,13 @@ function CompanyLayout() {
           />
           <Route
             path="jobs"
-            element={<JobPostings jobs={jobs} searchQuery={searchQuery} company={company} />}
+            element={
+              <JobPostings
+                jobs={jobs}
+                searchQuery={searchQuery}
+                company={company}
+              />
+            }
           />
           <Route path="shortlists" element={<ShortlistsPage jobs={jobs} />} />
           <Route

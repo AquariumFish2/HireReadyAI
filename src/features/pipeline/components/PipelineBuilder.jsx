@@ -1,17 +1,15 @@
+//src\features\pipeline\components\PipelineBuilder.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-} from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Plus, X, Library, Settings } from "lucide-react";
 import StageLibrary from "./StageLibrary";
 import StageCard from "./StageCard";
 import StageDetailsPanel from "./StageDetailsPanel";
+import { useTranslation } from "react-i18next";
 
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(
-    () => window.matchMedia(query).matches
+    () => window.matchMedia(query).matches,
   );
 
   useEffect(() => {
@@ -35,7 +33,7 @@ export default function PipelineBuilder({
   const [selectedStageId, setSelectedStageId] = useState(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
-
+  const { t } = useTranslation();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const selectedStage = stages.find((s) => s.id === selectedStageId) || null;
@@ -55,7 +53,7 @@ export default function PipelineBuilder({
       await onAddStage(libraryItem);
       if (!isDesktop) setLibraryOpen(false);
     },
-    [onAddStage, isDesktop]
+    [onAddStage, isDesktop],
   );
 
   const handleStageSelect = useCallback(
@@ -66,7 +64,7 @@ export default function PipelineBuilder({
         return next;
       });
     },
-    [isDesktop]
+    [isDesktop],
   );
 
   const handleDelete = useCallback(
@@ -77,7 +75,7 @@ export default function PipelineBuilder({
       }
       onDeleteStage(id);
     },
-    [selectedStageId, onDeleteStage]
+    [selectedStageId, onDeleteStage],
   );
 
   const closeAll = useCallback(() => {
@@ -115,10 +113,10 @@ export default function PipelineBuilder({
         <div className="flex-1 overflow-y-auto bg-gray-50/50 px-8 py-6">
           <div className="max-w-xl mx-auto">
             <h2 className="text-xl font-bold text-dark-amethyst-950 mb-1">
-              {job?.title || "Pipeline"}
+              {job?.title || t("pipeline_builder.title")}
             </h2>
             <p className="text-xs text-gray-400 mb-6">
-              Drag stages to reorder or click to configure.
+              {t("pipeline_builder.desktop.subtitle")}
             </p>
 
             {stages.length === 0 ? (
@@ -127,10 +125,10 @@ export default function PipelineBuilder({
                   <Plus className="w-5 h-5 text-gray-400" />
                 </div>
                 <p className="text-sm font-medium text-gray-500 mb-1">
-                  No stages yet
+                  {t("pipeline_builder.empty.title")}
                 </p>
                 <p className="text-xs text-gray-400">
-                  Click a stage in the library to add it here.
+                  {t("pipeline_builder.desktop.empty_desc")}
                 </p>
               </div>
             ) : (
@@ -190,9 +188,7 @@ export default function PipelineBuilder({
         className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-xl shadow-sm text-sm text-gray-600 hover:text-dark-amethyst-700 hover:border-dark-amethyst-300 transition-all cursor-pointer"
       >
         <Library className="w-4 h-4" />
-        <span className="text-xs font-medium hidden sm:inline">
-          Library
-        </span>
+        <span className="text-xs font-medium hidden sm:inline">Library</span>
       </button>
 
       {/* Pipeline canvas */}
@@ -202,7 +198,7 @@ export default function PipelineBuilder({
             {job?.title || "Pipeline"}
           </h2>
           <p className="text-xs text-gray-400 mb-6">
-            Tap a stage to configure, or add from the library.
+            {t("pipeline_builder.mobile.subtitle")}
           </p>
 
           {stages.length === 0 ? (
@@ -211,10 +207,10 @@ export default function PipelineBuilder({
                 <Plus className="w-5 h-5 text-gray-400" />
               </div>
               <p className="text-sm font-medium text-gray-500 mb-1">
-                No stages yet
+                {t("pipeline_builder.empty.title")}
               </p>
               <p className="text-xs text-gray-400">
-                Tap the Library button to add stages.
+                {t("pipeline_builder.mobile.empty_desc")}
               </p>
             </div>
           ) : (
@@ -261,7 +257,7 @@ export default function PipelineBuilder({
           className="absolute right-3 bottom-3 z-10 inline-flex items-center gap-1.5 px-3 py-2 bg-dark-amethyst-600 text-white border border-dark-amethyst-500 rounded-xl shadow-lg text-sm hover:bg-dark-amethyst-700 transition-all cursor-pointer"
         >
           <span className="text-xs font-medium hidden sm:inline">
-            Settings
+            {t("pipeline_builder.settings")}
           </span>
           <Settings className="w-4 h-4" />
         </button>
@@ -286,12 +282,12 @@ export default function PipelineBuilder({
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <span className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">
-              Stage Library
+              {t("pipeline_builder.library.title")}
             </span>
             <button
               onClick={() => setLibraryOpen(false)}
               className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
-              aria-label="Close library"
+              aria-label={t("pipeline_builder.library.close")}
             >
               <X className="w-4 h-4" />
             </button>
@@ -319,12 +315,12 @@ export default function PipelineBuilder({
         >
           <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
             <span className="text-sm font-semibold text-gray-900 truncate">
-              {selectedStage?.name || "Stage Settings"}
+              {selectedStage?.name || t("pipeline_builder.details.title")}
             </span>
             <button
               onClick={() => setDetailsOpen(false)}
               className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
-              aria-label="Close settings"
+              aria-label={t("pipeline_builder.close_settings")}
             >
               <X className="w-4 h-4" />
             </button>

@@ -1,4 +1,6 @@
+//src\features\interview\components\CodeQuestion.jsx
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const PLACEHOLDER = {
   javascript: "// Write your JavaScript solution here\n\n",
@@ -24,6 +26,7 @@ export default function CodeQuestion({ question, onAnswer }) {
   const lang = question?.language?.toLowerCase() ?? "default";
   const placeholder = PLACEHOLDER[lang] ?? PLACEHOLDER.default;
   const langColor = LANG_COLORS[lang] ?? LANG_COLORS.default;
+  const { t } = useTranslation();
 
   const [code, setCode] = useState(placeholder);
   const textareaRef = useRef(null);
@@ -34,7 +37,9 @@ export default function CodeQuestion({ question, onAnswer }) {
     const ta = textareaRef.current;
     const ln = lineNumRef.current;
     if (!ta || !ln) return;
-    const onScroll = () => { ln.scrollTop = ta.scrollTop; };
+    const onScroll = () => {
+      ln.scrollTop = ta.scrollTop;
+    };
     ta.addEventListener("scroll", onScroll);
     return () => ta.removeEventListener("scroll", onScroll);
   }, []);
@@ -44,7 +49,8 @@ export default function CodeQuestion({ question, onAnswer }) {
     if (e.key === "Tab") {
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
-      const newCode = code.slice(0, selectionStart) + "  " + code.slice(selectionEnd);
+      const newCode =
+        code.slice(0, selectionStart) + "  " + code.slice(selectionEnd);
       setCode(newCode);
       // Restore cursor position after state update
       requestAnimationFrame(() => {
@@ -95,7 +101,8 @@ export default function CodeQuestion({ question, onAnswer }) {
               width: "42px",
               background: "#0d1117",
               borderRight: "1px solid #21262d",
-              fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+              fontFamily:
+                "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
               fontSize: "13px",
               lineHeight: "21px",
               color: "#484f58",
@@ -117,7 +124,8 @@ export default function CodeQuestion({ question, onAnswer }) {
             style={{
               background: "#0d1117",
               color: "#e6edf3",
-              fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+              fontFamily:
+                "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
               fontSize: "13px",
               lineHeight: "21px",
               caretColor: "#58a6ff",
@@ -128,10 +136,15 @@ export default function CodeQuestion({ question, onAnswer }) {
 
         {/* Footer bar */}
         <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-t border-[#30363d]">
-          <span className="text-[11px]" style={{ color: "#484f58", fontFamily: "monospace" }}>
+          <span
+            className="text-[11px]"
+            style={{ color: "#484f58", fontFamily: "monospace" }}
+          >
             Ln {lines.length} · {code.length} chars
           </span>
-          <span className="text-[11px]" style={{ color: "#484f58" }}>UTF-8</span>
+          <span className="text-[11px]" style={{ color: "#484f58" }}>
+            UTF-8
+          </span>
         </div>
       </div>
 
@@ -142,7 +155,7 @@ export default function CodeQuestion({ question, onAnswer }) {
           disabled={isEmpty}
           className="bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Submit Answer →
+          {t("code_question.submit_answer")} →
         </button>
       </div>
     </div>

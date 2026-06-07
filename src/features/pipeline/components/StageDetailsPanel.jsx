@@ -1,9 +1,12 @@
+//src\features\pipeline\components\StageDetailsPanel.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { STAGE_TYPE_OPTIONS } from "../constants/stageLibrary";
+import { useTranslation } from "react-i18next";
 
 const DEBOUNCE_MS = 400;
 
 export default function StageDetailsPanel({ stage, stages, onUpdate }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     name: "",
     stage_type: "",
@@ -32,9 +35,12 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mb-3">
           <span className="text-gray-400 text-lg">⚙</span>
         </div>
-        <p className="text-sm font-medium text-gray-600 mb-1">Stage Settings</p>
+        <p className="text-sm font-medium text-gray-600 mb-1">
+          {" "}
+          {t("stage_details.title")}
+        </p>
         <p className="text-xs text-gray-400">
-          Select a stage from the canvas to configure it.
+          {t("stage_details.empty_description")}
         </p>
       </div>
     );
@@ -63,20 +69,27 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
   const totalOtherWeights = (stages || [])
     .filter((s) => s.id !== stage.id)
     .reduce((sum, s) => sum + (parseFloat(s.weight) || 0), 0);
-  
+
   // Use a tiny epsilon offset because of floating point math (e.g. 0.8 + 0.2000000000000001)
-  const maxAllowedWeight = Math.max(0, Math.round((1 - totalOtherWeights) * 100) / 100);
+  const maxAllowedWeight = Math.max(
+    0,
+    Math.round((1 - totalOtherWeights) * 100) / 100,
+  );
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
       <div className="px-5 pt-5 pb-4 border-b border-gray-100">
         <p className="text-[10px] font-semibold text-dark-amethyst-600 tracking-widest uppercase mb-0.5">
-          Stage Settings
+          {t("stage_details.title")}
         </p>
         <p className="text-sm font-semibold text-gray-900 leading-tight truncate flex items-center gap-1.5">
-          {form.name || "Untitled Stage"}
-          {stage.is_locked && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">Locked</span>}
+          {form.name || t("stage_details.untitled_stage")}
+          {stage.is_locked && (
+            <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+              {t("stage_details.locked")}
+            </span>
+          )}
         </p>
         <p className="text-xs text-gray-400 truncate">
           {form.stage_type?.replace(/_/g, " ")}
@@ -87,7 +100,7 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         {/* Stage Name */}
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Stage Name
+            {t("stage_details.fields.stage_name")}
           </label>
           <input
             type="text"
@@ -101,23 +114,31 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         {/* Stage Type */}
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Stage Type
+            {t("stage_details.fields.stage_type")}
           </label>
           <select
             value={form.stage_type}
             disabled={stage.is_locked}
-            onChange={(e) => handleImmediateChange("stage_type", e.target.value)}
+            onChange={(e) =>
+              handleImmediateChange("stage_type", e.target.value)
+            }
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500 cursor-pointer disabled:cursor-not-allowed"
           >
-            <option value="">Select type…</option>
+            <option value="">
+              {" "}
+              {t("stage_details.placeholders.select_type")}
+            </option>
             {STAGE_TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
             ))}
-            {stage.is_locked && !STAGE_TYPE_OPTIONS.some(o => o.value === form.stage_type) && (
-              <option value={form.stage_type}>{form.stage_type.replace(/_/g, " ")}</option>
-            )}
+            {stage.is_locked &&
+              !STAGE_TYPE_OPTIONS.some((o) => o.value === form.stage_type) && (
+                <option value={form.stage_type}>
+                  {form.stage_type.replace(/_/g, " ")}
+                </option>
+              )}
           </select>
         </div>
 
@@ -125,7 +146,7 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-semibold text-gray-600">
-              Weight
+              {t("stage_details.fields.weight")}
             </label>
             <span className="text-xs font-bold text-dark-amethyst-600">
               {weightPct}%
@@ -145,34 +166,39 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         {/* Description */}
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Description
+            {t("stage_details.fields.description")}
           </label>
           <textarea
             rows={3}
             value={form.description}
             disabled={stage.is_locked}
-            onChange={(e) => handleImmediateChange("description", e.target.value)}
+            onChange={(e) =>
+              handleImmediateChange("description", e.target.value)
+            }
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow resize-none disabled:bg-gray-50 disabled:text-gray-500"
-            placeholder="Describe what happens in this stage…"
+            placeholder={t("stage_details.placeholders.description")}
           />
         </div>
 
         {/* Out-of-scope fields — rendered disabled as placeholders */}
         <div className="space-y-3 pt-2 border-t border-gray-100">
           <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">
-            Advanced (Coming Soon)
+            {t("stage_details.advanced.title")}
           </p>
-          {["AI Evaluation", "Manual Review Required", "Auto Advance", "Auto Reject"].map(
-            (label) => (
-              <div
-                key={label}
-                className="flex items-center justify-between opacity-40 cursor-not-allowed"
-              >
-                <span className="text-xs text-gray-500">{label}</span>
-                <div className="w-8 h-4 bg-gray-200 rounded-full" />
-              </div>
-            )
-          )}
+          {[
+            t("stage_details.advanced.ai_evaluation"),
+            t("stage_details.advanced.manual_review"),
+            t("stage_details.advanced.auto_advance"),
+            t("stage_details.advanced.auto_reject"),
+          ].map((label) => (
+            <div
+              key={label}
+              className="flex items-center justify-between opacity-40 cursor-not-allowed"
+            >
+              <span className="text-xs text-gray-500">{label}</span>
+              <div className="w-8 h-4 bg-gray-200 rounded-full" />
+            </div>
+          ))}
         </div>
       </div>
     </div>

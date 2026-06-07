@@ -1,3 +1,4 @@
+//src\features\recruiter\pages\PipelineCandidatesPage.jsx
 import { useState, useEffect, useRef } from "react";
 import { Lock, Search, SlidersHorizontal } from "lucide-react";
 import {
@@ -7,6 +8,7 @@ import {
   autoAdvanceToShortlist,
   updateStageMinScore,
 } from "../services/candidatesPipline.service";
+import { useTranslation } from "react-i18next";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function resolveCurrentStage(stages = []) {
@@ -51,34 +53,42 @@ const scoreColor = (s) => {
   return "bg-red-100 text-red-600";
 };
 
-function getFit(score, isRejected) {
+function getFit(score, isRejected, t) {
   if (isRejected) {
     return {
-      label: "Rejected",
+      label: t("candidate_pipeline.fit.rejected"),
       cls: "bg-red-100 text-red-700 border-red-300",
     };
   }
+
   if (score >= 85)
     return {
-      label: "Strong Fit",
+      label: t("candidate_pipeline.fit.strong_fit"),
       cls: "bg-violet-100 text-violet-700 border-violet-200",
     };
+
   if (score >= 70)
     return {
-      label: "Good Fit",
+      label: t("candidate_pipeline.fit.good_fit"),
       cls: "bg-indigo-100 text-indigo-700 border-indigo-200",
     };
+
   if (score >= 55)
     return {
-      label: "Needs Review",
+      label: t("candidate_pipeline.fit.needs_review"),
       cls: "bg-amber-100 text-amber-700 border-amber-200",
     };
-  return { label: "Low Fit", cls: "bg-red-100 text-red-600 border-red-200" };
+
+  return {
+    label: t("candidate_pipeline.fit.low_fit"),
+    cls: "bg-red-100 text-red-600 border-red-200",
+  };
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 const CandidateCard = ({ candidate, onDragStart, isDragging }) => {
-  const fit = getFit(candidate.score);
+  const fit = getFit(candidate.score, candidate.is_rejected, t);
+  const { t } = useTranslation();
   return (
     <div
       draggable
@@ -102,7 +112,7 @@ const CandidateCard = ({ candidate, onDragStart, isDragging }) => {
 
             {candidate.is_rejected && (
               <span className="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-600 border border-red-200">
-                Rejected
+                {t("candidate_pipeline.fit.rejected")}
               </span>
             )}
           </p>
@@ -132,7 +142,9 @@ const CandidateCard = ({ candidate, onDragStart, isDragging }) => {
       {candidate.score > 0 && (
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-dark-amethyst-500">Stage score</span>
+            <span className="text-xs text-dark-amethyst-500">
+              {t("candidate_pipeline.stage_score")}
+            </span>
             <span className="text-xs font-semibold text-dark-amethyst-700">
               {candidate.score}/100
             </span>
@@ -169,6 +181,7 @@ const PipelineColumn = ({
   setStageSettings,
   handleStageAutoAdvance,
 }) => {
+  const { t } = useTranslation();
   const isOver = dragOverStage === stage.id;
   const isLocked = stage.is_locked;
   const [openMenu, setOpenMenu] = useState(false);
@@ -207,7 +220,7 @@ const PipelineColumn = ({
           {isLocked && (
             <Lock
               className="w-3 h-3 text-dark-amethyst-300 ml-0.5"
-              title="Locked stage — cannot be dropped into"
+              title={t("candidate_pipeline.locked_stage")}
             />
           )}
 
@@ -225,7 +238,7 @@ const PipelineColumn = ({
                   {/* Min Score */}
                   <div className="p-2">
                     <p className="text-xs mb-1 text-dark-amethyst-500">
-                      Min Score
+                      {t("candidate_pipeline.min_score")}
                     </p>
 
                     <input
@@ -240,7 +253,7 @@ const PipelineColumn = ({
                       }}
                       className="text-xs mt-2 bg-dark-amethyst-600 text-white px-2 py-1 rounded"
                     >
-                      Save
+                      {t("candidate_pipeline.save")}
                     </button>
                   </div>
 
@@ -249,7 +262,7 @@ const PipelineColumn = ({
                     className="w-full text-left text-xs p-2 hover:bg-dark-amethyst-50 rounded"
                     onClick={() => handleStageAutoAdvance(stage.id)}
                   >
-                    Auto Advance
+                    {t("candidate_pipeline.auto_advance")}
                   </button>
                 </div>
               )}
@@ -276,7 +289,9 @@ const PipelineColumn = ({
             }`}
           >
             <p className="text-xs text-dark-amethyst-300">
-              {isLocked ? "Auto-managed" : "Drop here"}
+              {isLocked
+                ? t("candidate_pipeline.auto_managed")
+                : t("candidate_pipeline.drop_here")}
             </p>
           </div>
         ) : (
@@ -296,6 +311,7 @@ const PipelineColumn = ({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function PipelineCandidatesPage({ company, jobs = [] }) {
+  const { t } = useTranslation();
   const [candidates, setCandidates] = useState([]);
   const [stages, setStages] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
@@ -387,7 +403,9 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
           return {
             id: app.id,
             jobId: app.job_postings?.id,
-            name: app.profiles?.full_name || "Unknown Candidate",
+            name:
+              app.profiles?.full_name ||
+              t("candidate_pipeline.unknown_candidate"),
             applied_at: app.applied_at,
             score,
             is_rejected: isRejected,
@@ -405,8 +423,12 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
     if (search && !c.name.toLowerCase().includes(search.toLowerCase()))
       return false;
 
-    if (filterFit === "Rejected") return c.is_rejected;
-    if (filterFit !== "All" && getFit(c.score).label !== filterFit)
+    if (filterFit === t("candidate_pipeline.fit.rejected"))
+      return c.is_rejected;
+    if (
+      filterFit !== t("candidate_pipeline.filters.all") &&
+      getFit(c.score, c.is_rejected, t).label !== filterFit
+    )
       return false;
 
     return true;
@@ -496,13 +518,17 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       );
 
       if (advancedCount > 0) {
-        alert(`Advanced ${advancedCount} candidate(s) successfully`);
+        alert(
+          t("candidate_pipeline.alerts.advanced_success", {
+            count: advancedCount,
+          }),
+        );
       } else {
-        alert("No candidates matched the criteria");
+        alert(t("candidate_pipeline.alerts.no_match"));
       }
     } catch (err) {
       console.error(err);
-      alert("Auto advance failed");
+      alert(t("candidate_pipeline.alerts.auto_advance_failed"));
     }
   };
   const handleAutoAdvance = async () => {
@@ -512,15 +538,17 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       const { advancedCount } = await autoAdvanceToShortlist(selectedJobId, 70);
       if (advancedCount > 0) {
         alert(
-          `Successfully advanced ${advancedCount} candidate(s) to Shortlist!`,
+          t("candidate_pipeline.alerts.shortlist_success", {
+            count: advancedCount,
+          }),
         );
         loadCandidates(selectedJobId);
       } else {
-        alert("No candidates met the requirements to be auto-advanced.");
+        alert(t("candidate_pipeline.alerts.no_candidates"));
       }
     } catch (err) {
       console.error("Auto advance error:", err);
-      alert("Failed to auto-advance candidates.");
+      alert(t("candidate_pipeline.alerts.failed"));
     } finally {
       setIsAdvancing(false);
     }
@@ -545,7 +573,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
           {/* Title / Job selector */}
           <div>
             <h1 className="text-xl font-bold text-dark-amethyst-950">
-              Candidate Pipeline
+              {t("candidate_pipeline.title")}
             </h1>
             <div className="flex items-center gap-2 mt-1">
               <select
@@ -553,7 +581,9 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
                 onChange={(e) => setSelectedJobId(e.target.value)}
                 className="text-xs font-semibold text-dark-amethyst-600 bg-dark-amethyst-50 border border-dark-amethyst-100 rounded-lg px-2 py-1 outline-none cursor-pointer"
               >
-                {jobs.length === 0 && <option value="">No jobs</option>}
+                {jobs.length === 0 && (
+                  <option value="">{t("candidate_pipeline.no_jobs")}</option>
+                )}
                 {jobs.map((j) => (
                   <option key={j.id} value={j.id}>
                     {j.title}
@@ -565,7 +595,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
                 <span className="font-semibold text-dark-amethyst-600">
                   {totalInFlight}
                 </span>{" "}
-                candidates in flight
+                {t("candidate_pipeline.candidates_in_flight")}
               </span>
             </div>
           </div>
@@ -577,7 +607,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
               ref={searchRef}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search candidates…"
+              placeholder={t("candidate_pipeline.search_placeholder")}
               className="w-full h-10 rounded-xl pl-9 pr-4 text-sm text-dark-amethyst-900 bg-dark-amethyst-50 border border-dark-amethyst-100 outline-none placeholder:text-dark-amethyst-300"
             />
           </div>
@@ -593,7 +623,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
               }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              Filters
+              {t("candidate_pipeline.filters.title")}
             </button>
           </div>
         </div>
@@ -602,16 +632,16 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
         {showFilters && (
           <div className="mt-4 pt-4 border-t border-dark-amethyst-100 flex items-center gap-3 flex-wrap">
             <span className="text-xs font-semibold text-dark-amethyst-500 uppercase tracking-wide">
-              Fit:
+              {t("candidate_pipeline.filters.fit")}
             </span>
 
             {[
-              "All",
-              "Strong Fit",
-              "Good Fit",
-              "Needs Review",
-              "Low Fit",
-              "Rejected",
+              t("candidate_pipeline.filters.all"),
+              t("candidate_pipeline.fit.strong_fit"),
+              t("candidate_pipeline.fit.good_fit"),
+              t("candidate_pipeline.fit.needs_review"),
+              t("candidate_pipeline.fit.low_fit"),
+              t("candidate_pipeline.fit.rejected"),
             ].map((f) => (
               <button
                 key={f}
@@ -643,10 +673,10 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
             <Search className="w-7 h-7 text-dark-amethyst-300" />
           </div>
           <h2 className="text-dark-amethyst-950 text-lg font-bold mb-1">
-            No candidates yet
+            {t("candidate_pipeline.empty.title")}
           </h2>
           <p className="text-dark-amethyst-500 text-sm">
-            Candidates appear here once applications start coming in.
+            {t("candidate_pipeline.empty.subtitle")}
           </p>
         </div>
       )}

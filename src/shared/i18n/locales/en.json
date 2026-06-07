@@ -9,7 +9,9 @@
     "job_postings": "Job Postings",
     "shortlists": "Shortlists",
     "candidate_pipeline": "Candidate Pipeline",
-    "jd_generator": "JD Generator"
+    "jd_generator": "JD Generator",
+    "add_job": "Add Job",
+    "search_jobs":"Search jobs by title or department..."
   },
 
   "applicant_dashboard": {
@@ -355,6 +357,7 @@
     "no_results": "No jobs found matching your filters.",
     "clear_filters": "Clear all filters"
   },
+
   "job_filters": {
     "title": "Filter",
     "clear_all": "Clear all",
@@ -379,11 +382,595 @@
     "remote": "Remote",
     "hybrid": "Hybrid",
 
-    "seniority": "Seniority Level"
+    "seniority": "Seniority Level",
+    "not_applicable": "N/A"
   },
 
   "job_search": {
     "placeholder": "Search job title or keyword...",
     "button": "Find Jobs"
+  },
+
+  "company_layout": {
+    "loading": "Loading...",
+    "error": "Error:"
+  },
+
+  "company_profile": {
+    "profile": {
+      "title": "Company Profile",
+      "subtitle": "Manage your workspace details and branding.",
+
+      "fields": {
+        "company_name": "Company Name",
+        "industry": "Industry",
+        "company_size": "Company Size",
+        "created_at": "Created At",
+        "employees": "{{count}} employees"
+      }
+    },
+
+    "framework": {
+      "title": "Competency Framework",
+      "subtitle": "Upload your grading framework for AI analysis.",
+      "upload": "Click to upload your framework file",
+      "file_types": "PDF or DOCX up to 25MB",
+      "active": "Active & Indexed"
+    },
+
+    "team": {
+      "title": "Team Members",
+      "subtitle": "Invite and manage your recruitment team permissions.",
+
+      "placeholders": {
+        "full_name": "Full Name",
+        "email": "Email Address"
+      },
+
+      "invite": "Invite",
+      "invite_success": "Member invited successfully!",
+
+      "unknown": "Unknown",
+      "team_member": "Team Member"
+    }
+  },
+
+  "jd_generator": {
+    "published": {
+      "title": "Job Published!",
+      "message": "has been published and is now visible to applicants.",
+      "generate_another": "Generate another JD"
+    },
+
+    "header": {
+      "title": "Job Description Generator",
+      "save_draft": "Save draft",
+      "publish": "Publish JD",
+      "publishing": "Publishing…"
+    },
+
+    "form": {
+      "title": "Role brief",
+      "subtitle": "Fill in the basics - AI handles the rest.",
+
+      "labels": {
+        "role_title": "Role title",
+        "seniority": "Seniority",
+        "job_type": "Job type",
+        "work_type": "Work type",
+        "experience": "Experience required",
+        "required_skills": "Required skills",
+        "salary_range": "Salary range (EGP)",
+        "key_notes": "Key notes"
+      },
+
+      "placeholders": {
+        "job_title": "Job title",
+        "select_seniority": "Select seniority",
+        "select_type": "Select type",
+        "select_work_type": "Select work type",
+        "experience": "e.g. 1-3 years",
+        "required_skills": "Required skills",
+        "salary_min": "Min",
+        "salary_max": "Max",
+        "additional_notes": "Additional hiring notes..."
+      },
+
+      "optional": "(optional)",
+
+      "buttons": {
+        "generate": "Generate JD",
+        "generating": "Generating…"
+      }
+    },
+
+    "validation": {
+      "title_required": "Job title is required",
+      "seniority_required": "Please select a seniority level",
+      "job_type_required": "Please select a job type",
+      "work_type_required": "Please select a work type",
+      "experience_required": "Please select experience required"
+    },
+
+    "preview": {
+      "empty_title": "Fill in the role brief",
+      "empty_subtitle": "and click Generate JD to see the preview",
+
+      "ai_generated": "AI Generated",
+
+      "salary_confidential": "Salary: Confidential",
+
+      "sections": {
+        "about_role": "About the role",
+        "responsibilities": "What you'll do",
+        "requirements": "What we're looking for",
+        "skills": "Skills & Tools"
+      }
+    },
+    "errors": {
+      "generate_failed": "Failed to generate JD"
+    }
+  },
+
+  "job_postings": {
+    "empty_state": "Select a job to view details",
+    "loading_stages": "Loading pipeline...",
+    "failed_stages": "Failed to load pipeline stages",
+    "failed_update": "Failed to update job details.",
+    "select_job": "Select a job",
+    "sidebar": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "edit": {
+      "edit_job": "Edit Job",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    }
+  },
+
+  "no_company_view": {
+    "loading": "Loading companies...",
+    "sign_out": "Sign out",
+
+    "create": {
+      "title": "Create a New Company",
+      "company_name": "Company Name",
+      "industry": "Industry",
+      "company_size": "Company Size",
+      "location": "Location",
+
+      "placeholders": {
+        "name": "Acme Corp",
+        "industry": "e.g. Technology, Healthcare",
+        "size": "Number of employees",
+        "location": "City, Country"
+      },
+
+      "buttons": {
+        "cancel": "Cancel",
+        "create": "Create Company",
+        "creating": "Creating..."
+      }
+    },
+
+    "join": {
+      "title": "Join or Create a Company",
+      "subtitle": "Select a company to get started with HireReadyAI or create your own",
+      "create_button": "Create a New Company",
+      "no_companies": "No companies available to join.",
+      "create_company": "Create a Company",
+      "join": "Join",
+      "joining": "Joining..."
+    }
+  },
+
+  "job_content_cards": {
+    "job_summary": "Job summary",
+    "no_description": "No description provided.",
+
+    "responsibilities": "Responsibilities",
+    "requirements": "Requirements",
+    "skills": "Skills",
+
+    "none_specified": "None specified.",
+
+    "placeholders": {
+      "add_item": "Type and press Enter to add...",
+      "add_skill": "Add skill..."
+    }
+  },
+
+  "job_detail_header": {
+    "regenerate": " Regenerate with AI",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save",
+    "full_time": "Full-Time",
+    "any_seniority": "Any Seniority",
+    "any_location": "Any Location"
+  },
+
+  "job_info_grid": {
+    "seniority_level": "Seniority Level",
+    "location": "Location",
+    "work_type": "Work Type",
+    "type": "Type",
+    "salary": "Salary",
+    "published": "Published",
+    "ai_shortlist": "AI Shortlist",
+    "strong_fits": "strong fits",
+    "open_candidate_board": "Open candidate board",
+    "view_public_posting": "View public posting",
+    "copy_link": "Copy link",
+    "recently": "Recently"
+  },
+
+  "job_pipeline_preview": {
+    "title": "Hiring pipeline for this job",
+    "pipeline": "Pipeline",
+    "stages": "stages",
+    "owned_by_job": "Owned by this job posting",
+    "edit_pipeline": "Edit pipeline",
+    "no_stages": "No stages defined for this pipeline.",
+    "stage_label": "Stage",
+    "ai": "AI"
+  },
+
+  "job_sidebar": {
+    "open_roles": "Open Roles",
+    "click_to_view": "Click to view details",
+    "no_jobs": "No jobs found.",
+    "any_seniority": "Any Seniority",
+    "applicant": "applicant",
+    "applicant_plural": "applicants",
+    "published": "Published",
+    "closed": "Closed"
+  },
+
+  "interview_page": {
+    "labels": {
+      "interview": "Interview"
+    },
+
+    "loading": {
+      "first_question": "Preparing your first question…",
+      "evaluating": "Evaluating your answer and generating the next question…"
+    },
+
+    "errors": {
+      "no_active_stage": "No active interview stage found for this application.",
+      "load_failed": "Failed to load interview session.",
+      "generate_failed": "Failed to generate interview question.",
+      "title": "Something went wrong",
+      "go_back": "Go Back"
+    },
+
+    "question_types": {
+      "video": "Video",
+      "text": "Text",
+      "multiple_choice": "Multiple Choice",
+      "code": "Code"
+    },
+
+    "finished": {
+      "title": "Interview Complete",
+      "subtitle": "Your responses have been submitted and evaluated. The hiring team will review the results.",
+      "overall_score": "Overall Score",
+      "recommendation": "Recommendation",
+      "back_to_application": "Back to Application"
+    },
+
+    "progress": {
+      "remaining": "{{count}} questions remaining",
+      "final": "This is the final question"
+    },
+
+    "video_question": {
+      "camera_required_title": "Camera access required",
+      "camera_required_desc": "Please allow access to record your answer",
+      "camera_required_alert": "Camera and microphone access is required to record your answer.",
+      "enable_camera": "Enable Camera & Microphone",
+
+      "start_recording": "Start Recording (max 3 min)",
+      "stop_recording": "Stop Recording",
+
+      "re_record": "Re-record",
+      "submit_answer": "Submit Answer →",
+
+      "transcribing": "Transcribing your answer…",
+      "transcribing_sub": "This may take a few seconds",
+
+      "max_time": "max 3 min"
+    }
+  },
+
+  "code_question": {
+    "submit_answer": "Submit Answer"
+  },
+
+  "pipeline_builder": {
+    "back_to_pipelines": "Back to Pipelines",
+    "pipelines": "Pipelines",
+    "title": "Pipeline",
+
+    "desktop": {
+      "subtitle": "Drag stages to reorder or click to configure.",
+      "empty_desc": "Click a stage in the library to add it here."
+    },
+
+    "mobile": {
+      "subtitle": "Tap a stage to configure, or add from the library.",
+      "empty_desc": "Tap the Library button to add stages."
+    },
+
+    "empty": {
+      "title": "No stages yet"
+    },
+
+    "library": {
+      "label": "Library",
+      "title": "Stage Library",
+      "close": "Close library"
+    },
+
+    "settings": "Settings",
+    "close_settings": "Close settings",
+    "created": "Created",
+    "details": {
+      "title": "Stage Settings"
+    }
+  },
+
+  "stage_details": {
+    "title": "Stage Settings",
+    "empty_description": "Select a stage from the canvas to configure it.",
+    "untitled_stage": "Untitled Stage",
+    "locked": "Locked",
+    "stage_library": "Stage Library",
+    "click_to_append": "Click to append",
+
+    "fields": {
+      "stage_name": "Stage Name",
+      "stage_type": "Stage Type",
+      "weight": "Weight",
+      "description": "Description"
+    },
+
+    "placeholders": {
+      "select_type": "Select type…",
+      "description": "Describe what happens in this stage…"
+    },
+
+    "advanced": {
+      "title": "Advanced (Coming Soon)",
+      "ai_evaluation": "AI Evaluation",
+      "manual_review": "Manual Review Required",
+      "auto_advance": "Auto Advance",
+      "auto_reject": "Auto Reject"
+    }
+  },
+
+  "candidate_pipeline": {
+    "title": "Candidate Pipeline",
+    "no_jobs": "No jobs",
+    "candidates_in_flight": "candidates in flight",
+    "search_placeholder": "Search candidates...",
+    "stage_score": "Stage score",
+    "unknown_candidate": "Unknown Candidate",
+
+    "filters": {
+      "title": "Filters",
+      "fit": "Fit:",
+      "all": "All"
+    },
+
+    "fit": {
+      "strong_fit": "Strong Fit",
+      "good_fit": "Good Fit",
+      "needs_review": "Needs Review",
+      "low_fit": "Low Fit",
+      "rejected": "Rejected"
+    },
+
+    "min_score": "Min Score",
+    "save": "Save",
+    "auto_advance": "Auto Advance",
+    "drop_here": "Drop here",
+    "auto_managed": "Auto-managed",
+    "locked_stage": "Locked stage — cannot be dropped into",
+
+    "empty": {
+      "title": "No candidates yet",
+      "subtitle": "Candidates appear here once applications start coming in."
+    },
+
+    "alerts": {
+      "advanced_success": "Advanced {{count}} candidate(s) successfully",
+      "no_match": "No candidates matched the criteria",
+      "auto_advance_failed": "Auto advance failed",
+      "shortlist_success": "Successfully advanced {{count}} candidate(s) to Shortlist!",
+      "no_candidates": "No candidates met the requirements to be auto-advanced.",
+      "failed": "Failed to auto-advance candidates."
+    }
+  },
+
+  "recruiter_dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome,",
+    "user": "User",
+    "subtitle": "Overview of your active job postings and applicants.",
+    "loading": "Loading dashboard...",
+    "error": "Failed to load dashboard data: "
+  },
+
+  "dashboard_charts": {
+    "pipeline_summary": {
+      "title": "Pipeline Summary",
+      "subtitle": "Across all active roles · last 7 days",
+      "live": "Live",
+      "stages": {
+        "applied": "Applied",
+        "screened": "Screened",
+        "testing": "Testing",
+        "interviewed": "Interviewed",
+        "shortlisted": "Shortlisted"
+      }
+    },
+    "top_jobs": {
+      "title": "Top Jobs by Applicants",
+      "subtitle": "Most active job postings"
+    }
+  },
+
+  "dashboard_jobs_table": {
+    "title": "Active Jobs Overview",
+    "no_jobs": "No jobs available",
+    "view_shortlist": "View Shortlist",
+    "columns": {
+      "job_title": "Job Title",
+      "company": "Company",
+      "applicants": "Applicants",
+      "tested": "Tested",
+      "interview": "Interview",
+      "waiting_action": "Waiting Action",
+      "shortlisted": "Shortlisted",
+      "actions": "Actions"
+    }
+  },
+
+  "dashboard_stats": {
+    "total_jobs": "Total Jobs",
+    "total_applicants": "Total Applicants",
+    "accepted": "Accepted",
+    "rejected": "Rejected"
+  },
+
+  "add_interview": {
+    "enter_question": "Enter each question on a new line.",
+    "title": "Send Interview Invitation",
+    "description": "Send an interview invitation to an applicant",
+    "buttons": {
+      "open": "Open Dialog",
+      "send": "Send interview",
+      "sending": "Sending..."
+    },
+    "labels": {
+      "application_id": "Application ID",
+      "job_id": "Job ID",
+      "rerecord_after": "Re-record available after"
+    },
+    "errors": {
+      "required_ids": "Application ID and Job ID are required",
+      "rerecord_positive": "Re-record minutes must be greater than 0"
+    }
+  },
+
+  "shortlists": {
+    "ai_match": "AI Match",
+    "title": "Shortlist",
+    "subtitle": "Top candidates surfaced by AI · awaiting hiring team decision",
+    "search": "Search candidates...",
+    "select_job": "Select a job posting",
+    "filters": "Filters",
+    "sort_label": "Sort",
+    "empty": "No candidates in this shortlist yet.",
+    "sort": {
+      "consensus": "Consensus",
+      "ai_score": "AI Score",
+      "name": "Name"
+    }
+  },
+
+  "shortlist": {
+    "yourVote": "Your Vote",
+    "noVoteYet": "You haven't voted yet.",
+    "votedMessage": "You voted {{vote}} — tap again to undo",
+
+    "teamVotes": "Team Votes",
+    "votesCast": "{{count}} / ? cast",
+    "noVotes": "No votes yet",
+
+    "vote": {
+      "up": "↑ Up",
+      "down": "↓ Down",
+      "neutral": "— Neutral"
+    },
+
+    "aiRationale": "AI Rationale",
+    "confidence": "Confidence {{value}}%",
+    "noAiRationale": "No AI rationale available for this candidate.",
+    "proceedNext": "— Proceed to next stage",
+
+    "teamNotes": "Team Notes",
+    "loadingNotes": "Loading notes...",
+    "noNotes": "No notes yet. Be the first to leave one.",
+    "teamMember": "Team member",
+    "notePlaceholder": "Leave a note for the hiring team...",
+    "visibleToTeam": "Visible to hiring team",
+    "cancel": "Cancel",
+    "postNote": "Post note",
+    "posting": "Posting...",
+
+    "rejectionReason": "Rejection reason (pre-filled from AI):",
+    "confirmReject": "Confirm reject",
+    "rejecting": "Rejecting...",
+    "moveRejected": "Move to rejected",
+    "rejected": "This candidate was rejected",
+
+    "timeAgo": {
+      "justNow": "Just now",
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    },
+    "upVotes": "Up votes",
+    "neutral": "Neutral",
+    "downVotes": "Down votes",
+    "shortlisted": "shortlisted",
+    "awaitingVote": "awaiting first vote",
+    "aiSuggestion": "AI suggests advancing top {{count}} to onsite",
+
+    "noCandidates": "No candidates in shortlist.",
+    "rank": "RANK",
+    "candidate": "CANDIDATE",
+    "cv": "CV",
+    "tests": "TESTS",
+    "interview": "INTERVIEW",
+    "composite": "COMPOSITE",
+    "teamVote": "TEAM VOTE",
+    "noHeadline": "No headline",
+    "up": "Up",
+    "down": "Down",
+    "rankLabel": "Rank",
+
+    "compare": {
+      "emptyState": "Select candidates from the table above to compare them side-by-side.",
+      "title": "Side-by-side comparison",
+      "description": "Select 2-3 candidates to compare dimensions in detail. Drag to reorder."
+    }
+  },
+
+  "shortlistInsights": {
+    "upVotes": "Up votes",
+    "neutral": "Neutral",
+    "downVotes": "Down votes",
+    "shortlisted": "shortlisted",
+    "awaitingVote": "awaiting first vote",
+    "aiSuggestion": "AI suggests advancing top {{count}} to onsite",
+
+    "noCandidates": "No candidates in shortlist.",
+    "rank": "RANK",
+    "candidate": "CANDIDATE",
+    "cv": "CV",
+    "tests": "TESTS",
+    "interview": "INTERVIEW",
+    "composite": "COMPOSITE",
+    "teamVote": "TEAM VOTE",
+    "noHeadline": "No headline",
+    "up": "Up",
+    "down": "Down",
+    "rankLabel": "Rank"
   }
 }

@@ -1,4 +1,6 @@
+//src\features\companies\components\job-postings\JobDetailHeader.jsx
 import { Wand2, Edit, X, Save, Menu } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function JobDetailHeader({
   selectedJob,
@@ -11,6 +13,8 @@ export default function JobDetailHeader({
   saving,
   onOpenSidebar,
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-6 mb-8">
       <div>
@@ -37,14 +41,20 @@ export default function JobDetailHeader({
           </h1>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500 capitalize lg:ml-0 ml-10">
-          <span>{selectedJob.seniority_level || "Any Seniority"}</span>
+          <span>
+            {selectedJob.seniority_level ||
+              t("job_detail_header.any_seniority")}
+          </span>
           <span>&middot;</span>
           <span>
             {selectedJob.work_location?.replace("_", " ").trim() ||
-              "Any Location"}
+              t("job_detail_header.any_location")}
           </span>
           <span>&middot;</span>
-          <span>{selectedJob.job_type?.replace("_", "-") || "Full-time"}</span>
+          <span>
+            {selectedJob.job_type?.replace("_", "-") ||
+              t("job_detail_header.full_time")}
+          </span>
         </div>
       </div>
 
@@ -54,14 +64,14 @@ export default function JobDetailHeader({
             <button className="flex items-center gap-2 bg-gradient-to-r from-mauve-magic-500 to-dark-amethyst-500 hover:from-mauve-magic-600 hover:to-dark-amethyst-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm">
               <Wand2 className="w-4 h-4" />
               {/* TODO:  */}
-              Regenerate with AI
+              {t("job_detail_header.regenerate")}
             </button>
             <button
               onClick={handleEditClick}
               className="flex items-center gap-2 border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs"
             >
               <Edit className="w-4 h-4" />
-              Edit
+              {t("job_detail_header.edit")}
             </button>
           </>
         ) : (
@@ -71,7 +81,7 @@ export default function JobDetailHeader({
               className="flex items-center gap-2 border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 transition-colors"
             >
               <X className="w-4 h-4" />
-              Cancel
+              {t("job_detail_header.cancel")}
             </button>
             <button
               onClick={handleSave}
@@ -79,7 +89,9 @@ export default function JobDetailHeader({
               className="flex items-center gap-2 bg-dark-amethyst-600 hover:bg-dark-amethyst-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {saving ? "Saving..." : "Save"}
+              {saving
+                ? t("job_detail_header.saving")
+                : t("job_detail_header.save")}
             </button>
           </>
         )}

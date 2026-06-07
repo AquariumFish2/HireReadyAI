@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button"
+//src\features\recruiter\components\dialog.jsx
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -8,92 +9,128 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { TextareaField } from "./textArea"
-import InterviewQuestion from "@/features/interview/models/interview-question.model"
+} from "@/components/ui/dialog";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { TextareaField } from "./textArea";
+import { useTranslation } from "react-i18next";
+import InterviewQuestion from "@/features/interview/models/interview-question.model";
 
 export function AddInterviewDialog() {
-    const [applicationID, setApplicationID] = useState("");
-    const [jobID, setJobID] = useState("");
-    const [reRecordMins, setReRecordMins] = useState(0);
-    const [error, setError] = useState("");
-    const [questionsText, setQuestionsText] = useState("");
-    const [questionsList, setQuestionList] = useState([]);
-    const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
+  const [applicationID, setApplicationID] = useState("");
+  const [jobID, setJobID] = useState("");
+  const [reRecordMins, setReRecordMins] = useState(0);
+  const [error, setError] = useState("");
+  const [questionsText, setQuestionsText] = useState("");
+  const [questionsList, setQuestionList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    async function submitInterview(e) {
-      e.preventDefault();
-      if (!applicationID || !jobID) {
-        setError("Application ID and Job ID are required");
-        return;
-      }
-      setLoading(true);
-      setError("");
-      try {
-        const array = questionsText.split(/\r?\n/).filter(q => q.trim() !== "").map(q => q.trim())
-        setQuestionList(array)
-
-        // Legacy: Interview creation moved to application stages
-        console.warn("AddInterviewDialog is obsolete in new stage-based schema");
-      } catch (err) {
-        console.log(err)
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+  async function submitInterview(e) {
+    e.preventDefault();
+    if (!applicationID || !jobID) {
+      setError(t("add_interview.errors.required_ids"));
+      return;
     }
+    setLoading(true);
+    setError("");
+    try {
+      const array = questionsText
+        .split(/\r?\n/)
+        .filter((q) => q.trim() !== "")
+        .map((q) => q.trim());
+      setQuestionList(array);
+
+      // Legacy: Interview creation moved to application stages
+      console.warn("AddInterviewDialog is obsolete in new stage-based schema");
+    } catch (err) {
+      console.log(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Open Dialog</Button>
+        <Button variant="outline">{t("add_interview.buttons.open")}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <form onSubmit={submitInterview}>
           <DialogHeader>
-            <DialogTitle>SEND AN INTERVIEW INVITATION</DialogTitle>
+            <DialogTitle>{t("add_interview.title")}</DialogTitle>
             <DialogDescription>
-              send an interview to an applicant
+              {t("add_interview.description")}
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <Label htmlFor="application-id">application id</Label>
-              <Input id="applicant-id" name="applicant-id" onChange={(e)=>{setApplicationID(e.target.value)}}/>
+              <Label htmlFor="application-id">
+                {t("add_interview.labels.application_id")}
+              </Label>
+              <Input
+                id="applicant-id"
+                name="applicant-id"
+                onChange={(e) => {
+                  setApplicationID(e.target.value);
+                }}
+              />
             </Field>
             <Field>
-              <Label htmlFor="job-id">job id</Label>
-              <Input id="job-id" name="job-id" onChange={(e) => setJobID(e.target.value)} />
+              <Label htmlFor="job-id">{t("add_interview.labels.job_id")}</Label>
+              <Input
+                id="job-id"
+                name="job-id"
+                onChange={(e) => setJobID(e.target.value)}
+              />
             </Field>
             <Field>
-              <Label htmlFor="rerecord-input">rerecord availible after </Label>
-              <Input id="rerecord-input" name="rerecord-input" type="number" className="no-spinner" onChange={(e) => {
-                    const value = Number(e.target.value);
-                    if(value < 0){
-                        setError("Rerecord minutes has to be more than 0")
-                    }else{
-                        setError("")
-                        setReRecordMins(value)
-                    }
-              }}/>
-              {error&&<p className="italic text-red-400 text-sm">{error}</p>}
+              <Label htmlFor="rerecord-input">
+                {t("add_interview.labels.rerecord_after")}{" "}
+              </Label>
+              <Input
+                id="rerecord-input"
+                name="rerecord-input"
+                type="number"
+                className="no-spinner"
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (value < 0) {
+                    setError(t("add_interview.errors.rerecord_positive"));
+                  } else {
+                    setError("");
+                    setReRecordMins(value);
+                  }
+                }}
+              />
+              {error && <p className="italic text-red-400 text-sm">{error}</p>}
             </Field>
-             <Field>
-               <TextareaField value={questionsText} onChange={(e)=>{setQuestionsText(e.target.value)}}/>
-             </Field>
+            <Field>
+              <TextareaField
+                value={questionsText}
+                onChange={(e) => {
+                  setQuestionsText(e.target.value);
+                }}
+              />
+            </Field>
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">Cancel</Button>
+              <Button type="button" variant="outline">
+                {t("avatar_modal.cancel")}
+              </Button>
             </DialogClose>
-            <Button type="submit" disabled={loading}>{loading ? "Sending..." : "Send interview"}</Button>
+            <Button type="submit" disabled={loading}>
+              {loading
+                ? t("add_interview.buttons.sending")
+                : t("add_interview.buttons.send")}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

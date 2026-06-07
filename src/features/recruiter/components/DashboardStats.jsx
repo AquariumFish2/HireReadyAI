@@ -1,10 +1,12 @@
+//src\features\recruiter\components\DashboardStats.jsx
 import React from "react";
 import { Briefcase, Users, CheckCircle, XCircle } from "lucide-react";
-
+import { useTranslation } from "react-i18next";
 export default function DashboardStats({ stats }) {
+  const { t } = useTranslation();
   const cards = [
     {
-      label: "Total Jobs",
+      label: t("dashboard_stats.total_jobs"),
       value: stats.totalJobs,
       icon: <Briefcase className="w-5 h-5 text-dark-amethyst-600" />,
       bgColor: "bg-white",
@@ -12,7 +14,7 @@ export default function DashboardStats({ stats }) {
       textColor: "text-dark-amethyst-950",
     },
     {
-      label: "Total Applicants",
+      label: t("dashboard_stats.total_applicants"),
       value: stats.totalApplicants,
       icon: <Users className="w-5 h-5 text-dark-amethyst-500" />,
       bgColor: "bg-white",
@@ -20,7 +22,7 @@ export default function DashboardStats({ stats }) {
       textColor: "text-dark-amethyst-950",
     },
     {
-      label: "Accepted",
+      label: t("dashboard_stats.accepted"),
       value: stats.totalAccepted,
       icon: <CheckCircle className="w-5 h-5 text-green-500" />,
       bgColor: "bg-white",
@@ -28,7 +30,7 @@ export default function DashboardStats({ stats }) {
       textColor: "text-dark-amethyst-950",
     },
     {
-      label: "Rejected",
+      label: t("dashboard_stats.rejected"),
       value: stats.totalRejected,
       icon: <XCircle className="w-5 h-5 text-red-500" />,
       bgColor: "bg-white",
@@ -36,7 +38,6 @@ export default function DashboardStats({ stats }) {
       textColor: "text-dark-amethyst-950",
     },
   ];
-
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 font-sans">
       {cards.map((card, idx) => (
@@ -48,7 +49,10 @@ export default function DashboardStats({ stats }) {
             <p className="text-dark-amethyst-400 text-sm font-medium mb-1 tracking-wide">
               {card.label}
             </p>
-            <h3 className={`text-3xl font-bold ${card.textColor}`} style={{ fontFamily: "'Inter', sans-serif" }}>
+            <h3
+              className={`text-3xl font-bold ${card.textColor}`}
+              style={{ fontFamily: "'Inter', sans-serif" }}
+            >
               {card.value}
             </h3>
           </div>

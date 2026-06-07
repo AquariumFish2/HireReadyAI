@@ -1,3 +1,4 @@
+// src\features\recruiter\pages\RecruiterDashboardPage.jsx
 import React from "react";
 import { useDashboardData } from "../hooks/useDashboardData";
 import DashboardStats from "../components/DashboardStats";
@@ -6,6 +7,7 @@ import DashboardJobsTable from "../components/DashboardJobsTable";
 import { useEffect, useState } from "react";
 import { fetchCurrentUserName } from "../services/dashboard.service";
 import { useUser } from "@/features/auth/context/user.context";
+import { useTranslation } from "react-i18next";
 export default function RecruiterDashboardPage() {
   const {
     jobs,
@@ -16,6 +18,7 @@ export default function RecruiterDashboardPage() {
     isLoading,
     error,
   } = useDashboardData();
+  const { t } = useTranslation();
 
   const { profile } = useUser();
   const [fullName, setFullName] = useState("");
@@ -39,7 +42,7 @@ export default function RecruiterDashboardPage() {
         <div className="flex flex-col items-center">
           <div className="w-8 h-8 border-2 border-dark-amethyst-600 border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-sm text-dark-amethyst-400">
-            Loading dashboard...
+            {t("recruiter_dashboard.loading")}
           </p>
         </div>
       </div>
@@ -50,7 +53,7 @@ export default function RecruiterDashboardPage() {
     return (
       <div className="p-8 font-sans">
         <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm border border-red-100">
-          Failed to load dashboard data: {error}
+          {t("recruiter_dashboard.error")} {error}
         </div>
       </div>
     );
@@ -66,21 +69,21 @@ export default function RecruiterDashboardPage() {
               className="text-3xl font-bold text-dark-amethyst-950 tracking-tight"
               style={{ fontFamily: "'Inter', sans-serif" }}
             >
-              Dashboard
+              {t("recruiter_dashboard.title")}
             </h1>
 
             {/* Welcome user badge */}
             <div className="px-4 py-2 rounded-full bg-dark-amethyst-50 border border-dark-amethyst-100 text-sm text-dark-amethyst-700 font-medium">
               Welcome,{" "}
               <span className="text-dark-amethyst-900 font-semibold">
-                {fullName || "User"} !
+                {fullName || t("recruiter_dashboard.user")} !
               </span>{" "}
             </div>
           </div>
 
           {/* Subtitle */}
           <p className="text-sm text-dark-amethyst-400">
-            Overview of your active job postings and applicants.
+            {t("recruiter_dashboard.subtitle")}
           </p>
         </div>
 

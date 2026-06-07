@@ -1,3 +1,4 @@
+//src\features\shortlist\components\ShortlistDetailPanel.jsx
 import { useState, useRef, useEffect } from "react";
 import {
   ThumbsUp,
@@ -10,6 +11,7 @@ import {
   Clock,
   UserCheck,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function getInitials(name = "") {
   return name
@@ -41,9 +43,9 @@ function timeAgo(dateString) {
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  if (days > 0) return `${days}d ago`;
-  if (hours > 0) return `${hours}h ago`;
-  return "Just now";
+  if (days > 0) return t("shortlist.timeAgo.days", { count: days });
+  if (hours > 0) return t("shortlist.timeAgo.hours", { count: hours });
+  return t("shortlist.timeAgo.justNow");
 }
 
 const TAG_COLORS = {
@@ -86,6 +88,7 @@ export default function ShortlistDetailPanel({
   onPostNote,
   isOverlay,
 }) {
+  const { t } = useTranslation();
   const [noteBody, setNoteBody] = useState("");
   const [visibleToTeam, setVisibleToTeam] = useState(true);
   const [showRejectInput, setShowRejectInput] = useState(false);
@@ -104,8 +107,6 @@ export default function ShortlistDetailPanel({
     is_rejected,
     rejection_reason,
   } = app;
-
-
 
   useEffect(() => {
     notesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -203,7 +204,7 @@ export default function ShortlistDetailPanel({
           {/* YOUR VOTE */}
           <div className="px-5 py-4 border-b border-gray-100">
             <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-3">
-              Your Vote
+              {t("shortlist.yourVote")}
             </p>
             {myVote ? (
               <div
@@ -215,12 +216,11 @@ export default function ShortlistDetailPanel({
                       : "bg-gray-50 text-gray-600 border border-gray-200"
                 }`}
               >
-                You voted <strong className="capitalize">{myVote}</strong> — tap
-                again to undo
+                {t("shortlist.votedMessage", { vote: myVote })}
               </div>
             ) : (
               <p className="text-xs text-gray-400 mb-3">
-                You haven't voted yet.
+                {t("shortlist.noVoteYet")}
               </p>
             )}
             <div className="flex gap-2">
@@ -244,10 +244,10 @@ export default function ShortlistDetailPanel({
           <div className="px-5 py-4 border-b border-gray-100">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400">
-                Team Votes
+                {t("shortlist.teamVotes")}
               </p>
               <span className="text-xs text-gray-500">
-                {totalVoters} / ? cast
+                {t("shortlist.votesCast", { count: totalVoters })}
               </span>
             </div>
             {totalVoters > 0 && (
@@ -291,15 +291,17 @@ export default function ShortlistDetailPanel({
                     }`}
                   >
                     {v.vote === "up"
-                      ? "↑ Up"
+                      ? t("shortlist.vote.up")
                       : v.vote === "down"
-                        ? "↓ Down"
-                        : "— Neutral"}
+                        ? t("shortlist.vote.down")
+                        : t("shortlist.vote.neutral")}
                   </span>
                 </div>
               ))}
               {votes.length === 0 && (
-                <p className="text-xs text-gray-400">No votes yet.</p>
+                <p className="text-xs text-gray-400">
+                  {t("shortlist.noVotes")}
+                </p>
               )}
             </div>
           </div>
@@ -311,22 +313,23 @@ export default function ShortlistDetailPanel({
                 <div className="flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-mauve-magic-500" />
                   <p className="text-[10px] font-bold tracking-widest uppercase text-mauve-magic-600">
-                    AI Rationale
+                    {t("shortlist.aiRationale")}
                   </p>
                 </div>
                 {ai_confidence != null && (
                   <span className="text-[10px] font-bold text-mauve-magic-700 bg-mauve-magic-100 px-2 py-0.5 rounded-full">
-                    Confidence {Math.round(ai_confidence * 100)}%
+                    {t("shortlist.confidence", {
+                      value: Math.round(ai_confidence * 100),
+                    })}
                   </span>
                 )}
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {ai_rationale ||
-                  "No AI rationale available for this candidate."}
+                {ai_rationale || t("shortlist.noAiRationale")}
               </p>
               {!is_rejected && (
                 <button className="mt-3 text-xs font-semibold text-mauve-magic-600 hover:text-mauve-magic-800 transition-colors">
-                  — Proceed to next stage
+                  {t("shortlist.proceedNext")}
                 </button>
               )}
             </div>
@@ -335,15 +338,17 @@ export default function ShortlistDetailPanel({
           {/* TEAM NOTES */}
           <div className="px-5 py-4 border-b border-gray-100">
             <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-3">
-              Team Notes
+              {t("shortlist.teamNotes")}
             </p>
             {notesLoading ? (
-              <div className="text-xs text-gray-400">Loading notes...</div>
+              <div className="text-xs text-gray-400">
+                {t("shortlist.loadingNotes")}
+              </div>
             ) : (
               <div className="space-y-3 mb-3">
                 {notes.length === 0 && (
                   <p className="text-xs text-gray-400">
-                    No notes yet. Be the first to leave one.
+                    {t("shortlist.noNotes")}
                   </p>
                 )}
                 {notes.map((note) => (
@@ -353,7 +358,7 @@ export default function ShortlistDetailPanel({
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs font-semibold text-gray-800">
-                        {note.profiles?.full_name || "Team member"}
+                        {note.profiles?.full_name || t("shortlist.teamMember")}
                       </span>
                       <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
                         <Clock className="w-3 h-3" />
@@ -372,7 +377,7 @@ export default function ShortlistDetailPanel({
               rows={2}
               value={noteBody}
               onChange={(e) => setNoteBody(e.target.value)}
-              placeholder="Leave a note for the hiring team..."
+              placeholder={t("shortlist.notePlaceholder")}
               className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 text-gray-700 placeholder-gray-400"
             />
             <div className="flex items-center justify-between mt-2">
@@ -384,14 +389,14 @@ export default function ShortlistDetailPanel({
                   className="accent-dark-amethyst-500"
                 />
                 <UserCheck className="w-3 h-3" />
-                Visible to hiring team
+                {t("shortlist.visibleToTeam")}
               </label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setNoteBody("")}
                   className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  Cancel
+                  {t("shortlist.cancel")}
                 </button>
                 <button
                   onClick={handlePostNote}
@@ -399,7 +404,9 @@ export default function ShortlistDetailPanel({
                   className="flex items-center gap-1.5 text-xs font-semibold bg-dark-amethyst-600 hover:bg-dark-amethyst-700 text-white px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
                 >
                   <Send className="w-3 h-3" />
-                  {postingNote ? "Posting..." : "Post note"}
+                  {postingNote
+                    ? t("shortlist.posting")
+                    : t("shortlist.postNote")}
                 </button>
               </div>
             </div>
@@ -412,7 +419,7 @@ export default function ShortlistDetailPanel({
             {showRejectInput ? (
               <div className="space-y-2">
                 <p className="text-xs text-gray-500 font-medium">
-                  Rejection reason (pre-filled from AI):
+                  {t("shortlist.rejectionReason")}
                 </p>
                 <textarea
                   rows={3}
@@ -425,14 +432,16 @@ export default function ShortlistDetailPanel({
                     onClick={() => setShowRejectInput(false)}
                     className="flex-1 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                   >
-                    Cancel
+                    {t("shortlist.cancel")}
                   </button>
                   <button
                     onClick={handleReject}
                     disabled={rejecting}
                     className="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
                   >
-                    {rejecting ? "Rejecting..." : "Confirm reject"}
+                    {rejecting
+                      ? t("shortlist.rejecting")
+                      : t("shortlist.confirmReject")}
                   </button>
                 </div>
               </div>
@@ -448,11 +457,12 @@ export default function ShortlistDetailPanel({
                 <button
                   onClick={() => {
                     setShowRejectInput(true);
-                    if (!rejectReason && ai_rationale) setRejectReason(ai_rationale);
+                    if (!rejectReason && ai_rationale)
+                      setRejectReason(ai_rationale);
                   }}
                   className="flex-1 py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl text-sm font-medium transition-colors"
                 >
-                  Move to rejected
+                  {t("shortlist.moveRejected")}
                 </button>
               </div>
             )}
@@ -460,7 +470,7 @@ export default function ShortlistDetailPanel({
         ) : (
           <div className="px-5 py-4 border-t border-gray-100 bg-red-50 shrink-0">
             <p className="text-xs text-red-500 font-semibold mb-1">
-              This candidate was rejected
+              {t("shortlist.rejected")}
             </p>
             {rejection_reason && (
               <p className="text-xs text-gray-500 leading-relaxed">

@@ -1,5 +1,7 @@
+//src\features\companies\pages\CompanyProfile.jsx
 import { UploadCloud, Plus, FileText } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CompanyProfile({
   company,
@@ -8,6 +10,7 @@ export default function CompanyProfile({
   frameworkFile,
   setFrameworkFile,
 }) {
+  const { t } = useTranslation();
   const [memberName, setMemberName] = useState("");
   const [memberEmail, setMemberEmail] = useState("");
 
@@ -17,7 +20,7 @@ export default function CompanyProfile({
     onInvite(memberName, memberEmail);
     setMemberName("");
     setMemberEmail("");
-    alert("Member invited successfully!");
+    alert(t("company_profile.team.invite_success"));
   };
 
   const handleFileChange = (e) => {
@@ -29,14 +32,13 @@ export default function CompanyProfile({
   return (
     <div className="p-4 sm:p-8 bg-gray-50/50 min-h-screen font-sans">
       <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
-
         {/* Profile Card */}
         <div className="bg-white p-5 sm:p-6 rounded-xl border border-gray-100 shadow-sm">
           <h2 className="text-lg sm:text-xl font-bold text-dark-amethyst-950 mb-1">
-            Company Profile
+            {t("company_profile.profile.title")}
           </h2>
           <p className="text-xs text-gray-400 mb-6">
-            Manage your workspace details and branding.
+            {t("company_profile.profile.subtitle")}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 items-center sm:items-start">
@@ -48,7 +50,7 @@ export default function CompanyProfile({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full grow">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  Company Name
+                  {t("company_profile.profile.fields.company_name")}
                 </label>
                 <input
                   type="text"
@@ -59,7 +61,7 @@ export default function CompanyProfile({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  Industry
+                  {t("company_profile.profile.fields.industry")}
                 </label>
                 <input
                   type="text"
@@ -70,14 +72,16 @@ export default function CompanyProfile({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  Company Size
+                  {t("company_profile.profile.fields.company_size")}
                 </label>
                 <input
                   type="text"
                   disabled
                   value={
                     company?.size
-                      ? `${company.size.toLocaleString()} employees`
+                      ? t("company_profile.profile.fields.employees", {
+                          count: company.size,
+                        })
                       : ""
                   }
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50/30 text-gray-700"
@@ -85,7 +89,7 @@ export default function CompanyProfile({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  Created At
+                  {t("company_profile.profile.fields.created_at")}
                 </label>
                 <input
                   type="text"
@@ -105,10 +109,10 @@ export default function CompanyProfile({
         {/* Framework Card */}
         <div className="bg-white p-5 sm:p-6 rounded-xl border border-gray-100 shadow-sm">
           <h2 className="text-lg sm:text-xl font-bold text-dark-amethyst-950 mb-1">
-            Competency Framework
+            {t("company_profile.framework.title")}
           </h2>
           <p className="text-xs text-gray-400 mb-6">
-            Upload your grading framework for AI analysis.
+            {t("company_profile.framework.subtitle")}
           </p>
 
           <label className="border-2 border-dashed border-gray-200 rounded-xl p-6 sm:p-8 text-center bg-gray-50/30 hover:bg-gray-50 transition-colors cursor-pointer group flex flex-col items-center justify-center">
@@ -120,9 +124,11 @@ export default function CompanyProfile({
             />
             <UploadCloud className="w-8 h-8 text-gray-400 mb-2 group-hover:text-dark-amethyst-500 transition-colors" />
             <p className="text-sm font-medium text-gray-700 px-2 text-center">
-              Click to upload your framework file
+              {t("company_profile.framework.upload")}
             </p>
-            <p className="text-xs text-gray-400 mt-1">PDF or DOCX up to 25MB</p>
+            <p className="text-xs text-gray-400 mt-1">
+              {t("company_profile.framework.file_types")}
+            </p>
           </label>
 
           {frameworkFile && (
@@ -132,7 +138,7 @@ export default function CompanyProfile({
                 <span className="truncate">{frameworkFile}</span>
               </div>
               <span className="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 py-0.5 rounded text-[10px] font-bold shrink-0">
-                Active & Indexed
+                {t("company_profile.framework.active")}
               </span>
             </div>
           )}
@@ -141,10 +147,10 @@ export default function CompanyProfile({
         {/* Team Members Card */}
         <div className="bg-white p-5 sm:p-6 rounded-xl border border-gray-100 shadow-sm">
           <h2 className="text-lg sm:text-xl font-bold text-dark-amethyst-950 mb-1">
-            Team Members
+            {t("company_profile.team.title")}
           </h2>
           <p className="text-xs text-gray-400 mb-4">
-            Invite and manage your recruitment team permissions.
+            {t("company_profile.team.subtitle")}
           </p>
 
           <form
@@ -156,7 +162,7 @@ export default function CompanyProfile({
               type="text"
               value={memberName}
               onChange={(e) => setMemberName(e.target.value)}
-              placeholder="Full Name"
+              placeholder={t("company_profile.team.placeholders.full_name")}
               className="w-full sm:flex-1 px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-dark-amethyst-400"
             />
             <input
@@ -164,14 +170,15 @@ export default function CompanyProfile({
               type="email"
               value={memberEmail}
               onChange={(e) => setMemberEmail(e.target.value)}
-              placeholder="Email Address"
+              placeholder={t("company_profile.team.placeholders.email")}
               className="w-full sm:flex-1 px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-dark-amethyst-400"
             />
             <button
               type="submit"
               className="w-full sm:w-auto flex items-center justify-center gap-1 bg-dark-amethyst-950 text-white px-5 py-2 sm:py-1.5 rounded-md text-xs font-medium hover:bg-dark-amethyst-900 transition-colors cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" /> Invite
+              <Plus className="w-3.5 h-3.5" />{" "}
+              {t("company_profile.team.invite")}
             </button>
           </form>
 
@@ -185,23 +192,26 @@ export default function CompanyProfile({
                   <div className="w-9 h-9 rounded-full bg-dark-amethyst-100 text-dark-amethyst-800 flex items-center justify-center text-xs font-bold shrink-0">
                     {member.profiles?.full_name
                       ? member.profiles.full_name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
                       : "?"}
                   </div>
                   <div className="min-w-0">
                     <h4 className="text-sm font-medium text-dark-amethyst-950 truncate">
-                      {member.profiles?.full_name || "Unknown"}
+                      {member.profiles?.full_name ||
+                        t("company_profile.team.unknown")}
                     </h4>
                     <p className="text-xs text-gray-400 truncate">
-                      {member.profiles?.role || "Team Member"}
+                      {member.profiles?.role ||
+                        t("company_profile.team.team_member")}
                     </p>
                   </div>
                 </div>
                 <span className="px-2.5 py-0.5 rounded-md text-[11px] font-medium border border-black/5 bg-gray-100 text-gray-600 shrink-0">
-                  {member.profiles?.role || "Team Member"}
+                  {member.profiles?.role ||
+                    t("company_profile.team.team_member")}
                 </span>
               </div>
             ))}

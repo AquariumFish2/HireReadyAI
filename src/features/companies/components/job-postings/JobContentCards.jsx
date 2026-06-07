@@ -1,6 +1,12 @@
+//src\features\companies\components\job-postings\JobContentCards.jsx
 import { CheckCircle, X } from "lucide-react";
-
-export default function JobContentCards({ selectedJob, isEditing, editForm, setEditForm }) {
+import { useTranslation } from "react-i18next";
+export default function JobContentCards({
+  selectedJob,
+  isEditing,
+  editForm,
+  setEditForm,
+}) {
   // Helper for array inputs
   const handleArrayInputKeyDown = (e, field) => {
     if (e.key === "Enter" && e.target.value.trim()) {
@@ -22,21 +28,27 @@ export default function JobContentCards({ selectedJob, isEditing, editForm, setE
     });
   };
 
+  const { t } = useTranslation();
+
   return (
     <>
       {/* Job Summary */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 lg:p-8">
-        <h3 className="text-sm font-bold text-gray-900 mb-4">Job summary</h3>
+        <h3 className="text-sm font-bold text-gray-900 mb-4">
+          {t("job_content_cards.job_summary")}
+        </h3>
         {isEditing ? (
           <textarea
             rows={4}
             className="w-full text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400"
             value={editForm.description || ""}
-            onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+            onChange={(e) =>
+              setEditForm({ ...editForm, description: e.target.value })
+            }
           />
         ) : (
           <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
-            {selectedJob.description || "No description provided."}
+            {selectedJob.description || t("job_content_cards.no_description")}
           </div>
         )}
       </div>
@@ -44,7 +56,9 @@ export default function JobContentCards({ selectedJob, isEditing, editForm, setE
       <div className="grid md:grid-cols-2 gap-6">
         {/* Responsibilities */}
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 lg:p-8">
-          <h3 className="text-sm font-bold text-gray-900 mb-4">Responsibilities</h3>
+          <h3 className="text-sm font-bold text-gray-900 mb-4">
+            {t("job_content_cards.responsibilities")}
+          </h3>
           <ul className="space-y-3">
             {isEditing ? (
               <>
@@ -70,8 +84,10 @@ export default function JobContentCards({ selectedJob, isEditing, editForm, setE
                 <li>
                   <input
                     type="text"
-                    placeholder="Type and press Enter to add..."
-                    onKeyDown={(e) => handleArrayInputKeyDown(e, "responsibilities")}
+                    placeholder={t("job_content_cards.placeholders.add_item")}
+                    onKeyDown={(e) =>
+                      handleArrayInputKeyDown(e, "responsibilities")
+                    }
                     className="w-full text-sm bg-white border border-gray-200 rounded px-3 py-2 text-gray-500"
                   />
                 </li>
@@ -80,19 +96,27 @@ export default function JobContentCards({ selectedJob, isEditing, editForm, setE
               (selectedJob.responsibilities || []).map((resp, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="w-4 h-4 text-dark-amethyst-500 shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-600 leading-relaxed">{resp}</span>
+                  <span className="text-sm text-gray-600 leading-relaxed">
+                    {resp}
+                  </span>
                 </li>
               ))
             )}
-            {!isEditing && (!selectedJob.responsibilities || selectedJob.responsibilities.length === 0) && (
-              <span className="text-sm text-gray-400">None specified.</span>
-            )}
+            {!isEditing &&
+              (!selectedJob.responsibilities ||
+                selectedJob.responsibilities.length === 0) && (
+                <span className="text-sm text-gray-400">
+                  {t("job_content_cards.none_specified")}
+                </span>
+              )}
           </ul>
         </div>
 
         {/* Requirements */}
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 lg:p-8">
-          <h3 className="text-sm font-bold text-gray-900 mb-4">Requirements</h3>
+          <h3 className="text-sm font-bold text-gray-900 mb-4">
+            {t("job_content_cards.requirements")}
+          </h3>
           <ul className="space-y-3">
             {isEditing ? (
               <>
@@ -118,8 +142,10 @@ export default function JobContentCards({ selectedJob, isEditing, editForm, setE
                 <li>
                   <input
                     type="text"
-                    placeholder="Type and press Enter to add..."
-                    onKeyDown={(e) => handleArrayInputKeyDown(e, "requirements")}
+                    placeholder={t("job_content_cards.placeholders.add_item")}
+                    onKeyDown={(e) =>
+                      handleArrayInputKeyDown(e, "requirements")
+                    }
                     className="w-full text-sm bg-white border border-gray-200 rounded px-3 py-2 text-gray-500"
                   />
                 </li>
@@ -128,48 +154,71 @@ export default function JobContentCards({ selectedJob, isEditing, editForm, setE
               (selectedJob.requirements || []).map((req, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="w-4 h-4 text-dark-amethyst-500 shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-600 leading-relaxed">{req}</span>
+                  <span className="text-sm text-gray-600 leading-relaxed">
+                    {req}
+                  </span>
                 </li>
               ))
             )}
-            {!isEditing && (!selectedJob.requirements || selectedJob.requirements.length === 0) && (
-              <span className="text-sm text-gray-400">None specified.</span>
-            )}
+            {!isEditing &&
+              (!selectedJob.requirements ||
+                selectedJob.requirements.length === 0) && (
+                <span className="text-sm text-gray-400">
+                  {" "}
+                  {t("job_content_cards.none_specified")}
+                </span>
+              )}
           </ul>
         </div>
       </div>
 
       {/* Skills */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 lg:p-8">
-        <h3 className="text-sm font-bold text-gray-900 mb-4">Skills</h3>
+        <h3 className="text-sm font-bold text-gray-900 mb-4">
+          {" "}
+          {t("job_content_cards.skills")}
+        </h3>
         <div className="flex flex-wrap gap-2">
           {isEditing ? (
             <>
               {(editForm.skills || []).map((skill, i) => (
-                <div key={i} className="flex items-center gap-1 bg-mauve-magic-50 text-mauve-magic-700 border border-mauve-magic-200 px-3 py-1.5 rounded-full text-sm font-medium">
+                <div
+                  key={i}
+                  className="flex items-center gap-1 bg-mauve-magic-50 text-mauve-magic-700 border border-mauve-magic-200 px-3 py-1.5 rounded-full text-sm font-medium"
+                >
                   {skill}
-                  <button onClick={() => removeArrayItem(i, "skills")} className="hover:text-red-500 ml-1">
+                  <button
+                    onClick={() => removeArrayItem(i, "skills")}
+                    className="hover:text-red-500 ml-1"
+                  >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
               <input
                 type="text"
-                placeholder="Add skill..."
+                placeholder={t("job_content_cards.placeholders.add_skill")}
                 onKeyDown={(e) => handleArrayInputKeyDown(e, "skills")}
                 className="text-sm bg-white border border-gray-200 rounded-full px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-mauve-magic-400 w-32"
               />
             </>
           ) : (
             (selectedJob.skills || []).map((skill, i) => (
-              <span key={i} className="bg-mauve-magic-50 text-mauve-magic-700 border border-mauve-magic-200 px-4 py-1.5 rounded-full text-sm font-medium">
+              <span
+                key={i}
+                className="bg-mauve-magic-50 text-mauve-magic-700 border border-mauve-magic-200 px-4 py-1.5 rounded-full text-sm font-medium"
+              >
                 {skill}
               </span>
             ))
           )}
-          {!isEditing && (!selectedJob.skills || selectedJob.skills.length === 0) && (
-            <span className="text-sm text-gray-400">None specified.</span>
-          )}
+          {!isEditing &&
+            (!selectedJob.skills || selectedJob.skills.length === 0) && (
+              <span className="text-sm text-gray-400">
+                {" "}
+                {t("job_content_cards.none_specified")}
+              </span>
+            )}
         </div>
       </div>
     </>

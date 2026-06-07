@@ -1,3 +1,4 @@
+//src\features\companies\pages\NoCompanyView.jsx
 import { useState, useEffect } from "react";
 import { Building2, Plus, LogOut, ArrowLeft } from "lucide-react";
 import {
@@ -7,6 +8,8 @@ import {
 import { addMembership } from "../services/memberships.service";
 import { logOut } from "@/features/auth/services/auth.service";
 import { useUser } from "@/features/auth/context/user.context";
+import { useTranslation } from "react-i18next";
+import { t } from "i18next";
 
 export default function NoCompanyView({ onCompanyJoined }) {
   const { profile } = useUser();
@@ -100,7 +103,9 @@ export default function NoCompanyView({ onCompanyJoined }) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-slate-900 font-sans">
         <div className="w-8 h-8 border-2 border-dark-amethyst-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-2 text-slate-500 text-sm">Loading companies...</p>
+        <p className="mt-2 text-slate-500 text-sm">
+          {t("no_company_view.loading")}
+        </p>
       </div>
     );
   }
@@ -122,7 +127,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
-          Sign out
+          {t("no_company_view.sign_out")}
         </button>
       </header>
 
@@ -145,13 +150,13 @@ export default function NoCompanyView({ onCompanyJoined }) {
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <h2 className="text-xl font-bold text-dark-amethyst-950">
-                  Create a New Company
+                  {t("no_company_view.create.title")}
                 </h2>
               </div>
               <form onSubmit={handleCreateCompany} className="p-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Company Name
+                    {t("no_company_view.create.company_name")}
                   </label>
                   <input
                     type="text"
@@ -161,12 +166,12 @@ export default function NoCompanyView({ onCompanyJoined }) {
                       setNewCompany({ ...newCompany, name: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-dark-amethyst-500 focus:border-dark-amethyst-500"
-                    placeholder="Acme Corp"
+                    placeholder={t("no_company_view.placeholders.name")}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Industry
+                    {t("no_company_view.create.industry")}
                   </label>
                   <input
                     type="text"
@@ -175,13 +180,13 @@ export default function NoCompanyView({ onCompanyJoined }) {
                       setNewCompany({ ...newCompany, industry: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-dark-amethyst-500 focus:border-dark-amethyst-500"
-                    placeholder="e.g. Technology, Healthcare"
+                    placeholder={t("no_company_view.placeholders.industry")}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Company Size
+                      {t("no_company_view.create.company_size")}
                     </label>
                     <input
                       type="number"
@@ -190,12 +195,12 @@ export default function NoCompanyView({ onCompanyJoined }) {
                         setNewCompany({ ...newCompany, size: e.target.value })
                       }
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-dark-amethyst-500 focus:border-dark-amethyst-500"
-                      placeholder="Number of employees"
+                      placeholder={t("no_company_view.placeholders.size")}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Location
+                      {t("no_company_view.create.location")}
                     </label>
                     <input
                       type="text"
@@ -207,7 +212,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
                         })
                       }
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-dark-amethyst-500 focus:border-dark-amethyst-500"
-                      placeholder="City, Country"
+                      placeholder={t("no_company_view.placeholders.location")}
                     />
                   </div>
                 </div>
@@ -217,14 +222,16 @@ export default function NoCompanyView({ onCompanyJoined }) {
                     onClick={() => setIsCreating(false)}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                   >
-                    Cancel
+                    {t("no_company_view.create.buttons.cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className="px-4 py-2 bg-dark-amethyst-950 text-white rounded-lg text-sm font-medium hover:bg-dark-amethyst-900 transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {isSubmitting ? "Creating..." : "Create Company"}
+                    {isSubmitting
+                      ? t("no_company_view.create.buttons.creating")
+                      : t("no_company_view.create.buttons.create")}
                   </button>
                 </div>
               </form>
@@ -236,11 +243,10 @@ export default function NoCompanyView({ onCompanyJoined }) {
                   <Building2 className="w-8 h-8 text-dark-amethyst-700" />
                 </div>
                 <h1 className="text-3xl font-bold text-dark-amethyst-950 mb-2">
-                  Join or Create a Company
+                  {t("no_company_view.join.title")}
                 </h1>
                 <p className="text-gray-600 mb-6">
-                  Select a company to get started with HireReadyAI or create
-                  your own
+                  {t("no_company_view.join.subtitle")}
                 </p>
                 {companies.length > 0 && (
                   <button
@@ -248,7 +254,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
                     className="inline-flex items-center gap-2 px-6 py-2.5 bg-dark-amethyst-950 text-white rounded-lg font-medium hover:bg-dark-amethyst-900 transition-colors cursor-pointer shadow-sm"
                   >
                     <Plus className="w-4 h-4" />
-                    Create a New Company
+                    {t("no_company_view.join.create_button")}
                   </button>
                 )}
               </div>
@@ -256,14 +262,14 @@ export default function NoCompanyView({ onCompanyJoined }) {
               {companies.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
                   <p className="text-gray-500 mb-6">
-                    No companies available to join.
+                    {t("no_company_view.join.no_companies")}
                   </p>
                   <button
                     onClick={() => setIsCreating(true)}
                     className="inline-flex items-center gap-2 mx-auto px-6 py-2.5 bg-dark-amethyst-950 text-white rounded-lg font-medium hover:bg-dark-amethyst-900 transition-colors cursor-pointer shadow-sm"
                   >
                     <Plus className="w-4 h-4" />
-                    Create a Company
+                    {t("no_company_view.join.create_company")}
                   </button>
                 </div>
               ) : (
@@ -302,7 +308,9 @@ export default function NoCompanyView({ onCompanyJoined }) {
                         disabled={joining === company.id}
                         className="w-full mt-4 px-4 py-2 bg-dark-amethyst-50 text-dark-amethyst-700 rounded-lg text-sm font-medium hover:bg-dark-amethyst-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
-                        {joining === company.id ? "Joining..." : "Join"}
+                        {joining === company.id
+                          ? t("no_company_view.join.joining")
+                          : t("no_company_view.join.join")}
                       </button>
                     </div>
                   ))}

@@ -1,13 +1,15 @@
+//src\features\recruiter\components\DashboardJobsTable.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { APPLICATION_STAGE } from "@/shared/constants/enums";
-
+import { useTranslation } from "react-i18next";
 export default function DashboardJobsTable({ jobs }) {
+  const { t } = useTranslation();
   if (!jobs || jobs.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-gray-100 p-8 text-center text-gray-500 font-sans">
-        No jobs available
+        {t("dashboard_jobs_table.no_jobs")}
       </div>
     );
   }
@@ -19,35 +21,35 @@ export default function DashboardJobsTable({ jobs }) {
           className="text-lg font-bold text-dark-amethyst-950"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
-          Active Jobs Overview
+          {t("dashboard_jobs_table.title")}
         </h3>
       </div>
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="bg-gray-50/50 border-b border-gray-100">
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider">
-              Job Title
+              {t("dashboard_jobs_table.columns.job_title")}
             </th>
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider">
-              Company
+              {t("dashboard_jobs_table.columns.company")}
             </th>
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider text-center">
-              Applicants
+              {t("dashboard_jobs_table.columns.applicants")}
             </th>
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider text-center">
-              Tested
+              {t("dashboard_jobs_table.columns.tested")}
             </th>
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider text-center">
-              Interview
+              {t("dashboard_jobs_table.columns.interview")}
             </th>
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider text-center">
-              Waiting Action
+              {t("dashboard_jobs_table.columns.waiting_action")}
             </th>
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider text-center">
-              Shortlisted
+              {t("dashboard_jobs_table.columns.shortlisted")}
             </th>
             <th className="px-6 py-3 text-xs font-semibold text-gray-500 tracking-wider text-right">
-              Actions
+              {t("dashboard_jobs_table.columns.actions")}
             </th>
           </tr>
         </thead>
@@ -80,7 +82,8 @@ export default function DashboardJobsTable({ jobs }) {
                   to={`/companies/shortlists/${job.id}`}
                   className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-mauve-magic-600 bg-mauve-magic-50 hover:bg-mauve-magic-100 rounded-lg transition-colors"
                 >
-                  View ShortList <ChevronRight className="w-3 h-3" />
+                  {t("dashboard_jobs_table.view_shortlist")}{" "}
+                  <ChevronRight className="w-3 h-3" />
                 </Link>
               </td>
             </tr>
