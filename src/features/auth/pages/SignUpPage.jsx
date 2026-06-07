@@ -62,10 +62,10 @@ export default function SignUpPage() {
     >
       <RoleToggle value={role} onChange={setRole} />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form dir="ltr" onSubmit={handleSubmit} className="flex flex-col gap-5">
         <FormField
-          label={t("sign_up.labels.full_name")}
-          placeholder={t("sign_up.placeholders.full_name")}
+          label="Full Name"
+          placeholder="Enter Your Full Name"
           type="text"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
@@ -73,8 +73,8 @@ export default function SignUpPage() {
         />
 
         <FormField
-          label={t("sign_up.labels.current_title")}
-          placeholder={t("sign_up.placeholders.current_title")}
+          label="Current title"
+          placeholder="e.g. HR Manager, Frontend Developer"
           type="text"
           value={headline}
           onChange={(e) => setHeadLine(e.target.value)}
@@ -82,8 +82,8 @@ export default function SignUpPage() {
         />
 
         <FormField
-          label={t("sign_up.labels.email")}
-          placeholder={t("sign_up.placeholders.email")}
+          label="Email"
+          placeholder="you@gmail.com"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -91,16 +91,16 @@ export default function SignUpPage() {
         />
 
         <FormField
-          label={t("sign_up.labels.password")}
-          placeholder={t("sign_up.placeholders.password")}
+          label="Phone (optional)"
+          placeholder="+20 10 0000 0000"
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
 
         <FormField
-          label={t("sign_up.labels.password")}
-          placeholder={t("sign_up.placeholders.password")}
+          label="Password"
+          placeholder="Min. 8 characters"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -108,8 +108,8 @@ export default function SignUpPage() {
         />
 
         <FormField
-          label={t("sign_up.labels.confirm_password")}
-          placeholder={t("sign_up.placeholders.confirm_password")}
+          label="Confirm password"
+          placeholder="Repeat your password"
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}

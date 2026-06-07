@@ -286,11 +286,13 @@ export default function JDGeneratorPage({ company, profile }) {
             {t("jd_generator.form.subtitle")}
           </p>
 
-          <form onSubmit={handleGenerate} className="flex flex-col gap-5">
+          <form
+            onSubmit={handleGenerate}
+            className="flex flex-col gap-5"
+            dir="ltr"
+          >
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>
-                {t("jd_generator.form.labels.role_title")}
-              </label>
+              <label className={labelClass}>Role title</label>
               <input
                 type="text"
                 value={title}
@@ -298,7 +300,7 @@ export default function JDGeneratorPage({ company, profile }) {
                   setTitle(e.target.value);
                   setErrors((p) => ({ ...p, title: "" }));
                 }}
-                placeholder={t("jd_generator.form.placeholders.job_title")}
+                placeholder="Job title"
                 className={fieldClass(inputClass, "title")}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -310,9 +312,7 @@ export default function JDGeneratorPage({ company, profile }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>
-                  {t("jd_generator.form.labels.seniority")}
-                </label>
+                <label className={labelClass}>Seniority</label>
                 <select
                   value={seniority}
                   onChange={(e) => {
@@ -323,9 +323,7 @@ export default function JDGeneratorPage({ company, profile }) {
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                 >
-                  <option value="">
-                    {t("jd_generator.form.placeholders.select_seniority")}
-                  </option>
+                  <option value="">Select seniority</option>
                   {Object.values(SENIORITY_LEVEL).map((lvl) => (
                     <option key={lvl} value={lvl} className="capitalize">
                       {lvl}
@@ -340,9 +338,7 @@ export default function JDGeneratorPage({ company, profile }) {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>
-                  {t("jd_generator.form.labels.job_type")}
-                </label>
+                <label className={labelClass}>Job type</label>
                 <select
                   value={jobType}
                   onChange={(e) => {
@@ -353,15 +349,9 @@ export default function JDGeneratorPage({ company, profile }) {
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                 >
-                  <option value="">
-                    {t("jd_generator.form.placeholders.select_type")}
-                  </option>
-                  <option value="full_time">
-                    {t("job_filters.full_time")}
-                  </option>
-                  <option value="part_time">
-                    {t("job_filters.part_time")}
-                  </option>
+                  <option value="">Select type</option>
+                  <option value="full_time">Full Time</option>
+                  <option value="part_time">Part Time</option>
                 </select>
                 {errors.jobType && (
                   <p className="text-xs text-red-500 mt-0.5">
@@ -372,9 +362,7 @@ export default function JDGeneratorPage({ company, profile }) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>
-                {t("jd_generator.form.labels.work_type")}
-              </label>
+              <label className={labelClass}>Work Type</label>
               <select
                 value={workLocation}
                 onChange={(e) => {
@@ -385,12 +373,10 @@ export default function JDGeneratorPage({ company, profile }) {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               >
-                <option value="">
-                  {t("jd_generator.form.placeholders.select_work_type")}
-                </option>
-                <option value="on_site">{t("job_filters.on_site")}</option>
-                <option value="remote">{t("job_filters.remote")}</option>
-                <option value="hybrid">{t("job_filters.hybrid")}</option>
+                <option value="">Select Work Type</option>
+                <option value="on_site">On-Site</option>
+                <option value="remote">Remote</option>
+                <option value="hybrid">Hybrid</option>
               </select>
               {errors.workLocation && (
                 <p className="text-xs text-red-500 mt-0.5">
@@ -400,9 +386,7 @@ export default function JDGeneratorPage({ company, profile }) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>
-                {t("jd_generator.form.labels.experience")}
-              </label>
+              <label className={labelClass}>Experience required</label>
               <input
                 type="text"
                 value={experienceYears}
@@ -410,7 +394,7 @@ export default function JDGeneratorPage({ company, profile }) {
                   setExperienceYears(e.target.value);
                   setErrors((p) => ({ ...p, experienceYears: "" }));
                 }}
-                placeholder={t("jd_generator.form.placeholders.experience")}
+                placeholder="e.g. 1-3 years"
                 className={fieldClass(inputClass, "experienceYears")}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -424,18 +408,16 @@ export default function JDGeneratorPage({ company, profile }) {
 
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>
-                {t("jd_generator.form.placeholders.required_skills")}{" "}
+                Required skills
                 <span className="text-dark-amethyst-400 normal-case font-normal">
-                  {t("jd_generator.form.optional")}
+                  (optional)
                 </span>
               </label>
               <input
                 type="text"
                 value={requiredSkills}
                 onChange={(e) => setRequiredSkills(e.target.value)}
-                placeholder={t(
-                  "jd_generator.form.placeholders.required_skills",
-                )}
+                placeholder="Required skills"
                 className={inputClass}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -444,9 +426,9 @@ export default function JDGeneratorPage({ company, profile }) {
 
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>
-                {t("jd_generator.form.labels.salary_range")}{" "}
+                Salary range (EGP)
                 <span className="text-dark-amethyst-400 normal-case font-normal">
-                  {t("jd_generator.form.optional")}
+                  (optional)
                 </span>
               </label>
               <div className="flex items-center gap-2">
@@ -454,7 +436,7 @@ export default function JDGeneratorPage({ company, profile }) {
                   type="number"
                   value={salaryMin}
                   onChange={(e) => setSalaryMin(e.target.value)}
-                  placeholder={t("jd_generator.form.placeholders.salary_min")}
+                  placeholder="Min"
                   className={inputClass}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
@@ -466,7 +448,7 @@ export default function JDGeneratorPage({ company, profile }) {
                   type="number"
                   value={salaryMax}
                   onChange={(e) => setSalaryMax(e.target.value)}
-                  placeholder={t("jd_generator.form.placeholders.salary_max")}
+                  placeholder="Max"
                   className={inputClass}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
@@ -476,18 +458,16 @@ export default function JDGeneratorPage({ company, profile }) {
 
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>
-                {t("jd_generator.form.labels.key_notes")}{" "}
+                Key notes
                 <span className="text-dark-amethyst-400 normal-case font-normal">
-                  {t("jd_generator.form.optional")}
+                  (optional)
                 </span>
               </label>
               <textarea
                 rows={5}
                 value={keyNotes}
                 onChange={(e) => setKeyNotes(e.target.value)}
-                placeholder={t(
-                  "jd_generator.form.placeholders.additional_notes",
-                )}
+                placeholder="Additional hiring notes..."
                 className="w-full rounded-xl px-4 py-3 text-sm text-dark-amethyst-900 bg-white border border-dark-amethyst-100 outline-none transition-all duration-200 placeholder:text-dark-amethyst-300 resize-none"
                 onFocus={handleFocus}
                 onBlur={handleBlur}

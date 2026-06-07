@@ -47,10 +47,13 @@ export default function CompanyProfile({
             </div>
 
             {/* Grid fields layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full grow">
+            <div
+              dir="ltr"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full grow"
+            >
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  {t("company_profile.profile.fields.company_name")}
+                  Company Name
                 </label>
                 <input
                   type="text"
@@ -61,7 +64,7 @@ export default function CompanyProfile({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  {t("company_profile.profile.fields.industry")}
+                  Industry
                 </label>
                 <input
                   type="text"
@@ -72,16 +75,14 @@ export default function CompanyProfile({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  {t("company_profile.profile.fields.company_size")}
+                  Company Size
                 </label>
                 <input
                   type="text"
                   disabled
                   value={
                     company?.size
-                      ? t("company_profile.profile.fields.employees", {
-                          count: company.size,
-                        })
+                      ? `${company.size.toLocaleString()} employees`
                       : ""
                   }
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50/30 text-gray-700"
@@ -89,7 +90,7 @@ export default function CompanyProfile({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                  {t("company_profile.profile.fields.created_at")}
+                  Created At
                 </label>
                 <input
                   type="text"
@@ -154,6 +155,7 @@ export default function CompanyProfile({
           </p>
 
           <form
+            dir="ltr"
             onSubmit={handleInviteSubmit}
             className="flex flex-col sm:flex-row gap-3 mb-6 bg-gray-50 p-3 rounded-lg border border-gray-100"
           >
@@ -162,7 +164,7 @@ export default function CompanyProfile({
               type="text"
               value={memberName}
               onChange={(e) => setMemberName(e.target.value)}
-              placeholder={t("company_profile.team.placeholders.full_name")}
+              placeholder="Full Name"
               className="w-full sm:flex-1 px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-dark-amethyst-400"
             />
             <input
@@ -170,7 +172,7 @@ export default function CompanyProfile({
               type="email"
               value={memberEmail}
               onChange={(e) => setMemberEmail(e.target.value)}
-              placeholder={t("company_profile.team.placeholders.email")}
+              placeholder="Email"
               className="w-full sm:flex-1 px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-dark-amethyst-400"
             />
             <button
@@ -182,7 +184,7 @@ export default function CompanyProfile({
             </button>
           </form>
 
-          <div className="space-y-4">
+          <div className="space-y-4" dir="ltr">
             {members.map((member, i) => (
               <div
                 key={i}

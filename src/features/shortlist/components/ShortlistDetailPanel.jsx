@@ -377,7 +377,7 @@ export default function ShortlistDetailPanel({
               rows={2}
               value={noteBody}
               onChange={(e) => setNoteBody(e.target.value)}
-              placeholder={t("shortlist.notePlaceholder")}
+              placeholder="Leave a note for the hiring team..."
               className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 text-gray-700 placeholder-gray-400"
             />
             <div className="flex items-center justify-between mt-2">

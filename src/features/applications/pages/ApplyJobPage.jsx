@@ -285,7 +285,10 @@ export default function ApplyJobPage() {
 
       {/* PAGE WRAPPER */}
       <div className="min-h-screen bg-dark-amethyst-50 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-3xl bg-white rounded-2xl border border-dark-amethyst-100 shadow-sm overflow-hidden">
+        <div
+          dir="ltr"
+          className="w-full max-w-3xl bg-white rounded-2xl border border-dark-amethyst-100 shadow-sm overflow-hidden"
+        >
           {/* HEADER */}
           <div className="p-6 border-b border-dark-amethyst-100 bg-white">
             <h1 className="text-2xl font-bold text-dark-amethyst-950">
@@ -318,14 +321,14 @@ export default function ApplyJobPage() {
           </div>
 
           {/* BODY */}
-          <div className="p-6 space-y-5">
+          <div dir="ltr" className="p-6 space-y-5">
             {/* STEP 1 */}
             {step === 0 && (
               <div className="space-y-5">
                 {/* FULL NAME */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
-                    {t("apply_job.labels.full_name")} *
+                    Full Name *
                   </label>
 
                   <input
@@ -355,7 +358,7 @@ export default function ApplyJobPage() {
                 {/* EMAIL */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
-                    {t("apply_job.labels.email")} *
+                    Email *
                   </label>
 
                   <input
@@ -383,7 +386,7 @@ export default function ApplyJobPage() {
                 {/* PHONE */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wide text-dark-amethyst-600 mb-2">
-                    {t("apply_job.labels.phone")} *
+                   Phone *
                   </label>
 
                   <input

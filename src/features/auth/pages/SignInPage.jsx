@@ -43,20 +43,20 @@ export default function SignInPage() {
       headline={t("sign_in.headline")}
       subheading={t("sign_in.subheading")}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form dir="ltr" onSubmit={handleSubmit} className="flex flex-col gap-5">
         <FormField
-          label={t("sign_in.labels.email")}
+          label="Email"
           type="email"
-          placeholder={t("sign_in.placeholders.email")}
+          placeholder="you@gmail.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
         <FormField
-          label={t("sign_in.labels.password")}
+          label="Password"
           type="password"
-          placeholder={t("sign_in.placeholders.password")}
+          placeholder="••••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
