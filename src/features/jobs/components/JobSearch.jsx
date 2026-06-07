@@ -15,7 +15,7 @@ export default function JobSearch({ search, setSearch }) {
         />
       </div>
 
-      <button className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition shrink-0 shadow-sm">
+      <button className="px-5 py-2.5 rounded-xl bg-primary !text-white text-sm font-semibold hover:bg-primary/90 transition shrink-0 shadow-sm cursor-pointer">
         Find Jobs
       </button>
     </div>
