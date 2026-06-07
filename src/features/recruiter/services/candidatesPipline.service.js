@@ -105,12 +105,13 @@ export async function moveToStage(applicationId, targetStageId) {
 
   if (evalError) return { error: evalError };
 
-  if (
-    !currentEvals ||
-    !currentEvals.application_stage_evaluations?.some(
-      (e) => e.ai_score !== null && e.ai_score !== undefined,
-    )
-  )
+  const currentStageEvals = currentEvals?.application_stage_evaluations;
+  const currentEvalsList = currentStageEvals
+    ? Array.isArray(currentStageEvals)
+      ? currentStageEvals
+      : [currentStageEvals]
+    : [];
+  if (!currentEvalsList.some((e) => e.ai_score != null))
     return {
       error: new Error(
         "Current stage has no evaluations — cannot advance candidate",
@@ -146,10 +147,16 @@ export async function moveToStage(applicationId, targetStageId) {
   if (targetError) return { error: targetError };
 
   if (targetStageData) {
-    const targetHasScore =
-      targetStageData.application_stage_evaluations?.some(
-        (e) => e.ai_score !== null && e.ai_score !== undefined,
-      );
+    const targetStageEvals =
+      targetStageData.application_stage_evaluations;
+    const targetEvalsList = targetStageEvals
+      ? Array.isArray(targetStageEvals)
+        ? targetStageEvals
+        : [targetStageEvals]
+      : [];
+    const targetHasScore = targetEvalsList.some(
+      (e) => e.ai_score != null,
+    );
     if (targetHasScore)
       return {
         error: new Error(

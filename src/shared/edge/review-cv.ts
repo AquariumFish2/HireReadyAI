@@ -82,45 +82,47 @@ ${cvText}
 
 ---
 
-STRICT SCORING RULES — READ CAREFULLY BEFORE SCORING:
+DIMENSION SCORING RULES — READ CAREFULLY:
 
-1. BASELINE: Start at 50. Only award points for clearly demonstrated evidence. Do not assume or infer skills not explicitly stated.
+Score each dimension independently on a 0–100 scale based on evidence in the CV and Q&A. Do not let one dimension influence another.
 
-2. UNANSWERED QUESTIONS PENALTY (only applies if the job has application questions):
-   - If any question is blank, unanswered, or evasive: deduct 10 points per question.
-   - If ALL questions are unanswered: cap cv_score at 45 regardless of CV quality.
-   - If the job has NO application questions: skip this rule entirely. Do not penalize.
+CV DIMENSIONS (always include):
+- technical_skills: How many required job skills are clearly present in the CV. 100 = all present, 0 = none present.
+- experience_match: How relevant is the candidate's work experience to this role. 100 = directly relevant, 0 = different field.
+- education: Does the candidate's education meet the stated requirements. 100 = exceeds requirements, 0 = no relevant education.
+- soft_skills: Evidence of communication, teamwork, problem-solving in the CV. 100 = strong evidence, 0 = none shown.
 
-3. IRRELEVANT CV PENALTY:
-   - If the candidate's experience is in a different field than the job: score 20–35.
-   - If fewer than 40% of required skills are present in the CV: score below 50.
-   - If the CV appears generic or not tailored to this role: deduct 5–10 points.
+APPLICATION SCORE (only if the job has application questions — see Q&A above):
+- application_score: Quality and completeness of the application answers.
+  - Thorough, specific answer: 90–100
+  - Adequate but brief: 60–89
+  - Vague, generic, or evasive: 20–59
+  - Blank or "N/A": 0
+  - If ALL answers are blank/unanswered: set application_score to 20 (do not penalize other dimensions).
+- If the job has NO application questions: omit application_score from dimension_scores entirely. Do not include it.
 
-4. MISSING REQUIREMENTS PENALTY:
-   - Each hard requirement (from jobRequirements) that is clearly absent: deduct 8 points.
-   - Each required skill (from jobSkills) that is absent: deduct 5 points.
+cv_score COMPUTATION:
+- cv_score = average of {technical_skills, experience_match, education, soft_skills}
+- Round to nearest integer. Do not set cv_score manually — it is derived from the four CV dimensions above.
 
-5. SCORE ANCHORS — use these to calibrate:
-   - 85–100: Nearly perfect match. All required skills present, requirements met, questions answered thoroughly.
-   - 70–84: Strong match with minor gaps. Most skills present, most questions answered.
-   - 55–69: Partial match. Notable gaps, some unanswered questions or missing skills.
-   - 40–54: Weak match. Multiple missing requirements or unanswered questions.
-   - 0–39: Poor match. Irrelevant background, unanswered questions, or insufficient evidence.
+RECOMMENDATION RULES:
+- "proceed" -> cv_score >= 70 AND (no application_score exists OR application_score >= 60).
+- "review" -> cv_score 50–69 OR application_score 30–59.
+- "reject" -> cv_score < 50 OR application_score < 30.
 
-6. RECOMMENDATION RULES (strict):
-   - "proceed" → only if cv_score >= 70 AND all required skills are present AND no key questions unanswered.
-   - "review" → cv_score 50–69 OR has potential but has gaps worth discussing.
-   - "reject" → cv_score < 50 OR CV is irrelevant OR critical questions left unanswered.
+GENERAL RULES:
+- Score only on evidence present in the CV and Q&A. Absence of evidence is evidence of absence.
+- Do not give benefit of the doubt for vague or generic statements.
+- Feedback must be honest enough that a hiring manager can act on it.
 
-7. GENERAL RULES:
-   - Score only on evidence present in the CV and Q&A. Absence of evidence is evidence of absence.
-   - Do not give benefit of the doubt for vague or generic statements.
-   - Gaps must be specific and actionable — not filler.
-   - Feedback must be honest enough that a hiring manager can act on it.
+FIELD GUIDELINES:
+- strengths: Specific, demonstrable qualities the candidate has that align with the job (e.g., "5 years of React experience", "Strong portfolio matching the tech stack").
+- weaknesses: Attributes or shortcomings of the candidate themselves (e.g., "No leadership experience", "Poorly formatted CV with typos", "Written answers lack clarity").
+- gaps: Missing information relative to the job requirements — things the hiring manager cannot evaluate because evidence is absent (e.g., "Does not mention required AWS certification", "No experience with PostgreSQL listed", "Unanswered question about availability", "No dates on work history"). Gaps must be specific and actionable — not filler.
 
 Return ONLY a valid JSON object with exactly these fields, no extra text, no markdown, no code blocks:
 {
-  "cv_score": <integer 0-100>,
+  "cv_score": <integer 0-100, automatically computed as average of CV dimensions>,
   "feedback": "<3-5 sentence honest assessment for the hiring team, including any unanswered questions or red flags>",
   "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
   "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
@@ -130,7 +132,8 @@ Return ONLY a valid JSON object with exactly these fields, no extra text, no mar
     "technical_skills": <integer 0-100>,
     "experience_match": <integer 0-100>,
     "education": <integer 0-100>,
-    "soft_skills": <integer 0-100>
+    "soft_skills": <integer 0-100>,
+    "application_score": <integar 0-100>
   }
 }`;
 }
@@ -245,6 +248,7 @@ serve(async (req) => {
         ],
         max_tokens: 1200,
         temperature: 0.3,
+        logprobs: true,
       }),
     });
 
@@ -255,6 +259,18 @@ serve(async (req) => {
 
     const hfData = await hfResponse.json();
     let content: string = hfData.choices[0].message.content.trim();
+
+    // Compute real confidence from token logprobs
+    let modelConfidence = 0.5;
+    const logprobsData = hfData.choices[0].logprobs;
+    if (logprobsData?.content) {
+      const tokenProbs = logprobsData.content
+        .map((t: { logprob: number }) => Math.exp(t.logprob))
+        .filter((p: number) => p > 0 && p <= 1);
+      if (tokenProbs.length > 0) {
+        modelConfidence = tokenProbs.reduce((a: number, b: number) => a + b, 0) / tokenProbs.length;
+      }
+    }
 
     // Strip any accidental markdown fences
     content = content.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
@@ -277,7 +293,12 @@ serve(async (req) => {
       throw new Error(`Failed to parse AI response as JSON: ${content}`);
     }
 
-    const cvScore = Math.max(0, Math.min(100, Math.round(parsed.cv_score ?? 0)));
+    // Derive cv_score as average of CV-only dimensions
+    const cvDims = ["technical_skills", "experience_match", "education", "soft_skills"];
+    const cvValues = cvDims.map(d => parsed.dimension_scores?.[d]).filter(v => typeof v === "number");
+    const cvScore = cvValues.length === cvDims.length
+      ? Math.round(cvValues.reduce((a, b) => a + b, 0) / cvDims.length)
+      : Math.max(0, Math.min(100, Math.round(parsed.cv_score ?? 0)));
 
     // ── 6. Write results back to DB ─────────────────────────────────────────
     const feedbackJson = JSON.stringify({
@@ -309,7 +330,7 @@ serve(async (req) => {
         {
           application_stage_id: cvStageRow.id,
           ai_score: cvScore,
-          confidence: (parsed.dimension_scores?.technical_skills ?? 70) / 100,
+          confidence: modelConfidence,
           reasoning: parsed.feedback,
           recommendation: parsed.recommendation,
           strengths: parsed.strengths || [],

@@ -94,20 +94,30 @@ export default function CandidateSidebar({ candidate, onClose }) {
   const evalsRaw = lastEvalStage?.application_stage_evaluations;
   const currentEval = Array.isArray(evalsRaw) ? evalsRaw[0] : evalsRaw;
 
-  // Compute AI Match score from cv_review's dimension_scores average
+  // Compute scores from cv_review's dimension_scores
   const cvReviewStage = sortedStages.find(
     (s) => s.recruitment_stages?.stage_type === "cv_review",
   );
+  let resumeScore = null;
   let aiMatchScore = null;
+  let hasAppScore = false;
+  const cvDimKeys = ["technical_skills", "experience_match", "education", "soft_skills"];
   if (cvReviewStage?.ai_feedback) {
     try {
       const feedback = JSON.parse(cvReviewStage.ai_feedback);
       const dims = feedback.dimension_scores;
       if (dims) {
-        const values = Object.values(dims).filter((v) => typeof v === "number");
-        if (values.length > 0) {
+        hasAppScore = "application_score" in dims;
+        // Resume = average of CV-only dimensions
+        const cvValues = cvDimKeys.map(k => dims[k]).filter(v => typeof v === "number");
+        if (cvValues.length === cvDimKeys.length) {
+          resumeScore = Math.round(cvValues.reduce((a, b) => a + b, 0) / cvDimKeys.length);
+        }
+        // AI Match = average of ALL dimensions (including application_score if present)
+        const allValues = Object.values(dims).filter((v) => typeof v === "number");
+        if (allValues.length > 0) {
           aiMatchScore = Math.round(
-            values.reduce((a, b) => a + b, 0) / values.length,
+            allValues.reduce((a, b) => a + b, 0) / allValues.length,
           );
         }
       }
@@ -181,14 +191,16 @@ export default function CandidateSidebar({ candidate, onClose }) {
             <div className="flex gap-3">
               <MetricCard
                 title="Resume"
-                score={candidate.cvScore}
+                score={resumeScore}
                 colorClass="bg-slate-400"
               />
-              <MetricCard
-                title="AI Match"
-                score={aiMatchScore}
-                colorClass="bg-yale-blue-500"
-              />
+              {hasAppScore && (
+                <MetricCard
+                  title="AI Match"
+                  score={aiMatchScore}
+                  colorClass="bg-yale-blue-500"
+                />
+              )}
               <MetricCard
                 title="Stage"
                 score={candidate.score}
