@@ -84,7 +84,7 @@ export const createApplication = async (applicationData) => {
     .eq("job_id", applicationData.job_id)
     .eq("stage_type", "cv_review")
     .limit(1)
-    .single();
+    .maybeSingle();
 
   const insertData = {
     ...applicationData,

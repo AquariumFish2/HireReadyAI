@@ -47,7 +47,7 @@ async function formatApplicationQA(
         const answerText = answer === null || answer === undefined || answer === "" 
           ? "(no answer provided)" 
           : String(answer);
-        return `Q: ${q.text}\nA: ${answerText}`;
+        return `Q: ${q.question}\nA: ${answerText}`;
       })
       .join("\n\n");
 
@@ -87,7 +87,7 @@ DIMENSION SCORING RULES — READ CAREFULLY:
 Score each dimension independently on a 0–100 scale based on evidence in the CV and Q&A. Do not let one dimension influence another.
 
 CV DIMENSIONS (always include):
-- technical_skills: How many required job skills are clearly present in the CV. 100 = all present, 0 = none present.
+- technical_skills: How many required job skills are present in the CV or can be reasonably inferred. Use general reasoning: if a candidate knows a technology/tool/concept, infer that they also know its prerequisites, common companions, and foundational building blocks (e.g., a framework implies its base language; a platform implies its ecosystem; a high-level tool implies the underlying concepts it abstracts). Do NOT penalize for missing explicit mentions when the skill is a logical prerequisite of something the candidate clearly knows. 100 = all present or implied, 0 = none present or implied.
 - experience_match: How relevant is the candidate's work experience to this role. 100 = directly relevant, 0 = different field.
 - education: Does the candidate's education meet the stated requirements. 100 = exceeds requirements, 0 = no relevant education.
 - soft_skills: Evidence of communication, teamwork, problem-solving in the CV. 100 = strong evidence, 0 = none shown.
@@ -114,6 +114,7 @@ GENERAL RULES:
 - Score only on evidence present in the CV and Q&A. Absence of evidence is evidence of absence.
 - Do not give benefit of the doubt for vague or generic statements.
 - Feedback must be honest enough that a hiring manager can act on it.
+- INFER prerequisite and companion skills: if a candidate clearly knows a technology (e.g., React, Vue, Angular, Next.js, Node.js, Django, etc.), infer they know its foundational technologies (e.g., JavaScript, HTML, CSS, etc.) unless the CV explicitly contradicts this. Do NOT list inferred skills as missing weaknesses.
 
 FIELD GUIDELINES:
 - strengths: Specific, demonstrable qualities the candidate has that align with the job (e.g., "5 years of React experience", "Strong portfolio matching the tech stack").

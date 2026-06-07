@@ -10,6 +10,8 @@ import {
   Clock,
   UserCheck,
 } from "lucide-react";
+import { supabase } from "@/shared/services/supabase";
+import OfferEmailModal from "./OfferEmailModal";
 
 function getInitials(name = "") {
   return name
@@ -85,6 +87,9 @@ export default function ShortlistDetailPanel({
   onAdvanceToOffer,
   onPostNote,
   isOverlay,
+  recruiterName = "",
+  recruiterEmail = "",
+  companyName = "",
 }) {
   const [noteBody, setNoteBody] = useState("");
   const [visibleToTeam, setVisibleToTeam] = useState(true);
@@ -92,6 +97,7 @@ export default function ShortlistDetailPanel({
   const [rejectReason, setRejectReason] = useState("");
   const [postingNote, setPostingNote] = useState(false);
   const [rejecting, setRejecting] = useState(false);
+  const [emailModalAction, setEmailModalAction] = useState(null);
   const notesEndRef = useRef(null);
 
   const { applications: app, tags = [] } = entry;
@@ -103,7 +109,30 @@ export default function ShortlistDetailPanel({
     ai_confidence,
     is_rejected,
     rejection_reason,
+    application_stages = [],
   } = app;
+
+  const hasOffer = application_stages.some(
+    (s) => s.recruitment_stages?.stage_type === "offer" && s.status === "in_progress"
+  );
+
+  const handleEmailSend = async ({ fromName, fromEmail, to, subject, body }) => {
+    const isOffer = emailModalAction === "offer";
+    const { error } = await supabase.functions.invoke("send-offer-email", {
+      body: {
+        to,
+        fromName,
+        fromEmail,
+        subject,
+        body,
+        applicationId: app.id,
+        jobId: app.job_id,
+        action: emailModalAction,
+      },
+    });
+    if (error) throw new Error(error.message || "Failed to send email");
+    window.location.reload();
+  };
 
 
 
@@ -177,6 +206,10 @@ export default function ShortlistDetailPanel({
                 <p className="text-xs text-gray-500">
                   {candidate?.headline || candidate?.role}
                 </p>
+                <div className="flex items-center gap-3 text-xs text-gray-400 mt-1">
+                  {app.answers?.info?.email && <span>{app.answers.info.email}</span>}
+                  {app.answers?.info?.phone && <span>{app.answers.info.phone}</span>}
+                </div>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {tags.map((tag) => (
                     <span
@@ -439,20 +472,30 @@ export default function ShortlistDetailPanel({
             ) : (
               <div className="flex gap-2">
                 <button
-                  onClick={() => onAdvanceToOffer(app.id)}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-linear-to-r from-dark-amethyst-600 to-mauve-magic-600 hover:from-dark-amethyst-700 hover:to-mauve-magic-700 text-white rounded-xl text-sm font-semibold transition-all shadow-sm"
+                  onClick={() => setEmailModalAction("offer")}
+                  disabled={hasOffer}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
+                    hasOffer
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                      : "bg-linear-to-r from-dark-amethyst-600 to-mauve-magic-600 hover:from-dark-amethyst-700 hover:to-mauve-magic-700 text-white"
+                  }`}
                 >
                   <ChevronUp className="w-4 h-4" />
-                  Advance to offer
+                  {hasOffer ? "Offer already sent" : "Advance to offer"}
                 </button>
                 <button
                   onClick={() => {
                     setShowRejectInput(true);
                     if (!rejectReason && ai_rationale) setRejectReason(ai_rationale);
                   }}
-                  className="flex-1 py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl text-sm font-medium transition-colors"
+                  disabled={hasOffer}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    hasOffer
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed border-0"
+                      : "border border-gray-200 hover:bg-gray-50 text-gray-700"
+                  }`}
                 >
-                  Move to rejected
+                  {hasOffer ? "Offer in progress" : "Move to rejected"}
                 </button>
               </div>
             )}
@@ -470,6 +513,20 @@ export default function ShortlistDetailPanel({
           </div>
         )}
       </div>
+
+      {/* ── Email Modal ── */}
+      {emailModalAction && (
+        <OfferEmailModal
+          candidateName={candidate?.full_name}
+          candidateEmail={app.answers?.info?.email}
+          recruiterName={recruiterName}
+          recruiterEmail={recruiterEmail}
+          companyName={companyName}
+          action={emailModalAction}
+          onClose={() => setEmailModalAction(null)}
+          onSend={handleEmailSend}
+        />
+      )}
     </>
   );
 }

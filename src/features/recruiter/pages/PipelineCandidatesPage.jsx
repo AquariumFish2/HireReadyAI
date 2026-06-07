@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Lock, Search, SlidersHorizontal } from "lucide-react";
+import { Lock, Search, SlidersHorizontal, Sparkles, X, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import {
   getPipelineCandidates,
   getJobStages,
@@ -8,6 +8,7 @@ import {
   updateStageMinScore,
 } from "../services/candidatesPipline.service";
 import CandidateSidebar from "../components/CandidateSidebar";
+import { supabase } from "@/shared/services/supabase";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function getInitials(name = "") {
@@ -64,65 +65,122 @@ function getFit(score, isRejected) {
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-const CandidateCard = ({ candidate, onDragStart, isDragging, onClick }) => {
+
+const stageScore = (as) => {
+  if (as.score != null) return Math.round(Number(as.score));
+  const evals = as.application_stage_evaluations;
+  const list = evals ? (Array.isArray(evals) ? evals : [evals]) : [];
+  if (list.length > 0 && list[0].ai_score != null)
+    return Math.round(Number(list[0].ai_score));
+  return null;
+};
+
+const statusStyle = (status) => {
+  switch (status) {
+    case "passed":
+      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+    case "in_progress":
+      return "bg-amber-100 text-amber-700 border-amber-200";
+    case "failed":
+      return "bg-red-100 text-red-700 border-red-200";
+    default:
+      return "bg-gray-100 text-gray-500 border-gray-200";
+  }
+};
+
+const statusLabel = (status) => {
+  switch (status) {
+    case "passed":
+      return "Passed";
+    case "in_progress":
+      return "In Progress";
+    case "failed":
+      return "Failed";
+    default:
+      return "Pending";
+  }
+};
+
+const CandidateCard = ({ candidate, onDragStart, isDragging, onClick, allStages }) => {
+  const [expanded, setExpanded] = useState(false);
   const fit = getFit(candidate.score);
+
+  const currentStageOrder = allStages?.find((s) => s.id === candidate.currentStageId)?.order_index ?? Infinity;
+
+  const previousStages = (candidate.stagesData || [])
+    .filter((as) => {
+      const order = as.recruitment_stages?.order_index ?? Infinity;
+      return order < currentStageOrder;
+    })
+    .sort((a, b) => (a.recruitment_stages?.order_index ?? 0) - (b.recruitment_stages?.order_index ?? 0));
+
   return (
     <div
       draggable
       onDragStart={() => onDragStart(candidate)}
       onClick={onClick}
-      className={`bg-white rounded-2xl border border-cerulean-900 p-4 cursor-grab active:cursor-grabbing select-none transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 group ${isDragging ? "opacity-40 scale-95" : ""}`}
+      className={`bg-white rounded-2xl border border-cerulean-900 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 group ${isDragging ? "opacity-40 scale-95" : ""}`}
       style={{ boxShadow: "0 1px 4px rgba(1,73,124,0.1)" }}
     >
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-3">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm shrink-0"
-          style={{
-            background: "linear-gradient(135deg, #01497c 0%, #012a4a 100%)",
-          }}
-        >
-          {getInitials(candidate.name)}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-deep-space-blue truncate">
-            {candidate.name}
-
-            {candidate.is_rejected && (
-              <span className="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-600 border border-red-200">
-                Rejected
-              </span>
-            )}
-          </p>
-          <p className="text-xs text-air-force-blue mt-0.5">
-            {timeAgo(candidate.applied_at)}
-          </p>
-        </div>
-      </div>
-
-      {/* Fit + score */}
-      <div className="flex items-center justify-between mb-3">
-        <span
-          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${fit.cls}`}
-        >
-          {fit.label}
-        </span>
-        {candidate.score > 0 && (
-          <span
-            className={`px-2 py-0.5 rounded-lg text-xs font-bold ${scoreColor(candidate.score)}`}
+      <div className="p-4 cursor-grab active:cursor-grabbing select-none">
+        {/* Header */}
+        <div className="flex items-start gap-3 mb-3">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm shrink-0"
+            style={{
+              background: "linear-gradient(135deg, #01497c 0%, #012a4a 100%)",
+            }}
           >
-            {candidate.score}
-          </span>
-        )}
-      </div>
+            {getInitials(candidate.name)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-deep-space-blue truncate">
+              {candidate.name}
 
-      {/* Score bar */}
-      {candidate.score > 0 && (
+              {candidate.is_rejected && (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-600 border border-red-200 ml-1">
+                  Rejected
+                </span>
+              )}
+            </p>
+            <p className="text-xs text-air-force-blue mt-0.5">
+              {timeAgo(candidate.applied_at)}
+            </p>
+          </div>
+        </div>
+
+        {/* Fit + score */}
+        <div className="flex items-center justify-between mb-3">
+          {candidate.hasEvaluation ? (
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${fit.cls}`}
+            >
+              {fit.label}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border bg-amber-100 text-amber-700 border-amber-200">
+              In Progress
+            </span>
+          )}
+          {candidate.hasEvaluation ? (
+            <span
+              className={`px-2 py-0.5 rounded-lg text-xs font-bold ${scoreColor(candidate.score)}`}
+            >
+              {candidate.score}
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-500">
+              -/100
+            </span>
+          )}
+        </div>
+
+        {/* Score bar */}
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-cerulean">Stage score</span>
             <span className="text-xs font-semibold text-rich-cerulean-600">
-              {candidate.score}/100
+              {candidate.hasEvaluation ? `${candidate.score}/100` : "-/100"}
             </span>
           </div>
           <div className="w-full h-1.5 rounded-full bg-cerulean-900 overflow-hidden">
@@ -136,9 +194,59 @@ const CandidateCard = ({ candidate, onDragStart, isDragging, onClick }) => {
                       ? "bg-air-force-blue-600"
                       : "bg-red-500"
               }`}
-              style={{ width: `${candidate.score}%` }}
+              style={{ width: `${candidate.score || 0}%` }}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Expand button — only show if there are previous stages */}
+      {previousStages.length > 0 && (
+        <button
+          onClick={(e) => { e.stopPropagation(); setExpanded((s) => !s); }}
+          className="w-full flex items-center justify-center gap-1 py-2 text-xs font-semibold text-cerulean hover:text-rich-cerulean border-t border-cerulean-900 transition"
+        >
+          {expanded ? (
+            <>
+              <ChevronUp className="w-3.5 h-3.5" />
+              Hide previous stages
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-3.5 h-3.5" />
+              {previousStages.length} previous stage{previousStages.length > 1 ? "s" : ""}
+            </>
+          )}
+        </button>
+      )}
+
+      {/* Expanded previous stages */}
+      {expanded && previousStages.length > 0 && (
+        <div className="px-4 pb-4 space-y-2 border-t border-cerulean-900 pt-3">
+          <p className="text-[10px] font-semibold text-cerulean uppercase tracking-wide mb-2">
+            Previous stages
+          </p>
+          {previousStages.map((as) => {
+            const ss = stageScore(as);
+            const name = as.recruitment_stages?.name || "Unknown";
+            return (
+              <div key={as.id} className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-sky-blue-900/60">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-xs font-medium text-deep-space-blue truncate">{name}</span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {ss != null ? (
+                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${scoreColor(ss)}`}>
+                      {ss}/100
+                    </span>
+                  ) : null}
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${statusStyle(as.status)}`}>
+                    {statusLabel(as.status)}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -153,10 +261,9 @@ const PipelineColumn = ({
   onDragOver,
   onDrop,
   draggingCandidate,
-  stageSettings,
-  setStageSettings,
   handleStageAutoAdvance,
   onCardClick,
+  allStages,
 }) => {
   const isOver = dragOverStage === stage.id;
   const isLocked = stage.is_locked;
@@ -180,22 +287,22 @@ const PipelineColumn = ({
     >
       {/* Column header */}
       <div className="flex items-center justify-between px-4 py-3 mb-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <span
             className="w-2.5 h-2.5 rounded-full shrink-0"
             style={{
               background: `hsl(${210 - stage.order_index * 10}, 70%, ${55 - stage.order_index * 3}%)`,
             }}
           />
-          <span className="text-sm font-bold text-deep-space-blue">
+          <span className="text-sm font-bold text-deep-space-blue truncate">
             {stage.name}
           </span>
-          <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-cerulean-900 text-rich-cerulean ml-1">
+          <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-cerulean-900 text-rich-cerulean shrink-0">
             {candidates.length}
           </span>
           {isLocked && (
             <Lock
-              className="w-3 h-3 text-steel-blue ml-0.5"
+              className="w-3 h-3 text-steel-blue shrink-0"
               title="Locked stage — cannot be dropped into"
             />
           )}
@@ -276,6 +383,7 @@ const PipelineColumn = ({
               onDragStart={onDragStart}
               isDragging={draggingCandidate?.id === c.id}
               onClick={() => onCardClick(c)}
+              allStages={allStages}
             />
           ))
         )}
@@ -301,6 +409,80 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
   const [stageSettings, setStageSettings] = useState({});
   const [selectedCandidate, setSelectedCandidate] = useState(null);
 
+  // Shortlist modal
+  const [showShortlistModal, setShowShortlistModal] = useState(false);
+  const [criteria, setCriteria] = useState("");
+  const [minScore, setMinScore] = useState(70);
+  const [generatingCriteria, setGeneratingCriteria] = useState(false);
+  const [scoreReasoning, setScoreReasoning] = useState("");
+  const [advancingToShortlist, setAdvancingToShortlist] = useState(false);
+
+  async function handleAutoGenerateCriteria() {
+    if (!selectedJobId) return;
+    setGeneratingCriteria(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("auto-generate-criteria", {
+        body: { jobId: selectedJobId },
+      });
+      if (error) throw new Error(error.message || "Failed to generate criteria");
+      if (data.criteria) setCriteria(data.criteria);
+      if (data.suggestedMinScore) setMinScore(data.suggestedMinScore);
+      if (data.scoreReasoning) setScoreReasoning(data.scoreReasoning);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setGeneratingCriteria(false);
+    }
+  }
+
+  async function handleAdvanceToShortlist() {
+    if (!selectedJobId || !criteria.trim()) return;
+    setAdvancingToShortlist(true);
+    try {
+      const shortlistStage = stages.find(s => s.stage_type === "shortlist");
+      if (!shortlistStage) throw new Error("No Shortlist stage found");
+
+      const precedingStage = stages
+        .filter(s => s.order_index < shortlistStage.order_index)
+        .sort((a, b) => b.order_index - a.order_index)[0];
+      if (!precedingStage) throw new Error("No stage before Shortlist found");
+
+      const candidateIds = candidates
+        .filter(c => c.currentStageId === precedingStage.id)
+        .map(c => c.id);
+
+      if (candidateIds.length === 0) {
+        alert("No candidates in the stage before Shortlist");
+        setAdvancingToShortlist(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("evaluate-shortlist", {
+        body: {
+          applicationIds: candidateIds,
+          evaluationCriteria: criteria.trim(),
+          minScore,
+        },
+      });
+
+      if (error) throw new Error(error.message || "Evaluation failed");
+
+      const results = data?.results || [];
+      const passed = results.filter(r => r.passed).length;
+      alert(`Evaluation complete: ${passed}/${candidateIds.length} candidates advanced to shortlist`);
+
+      setShowShortlistModal(false);
+      setCriteria("");
+      setMinScore(70);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to advance to shortlist: " + err.message);
+    } finally {
+      setAdvancingToShortlist(false);
+    }
+  }
+
   // Initialize selected job
   useEffect(() => {
     if (jobs.length > 0 && !selectedJobId) {
@@ -321,27 +503,55 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
     if (!company?.id) return;
     setLoading(true);
     getPipelineCandidates(company.id)
-      .then(({ data, error }) => {
+      .then(async ({ data, error }) => {
         if (error) {
           console.error(error);
           return;
         }
 
+        const stagesToFix = [];
+
         const mapped = (data || []).map((app) => {
           const allStages = app.application_stages || [];
 
-          // Use current_stage_id from the applications table
-          // Fallback: derive from application_stages (for existing records)
-          let currentStageId = app.current_stage_id || null;
+          let currentStageId = app.current_stage_id;
+
           if (!currentStageId && allStages.length > 0) {
-            const inProgress = allStages.find(
-              (s) => s.status === "in_progress",
-            );
-            const fallback = inProgress || allStages[0];
-            currentStageId = fallback?.recruitment_stages?.id || null;
+            // current_stage_id cascade-nulled (stage deleted) or never set
+            // Find the last stage with an evaluation score
+            const scored = allStages
+              .filter(
+                (s) =>
+                  s.recruitment_stages &&
+                  s.application_stage_evaluations?.length > 0 &&
+                  s.application_stage_evaluations[0].ai_score != null,
+              )
+              .sort(
+                (a, b) =>
+                  (a.recruitment_stages.order_index || 0) -
+                  (b.recruitment_stages.order_index || 0),
+              );
+
+            const lastScored = scored[scored.length - 1];
+            if (lastScored) {
+              currentStageId = lastScored.recruitment_stages.id;
+            } else {
+              // No evaluated stage — put them at the first available stage
+              const sorted = [...allStages]
+                .filter((s) => s.recruitment_stages)
+                .sort(
+                  (a, b) =>
+                    (a.recruitment_stages.order_index || 0) -
+                    (b.recruitment_stages.order_index || 0),
+                );
+              currentStageId = sorted[0]?.recruitment_stages?.id || null;
+            }
+
+            if (currentStageId) {
+              stagesToFix.push({ id: app.id, newStageId: currentStageId });
+            }
           }
 
-          // Find the matching stage in application_stages to get evaluations
           const currentStage = currentStageId
             ? allStages.find(
                 (s) => s.recruitment_stages?.id === currentStageId,
@@ -351,24 +561,17 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
           let evaluation = null;
           let score = 0;
 
-          if (
-            currentStage &&
-            currentStage.application_stage_evaluations?.length
-          ) {
-            evaluation = currentStage.application_stage_evaluations[0];
-            if (
-              evaluation &&
-              evaluation.ai_score !== null &&
-              evaluation.ai_score !== undefined
-            ) {
+          if (currentStage) {
+            evaluation = currentStage.application_stage_evaluations?.[0] ?? null;
+
+            if (evaluation?.ai_score != null) {
               score = Math.round(Number(evaluation.ai_score));
+            } else if (currentStage.score != null) {
+              score = Math.round(Number(currentStage.score));
             }
           }
 
-          // Fallback to cv_score if evaluation not found
-          if (score === 0 && app.cv_score) {
-            score = Math.round(Number(app.cv_score));
-          }
+          const hasEvaluation = evaluation !== null || (currentStage?.score != null);
 
           const isRejected =
             app.is_rejected || evaluation?.recommendation === "reject";
@@ -379,16 +582,26 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
             name: app.profiles?.full_name || "Unknown Candidate",
             applied_at: app.applied_at,
             score,
+            hasEvaluation,
             is_rejected: isRejected,
             currentStageId,
             cvScore: app.cv_score,
             compositeScore: app.composite_score,
             profile: app.profiles,
+            answers: app.answers,
             stagesData: allStages,
           };
         });
 
         setCandidates(mapped);
+
+        // Persist fixed current_stage_id back to DB
+        for (const fix of stagesToFix) {
+          await supabase
+            .from("applications")
+            .update({ current_stage_id: fix.newStageId })
+            .eq("id", fix.id);
+        }
       })
       .finally(() => setLoading(false));
   }, [company?.id]);
@@ -399,8 +612,10 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       return false;
 
     if (filterFit === "Rejected") return c.is_rejected;
-    if (filterFit !== "All" && getFit(c.score).label !== filterFit)
-      return false;
+    if (filterFit !== "All") {
+      const fitLabel = c.hasEvaluation ? getFit(c.score).label : "In Progress";
+      if (fitLabel !== filterFit) return false;
+    }
 
     return true;
   });
@@ -576,6 +791,13 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
           {/* Header Buttons */}
           <div className="flex gap-2">
             <button
+              onClick={() => { setShowShortlistModal(true); setScoreReasoning(""); }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition bg-deep-space-blue text-white border-deep-space-blue hover:bg-yale-blue-600"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Advance to Shortlist
+            </button>
+            <button
               onClick={() => setShowFilters((s) => !s)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition ${
                 showFilters
@@ -598,6 +820,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
 
             {[
               "All",
+              "In Progress",
               "Strong Fit",
               "Good Fit",
               "Needs Review",
@@ -688,6 +911,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
                   setStageSettings={setStageSettings}
                   handleStageAutoAdvance={handleStageAutoAdvance}
                   onCardClick={setSelectedCandidate}
+                  allStages={stages}
                 />
               ))}
             </div>
@@ -700,6 +924,100 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
           candidate={selectedCandidate} 
           onClose={() => setSelectedCandidate(null)} 
         />
+      )}
+
+      {/* ── Advance to Shortlist Modal ── */}
+      {showShortlistModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-cerulean-900">
+              <div>
+                <h2 className="text-lg font-bold text-deep-space-blue">Advance to Shortlist</h2>
+                <p className="text-xs text-cerulean mt-0.5">Set criteria and minimum score for AI evaluation</p>
+              </div>
+              <button
+                onClick={() => setShowShortlistModal(false)}
+                className="p-1.5 rounded-lg text-cerulean hover:text-rich-cerulean hover:bg-sky-blue-900 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5 space-y-5">
+              {/* Evaluation Criteria */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold text-cerulean uppercase tracking-wide">Evaluation Criteria</label>
+                  <button
+                    onClick={handleAutoGenerateCriteria}
+                    disabled={generatingCriteria}
+                    className="flex items-center gap-1 text-xs font-semibold text-rich-cerulean hover:text-yale-blue-600 transition disabled:opacity-50"
+                  >
+                    {generatingCriteria ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-3 h-3" />
+                    )}
+                    Auto-generate
+                  </button>
+                </div>
+                <textarea
+                  value={criteria}
+                  onChange={(e) => setCriteria(e.target.value)}
+                  placeholder="Describe what makes a strong candidate for this role..."
+                  rows={5}
+                  className="w-full rounded-xl px-4 py-3 text-sm text-deep-space-blue bg-sky-blue-900 border border-cerulean-900 outline-none focus:border-rich-cerulean transition placeholder:text-steel-blue resize-none"
+                />
+              </div>
+
+              {/* Min Score */}
+              <div>
+                <label className="block text-xs font-semibold text-cerulean uppercase tracking-wide mb-2">Minimum Score</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={minScore}
+                    onChange={(e) => { setMinScore(Number(e.target.value)); setScoreReasoning(""); }}
+                    className="flex-1 accent-rich-cerulean"
+                  />
+                  <span className="text-lg font-bold text-deep-space-blue w-10 text-right">{minScore}</span>
+                </div>
+                <p className="text-xs text-cerulean mt-1">Candidates below this score will be rejected</p>
+                {scoreReasoning && (
+                  <p className="text-xs text-rich-cerulean mt-1.5 italic">{scoreReasoning}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-cerulean-900 bg-sky-blue-900 rounded-b-2xl">
+              <button
+                onClick={() => setShowShortlistModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-cerulean bg-white border border-cerulean-900 hover:bg-sky-blue-900 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAdvanceToShortlist}
+                disabled={advancingToShortlist || !criteria.trim()}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-deep-space-blue hover:bg-yale-blue-600 transition disabled:opacity-50"
+              >
+                {advancingToShortlist ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Evaluating...
+                  </>
+                ) : (
+                  "Confirm & Advance"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

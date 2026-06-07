@@ -1,4 +1,4 @@
-import { ThumbsUp, ThumbsDown, Sparkles, Calendar } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Sparkles, Calendar, Send } from "lucide-react";
 
 const TAG_COLORS = {
   "Strong Fit": "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -35,7 +35,11 @@ function timeAgo(dateString) {
 
 export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
   const { applications: app, tags = [], rank } = entry;
-  const { profiles: candidate, shortlist_votes: votes = [], composite_score, ai_rationale, applied_at, is_rejected } = app;
+  const { profiles: candidate, shortlist_votes: votes = [], composite_score, ai_rationale, applied_at, is_rejected, application_stages = [] } = app;
+
+  const hasOffer = application_stages.some(
+    (s) => s.recruitment_stages?.stage_type === "offer" && s.status === "in_progress"
+  );
 
   const upVotes = votes.filter((v) => v.vote === "up").length;
   const downVotes = votes.filter((v) => v.vote === "down").length;
@@ -66,6 +70,12 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
             <span className={`text-sm font-semibold ${isSelected ? "text-dark-amethyst-900" : "text-gray-900"}`}>
               {candidate?.full_name || "Unknown"}
             </span>
+            {hasOffer && (
+              <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 bg-blue-50 text-deep-space-blue border border-deep-space-blue/30 rounded-full font-semibold">
+                <Send className="w-2.5 h-2.5" />
+                Offer
+              </span>
+            )}
             {is_rejected && (
               <span className="text-[10px] px-1.5 py-0.5 bg-red-50 text-red-500 border border-red-200 rounded font-medium">
                 Rejected
@@ -83,6 +93,9 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
           <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
             <Calendar className="w-3 h-3" />
             <span>Applied {timeAgo(applied_at)}</span>
+            {app.answers?.info?.email && (
+              <span className="text-gray-400">· {app.answers.info.email}</span>
+            )}
           </div>
         </div>
       </div>

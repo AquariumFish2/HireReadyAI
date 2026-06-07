@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import VideoQuestion from "../components/VideoQuestion";
 import TextQuestion from "../components/TextQuestion";
@@ -96,12 +96,15 @@ export default function InterviewPage() {
   const [elapsed, setElapsed] = useState(0);
   const [maxTime, setMaxTime] = useState(null);
   const [timeExceeded, setTimeExceeded] = useState(false);
+  const generatingRef = useRef(false);
 
   const requestNextQuestion = async (
     stageId,
     previousAnswer,
     currentAnsweredCount,
   ) => {
+    if (generatingRef.current) return;
+    generatingRef.current = true;
     setPhase(previousAnswer ? PHASE.EVALUATING : PHASE.LOADING);
     setElapsed(0);
     setTimeExceeded(false);
@@ -126,6 +129,8 @@ export default function InterviewPage() {
       console.error("generate-question error:", err);
       setErrorMsg(err.message ?? "Failed to generate interview question.");
       setPhase(PHASE.ERROR);
+    } finally {
+      generatingRef.current = false;
     }
   };
 

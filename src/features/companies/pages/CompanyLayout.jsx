@@ -150,10 +150,10 @@ function CompanyLayout() {
             path="jobs"
             element={<JobPostings jobs={jobs} searchQuery={searchQuery} company={company} />}
           />
-          <Route path="shortlists" element={<ShortlistsPage jobs={jobs} />} />
+          <Route path="shortlists" element={<ShortlistsPage jobs={jobs} company={company} />} />
           <Route
             path="shortlists/:jobId"
-            element={<ShortlistsPage jobs={jobs} />}
+            element={<ShortlistsPage jobs={jobs} company={company} />}
           />
           <Route
             path="candidates"

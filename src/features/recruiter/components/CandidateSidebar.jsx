@@ -70,7 +70,7 @@ export default function CandidateSidebar({ candidate, onClose }) {
   const navigate = useNavigate();
   if (!candidate) return null;
 
-  const { profile, stagesData = [] } = candidate;
+  const { profile, stagesData = [], answers } = candidate;
 
   const sortedStages = [...stagesData].sort(
     (a, b) =>
@@ -159,11 +159,16 @@ export default function CandidateSidebar({ candidate, onClose }) {
                   Reject
                 </span>
               </div>
-              <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium">
-                {profile?.phone && (
+              <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium flex-wrap">
+                {answers?.info?.email && (
                   <span className="flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5 text-slate-400" />
-                    {profile.phone}
+                    {answers.info.email}
+                  </span>
+                )}
+                {answers?.info?.phone && (
+                  <span className="flex items-center gap-1.5">
+                    {answers.info.phone}
                   </span>
                 )}
                 {profile?.headline && (

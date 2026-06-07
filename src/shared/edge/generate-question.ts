@@ -89,37 +89,42 @@ function buildPrompt(params: {
   } = params;
 
   const questionTypeGuide = stageType === "hr_interview"
-  ? `QUESTION TYPE — HR INTERVIEW:
+  ? `FORMAT CONSTRAINTS — HR INTERVIEW:
 - DEFAULT to "video" for all behavioral, motivational, situational, and self-reflection questions
 - Use "text" ONLY for written exercises (e.g., "Write a short response to a client complaint")
 - Use "multiple_choice" ONLY for policy/compliance knowledge checks
-- NEVER use "code" in HR interviews`
+- NEVER use "code" in HR interviews
+- The SUBJECT of questions is determined by the stage Name and Purpose below, NOT by this type alone
+- The "multiple_choice" can either be scored 0 or 100 nothing between`
 
   : stageType === "technical_interview"
-  ? `QUESTION TYPE — TECHNICAL INTERVIEW:
+  ? `FORMAT CONSTRAINTS — TECHNICAL INTERVIEW:
 - Use "video" for: system design walkthroughs, architecture decisions, past project deep-dives, trade-off discussions
 - Use "text" for: short written explanations (under 3 sentences), debugging analysis without code
 - Use "code" for: algorithm implementation, fix-the-bug tasks, write-a-function tasks, or UI component implementation
   * If the question relates to UI, frontend layout, HTML, CSS, React, or their equivalents from other languages, set "code_type" to "visuals".
-  * If the question involves algorithms, backend logic, data structures, or general problem-solving, set "code_type" to "problem_solving".
+  * If the question involves algorithms, backend logic, data structures, or general problem-solving, set "code_type" to "problem_solving and doesn't include any visual renders example (given an array get the first 5 even numbers, given 2 strings return true if anagrams false if not)".
 - Use "multiple_choice" for: specific API knowledge, language syntax checks, tool/library familiarity
-- BIAS toward "video" and "code". Avoid "text" unless neither fits.`
+- The "multiple_choice" can either be scored 0 or 100 nothing between
+- BIAS toward "video" and "code". Avoid "text" unless neither fits.
+- The SUBJECT of questions is determined by the stage Name and Purpose below, NOT by this type alone`
 
-  : `QUESTION TYPE — ASSESSMENT:
-- Use "multiple_choice" for factual/knowledge checks (provide exactly 4 options)
-- Use "code" for algorithmic or implementation tasks (set "code_type" appropriately)
-- Use "text" for written analysis only when multiple_choice and code don't fit
-- NEVER use "video" in pure assessments`;
+  : `FORMAT CONSTRAINTS — ASSESSMENT:
+- NEVER use "video"
+- Use "multiple_choice", "code", or "text" as appropriate for the question
+- The SUBJECT of questions is determined by the stage Name and Purpose below, NOT by this type`;
 
   const stageGuidance: Record<string, string> = {
     hr_interview:
-      "Behavioral/cultural-fit interview. Prefer 'video' for personal/behavioral questions (STAR method). Assess communication clarity, motivation, values.",
+      "Behavioral/cultural-fit interview. Focus on culture, motivation, and values. However, the stage Name and Purpose below may specialize this (e.g., 'Technical Leadership Interview' should include technical judgment questions). Always follow Name and Purpose as the primary directive.",
     technical_interview:
-      "Prefer 'video' for system design, architecture, and experience-based questions. Use 'code' when the answer literally requires writing code. Use 'text' sparingly.",
+      "Technical depth interview. Focus on problem-solving, system design, and technical knowledge. However, the stage Name and Purpose below may specialize this (e.g., 'Frontend Architecture Interview' should focus on frontend). Always follow Name and Purpose as the primary directive.",
+    assessment_test:
+      "Custom assessment. The stage Name and Purpose below define exactly what subject to test — follow them strictly.",
     assessment:
-      "Skills assessment. Use 'multiple_choice' for factual knowledge. Use 'code' for algorithmic tasks. Use 'text' for analytical problems.",
+      "Skills assessment. The stage Name and Purpose below define what skill to assess — follow them strictly.",
   };
-  const guidance = stageGuidance[stageType] || "Competency-based evaluation. Match question type to question nature.";
+  const guidance = stageGuidance[stageType] || "The stage Name and Purpose below define what to test — follow them as the primary directive.";
 
   const historyText = history.length > 0
     ? history.map((q, i) => {
@@ -169,7 +174,10 @@ The final question should cover any remaining significant competency gaps. Make 
 ${previousAnswerText ? `STEP 1: Evaluate the answer above.\nSTEP 2: Generate Question ${nextQuestionNumber} of ${maxQuestions}.` : `Generate Question ${nextQuestionNumber} of ${maxQuestions}.`}`;
   }
 
-  return `You are a strict AI interviewer. You are conducting a "${stageName}" (${stageType || "interview"}) stage.
+  return `You are a strict AI interviewer. You are conducting a "${stageName}" stage.
+
+=== OVERRIDING DIRECTIVE — READ FIRST ===
+The stage Name and Purpose below are the PRIMARY definition of what this test is about. They override any default assumptions based on stage type. Generate questions that match the Name and Purpose above all else.
 
 STRICT RULES — NEVER BREAK THESE:
 1. Be completely neutral: zero hints, zero encouragement, zero positive reinforcement
@@ -178,16 +186,17 @@ STRICT RULES — NEVER BREAK THESE:
 4. Never ask leading questions that telegraph the correct answer
 5. Probe weaknesses directly and without signaling what is missing
 6. Questions must be clear, direct, and professional
-
+7. NEVER repeat a question — each new question must test a different concept from ALL previous questions. Check the INTERVIEW HISTORY to ensure no overlap in topic, concept, or skill tested.
+8. The "multiple_choice" can either be scored 0 or 100 nothing between
 === JOB CONTEXT ===
 Position: ${jobTitle}${jobSeniority ? ` (${jobSeniority})` : ""}
 Required Skills: ${jobSkills?.join(", ") || "Not specified"}
 Requirements: ${jobRequirements?.join("; ") || "Not specified"}
 
-=== STAGE CONTEXT ===
+=== STAGE CONTEXT (THIS IS WHAT DEFINES THE TEST) ===
 Name: ${stageName}
-Type: ${stageType || "interview"}
 Purpose: ${stageDescription || "Evaluate candidate fit for the role"}
+Type (format constraints only): ${stageType || "interview"}
 Evaluation Criteria: ${JSON.stringify(evaluationCriteria)}
 Guidance: ${guidance}
 Candidate CV Score: ${cvScore != null ? `${cvScore}/100` : "Unknown"}
@@ -249,7 +258,7 @@ async function callAI(prompt: string): Promise<AIOutput> {
         {
           role: "system",
           content:
-            "You are a strict AI interviewer. Always respond with valid JSON only. Never include markdown, code blocks, or any text outside the JSON object.",
+            "You are a strict AI interviewer. Always respond with valid JSON only. Never include markdown, code blocks, or any text outside the JSON object. The stage Name and Purpose in the user prompt define the test subject — follow them as the highest priority.",
         },
         { role: "user", content: prompt },
       ],

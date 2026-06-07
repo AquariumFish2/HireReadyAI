@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { useShortlistData } from "../hooks/useShortlistData";
+import { useUser } from "@/features/auth/context/user.context";
 import ShortlistInsightsBar from "../components/ShortlistInsightsBar";
 import ShortlistCandidateCard from "../components/ShortlistCandidateCard";
 import ShortlistDetailPanel from "../components/ShortlistDetailPanel";
@@ -11,7 +12,7 @@ const SORT_OPTIONS = [
   { key: "name",      label: "Name" },
 ];
 
-export default function ShortlistsPage({ jobs }) {
+export default function ShortlistsPage({ jobs, company }) {
   const {
     selectedJobId,
     setSelectedJobId,
@@ -32,6 +33,7 @@ export default function ShortlistsPage({ jobs }) {
     advanceToOffer,
     postNote,
   } = useShortlistData(jobs);
+  const { user, profile } = useUser();
 
   const [search, setSearch] = useState("");
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -164,6 +166,9 @@ export default function ShortlistsPage({ jobs }) {
                 onAdvanceToOffer={advanceToOffer}
                 onPostNote={postNote}
                 isOverlay={false}
+                recruiterName={profile?.fullName}
+                recruiterEmail={user?.email}
+                companyName={company?.name}
               />
             )}
 
@@ -180,6 +185,9 @@ export default function ShortlistsPage({ jobs }) {
                 onAdvanceToOffer={advanceToOffer}
                 onPostNote={postNote}
                 isOverlay={true}
+                recruiterName={profile?.fullName}
+                recruiterEmail={user?.email}
+                companyName={company?.name}
               />
             )}
           </>

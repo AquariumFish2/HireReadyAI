@@ -14,33 +14,26 @@ export const fetchShortlistForJob = async (jobId) => {
         id,
         rank,
         tags,
-        applications (
+        applications!inner (
           id,
+          job_id,
+          answers,
           composite_score,
           ai_rationale,
           ai_confidence,
           is_rejected,
           rejection_reason,
           applied_at,
-          profiles (
+          profiles!inner (
             id,
             full_name,
             headline,
             role
           ),
-          shortlist_votes (
-            id,
-            vote,
-            voter_id,
-            profiles (
-              full_name,
-              headline,
-              role
-            )
-          ),
           application_stages (
             id,
             score,
+            status,
             recruitment_stages ( name, stage_type )
           )
         )
@@ -50,13 +43,36 @@ export const fetchShortlistForJob = async (jobId) => {
 
     if (error) {
       console.error("Supabase Error fetching shortlist:", error);
+      return generateDummyShortlist();
     }
 
-    if (data && data.length > 0) {
-      return data;
+    if (!data || data.length === 0) {
+      return data || [];
     }
 
-    return generateDummyShortlist();
+    // Fetch votes separately to avoid 400 from missing FK relationship
+    const appIds = data.map(e => e.applications.id);
+    const { data: votes } = await supabase
+      .from("shortlist_votes")
+      .select(`
+        id, application_id, vote, voter_id,
+        profiles!inner ( full_name, headline, role )
+      `)
+      .in("application_id", appIds);
+
+    const votesByApp = (votes || []).reduce((map, v) => {
+      if (!map[v.application_id]) map[v.application_id] = [];
+      map[v.application_id].push(v);
+      return map;
+    }, {});
+
+    return data.map(entry => ({
+      ...entry,
+      applications: {
+        ...entry.applications,
+        shortlist_votes: votesByApp[entry.applications.id] || [],
+      },
+    }));
   } catch (err) {
     console.error("Error in fetchShortlistForJob:", err);
     return generateDummyShortlist();
@@ -170,6 +186,7 @@ const generateDummyShortlist = () => [
     tags: ["Strong Fit", "Leaning hire"],
     applications: {
       id: "app-1",
+      job_id: "job-1",
       composite_score: 86,
       ai_rationale:
         "Candidate demonstrates strong frontend engineering skills, ships polished UI work, and meets most job requirements. System-design depth is the main gap to probe.",
@@ -185,7 +202,8 @@ const generateDummyShortlist = () => [
         { id: "v4", vote: "up",      voter_id: "voter-5", profiles: { full_name: "Priya Nair",    headline: "Engineering Manager",role: "recruiter" } },
       ],
       application_stages: [
-        { id: "as-1", score: 88, recruitment_stages: { name: "CV Review", stage_type: "cv_review" } },
+        { id: "as-1", score: 88, status: "completed", recruitment_stages: { name: "CV Review", stage_type: "cv_review" } },
+        { id: "as-offer", score: null, status: "in_progress", recruitment_stages: { name: "Offer", stage_type: "offer" } },
       ],
     },
   },

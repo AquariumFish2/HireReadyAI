@@ -48,7 +48,7 @@ export default function CandidateProfilePage() {
         return;
       }
       setProfile(data);
-      if (data?.job_postings?.id && data.composite_score != null) {
+      if (data?.job_postings?.id && data.composite_score != null && data.composite_score !== 0) {
         getJobScorePercentile(data.job_postings.id, data.composite_score).then(({ percentile: p }) => {
           setPercentile(p);
         });
@@ -82,13 +82,11 @@ export default function CandidateProfilePage() {
   const cvStage = stages.find(s => s.recruitment_stages?.stage_type === "cv_review");
   const cvFeedback = parseAIFeedback(cvStage);
 
-  // Compute composite from stage scores as fallback
-  const computedComposite = app.composite_score != null
-    ? Number(app.composite_score)
-    : (() => {
-        const scores = stages.filter(s => s.score != null).map(s => Number(s.score));
-        return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
-      })();
+  // Compute composite from stage scores when stages have been scored
+  const scoredStages = stages.filter(s => s.score != null);
+  const computedComposite = scoredStages.length > 0
+    ? Math.round(scoredStages.reduce((sum, s) => sum + Number(s.score), 0) / scoredStages.length)
+    : (app.composite_score ?? null);
 
   const percentileTag = getPercentileTag(percentile);
   const interviewStages = stages.filter(s =>
@@ -122,8 +120,9 @@ export default function CandidateProfilePage() {
             {candidate.headline && (
               <p className="text-sm text-rich-cerulean mt-1">{candidate.headline}</p>
             )}
-            <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
-              {candidate.phone && <span>{candidate.phone}</span>}
+            <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 flex-wrap">
+              {app.answers?.info?.email && <span>{app.answers.info.email}</span>}
+              {app.answers?.info?.phone && <span>{app.answers.info.phone}</span>}
               {app.job_postings?.title && (
                 <span className="flex items-center gap-1">
                   <FileText className="w-3.5 h-3.5" />

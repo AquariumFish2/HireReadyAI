@@ -11,8 +11,9 @@ export async function getPipelineCandidates(companyId) {
       composite_score,
       is_rejected,
       cv_score,
-      current_stage_id,
-      profiles ( full_name, headline, phone ),
+    current_stage_id,
+    answers,
+    profiles ( full_name, headline, phone ),
       job_postings!inner ( id, title, company_id ),
       application_stages (
         id,
@@ -163,6 +164,19 @@ export async function moveToStage(applicationId, targetStageId) {
           "Target stage already has a score for this candidate",
         ),
       };
+  } else {
+    // Step 3b: Application has no row for this stage yet (e.g. stage was added after they applied)
+    // Create one so the candidate appears in the pipeline UI
+    const { error: insertErr } = await supabase
+      .from("application_stages")
+      .insert({
+        application_id: applicationId,
+        stage_id: targetStageId,
+        status: "in_progress",
+        started_at: new Date().toISOString(),
+      });
+
+    if (insertErr) return { error: insertErr };
   }
 
   // Step 4: Update current_stage_id on the application

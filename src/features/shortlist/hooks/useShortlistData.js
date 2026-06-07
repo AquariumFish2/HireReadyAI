@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
+import { supabase } from "@/shared/services/supabase";
 import {
   fetchShortlistForJob,
   castVote as castVoteService,
@@ -191,9 +192,17 @@ export const useShortlistData = (jobs) => {
     }
   };
 
-  const advanceToOffer = async (applicationId, offerStageId) => {
+  const advanceToOffer = async (applicationId) => {
     try {
-      await advanceToOfferService(applicationId, offerStageId);
+      const { data: offerStage } = await supabase
+        .from("recruitment_stages")
+        .select("id")
+        .eq("stage_type", "offer")
+        .maybeSingle();
+
+      if (offerStage) {
+        await advanceToOfferService(applicationId, offerStage.id);
+      }
     } catch (err) {
       console.error("Failed to advance to offer:", err);
     }
