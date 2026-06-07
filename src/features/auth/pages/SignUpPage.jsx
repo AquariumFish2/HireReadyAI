@@ -5,6 +5,7 @@ import { USER_ROLE } from "@/shared/constants/enums";
 import AuthLayout from "../components/AuthLayout";
 import FormField from "@/shared/ui/FormField";
 import RoleToggle from "../components/RoleToggle";
+import { signInWithGoogle } from "../services/auth.service";
 import SocialButton from "../components/SocialButton";
 
 export default function SignUpPage() {
@@ -29,6 +30,14 @@ export default function SignUpPage() {
       }
     }
   }, [profile, loading, navigate]);
+
+  async function handleGoogleSignIn() {
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      setError(err.message || "Google sign-in failed.");
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -146,7 +155,7 @@ export default function SignUpPage() {
         <span className="flex-1 h-px bg-dark-amethyst-200" />
       </div>
 
-      <SocialButton provider="google" />
+      <SocialButton provider="google" onClick={handleGoogleSignIn} />
 
       <p className="text-center text-xs text-dark-amethyst-400 mt-6">
         Already have an account?{" "}

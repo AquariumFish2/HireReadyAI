@@ -5,6 +5,7 @@ import AuthLayout from "../components/AuthLayout";
 import FormField from "@/shared/ui/FormField";
 import SocialButton from "../components/SocialButton";
 import { Link, useNavigate } from "react-router-dom";
+import { signInWithGoogle } from "../services/auth.service";
 
 export default function SignInPage() {
   const { signInUser, loading, user, profile } = useUser();
@@ -23,6 +24,14 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+
+  async function handleGoogleSignIn() {
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      setError(err.message || "Google sign-in failed.");
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -94,7 +103,7 @@ export default function SignInPage() {
         <span className="flex-1 h-px bg-dark-amethyst-200" />
       </div>
 
-      <SocialButton provider="google" />
+      <SocialButton provider="google" onClick={handleGoogleSignIn} />
 
       <p className="text-center text-xs text-dark-amethyst-300 mt-5">
         By signing in you agree to our{" "}
