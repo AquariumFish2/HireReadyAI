@@ -10,7 +10,6 @@ export default function JobsPage() {
   const { signOutUser } = useUser();
   const navigate = useNavigate();
   const { jobs, loading, error } = useJobs();
-
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("");
   const [jobType, setJobType] = useState("");

@@ -10,26 +10,25 @@ export default function JobFilters({
   onClear,
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-5 space-y-6">
+    <div className="bg-background rounded-xl border border-border p-4 space-y-4 sticky top-4 h-fit max-h-[calc(100vh-2rem)] overflow-y-auto">
 
-
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-dark-amethyst-950">Filter</h3>
+      {/* Header */}
+      <div className="flex items-center justify-between pb-1 border-b border-border">
+        <h3 className="text-sm font-bold text-foreground">Filter</h3>
         <button
           onClick={onClear}
-          className="text-xs text-dark-amethyst-500 hover:text-dark-amethyst-700 hover:underline font-medium"
+          className="text-xs text-muted-foreground hover:text-foreground hover:underline font-medium transition-colors"
         >
           Clear all
         </button>
       </div>
 
-
-      <div className="space-y-2.5">
-        <h4 className="text-xs font-semibold text-dark-amethyst-800 uppercase tracking-wide">Date Posted</h4>
+      <div className="space-y-1.5">
+        <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Date Posted</h4>
         <select
           value={datePosted}
           onChange={(e) => setDatePosted(e.target.value)}
-          className="w-full h-9 px-3 rounded-lg text-sm text-dark-amethyst-800 border border-dark-amethyst-100 bg-dark-amethyst-50 outline-none focus:border-dark-amethyst-400 transition"
+          className="w-full h-8 px-2 rounded-md text-xs text-foreground border border-border bg-muted/50 outline-none focus:ring-1 focus:ring-ring focus:bg-background transition cursor-pointer"
         >
           <option value="">Anytime</option>
           <option value="24h">Last 24 hours</option>
@@ -38,43 +37,42 @@ export default function JobFilters({
         </select>
       </div>
 
-      <div className="space-y-2.5">
-        <h4 className="text-xs font-semibold text-dark-amethyst-800 uppercase tracking-wide">Salary Range (EGP)</h4>
-        <div className="flex items-center gap-2">
+      <div className="space-y-1.5">
+        <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Salary Range (EGP)</h4>
+        <div className="flex items-center gap-1.5">
           <input
             type="number"
             value={salaryMin}
             onChange={(e) => setSalaryMin(e.target.value)}
             placeholder="Min"
-            className="w-full h-9 px-3 rounded-lg text-sm text-dark-amethyst-800 border border-dark-amethyst-100 bg-dark-amethyst-50 outline-none focus:border-dark-amethyst-400 transition placeholder:text-dark-amethyst-300"
+            className="w-full h-8 px-2 rounded-md text-xs text-foreground border border-border bg-muted/50 outline-none focus:ring-1 focus:ring-ring focus:bg-background transition placeholder:text-muted-foreground/60"
           />
-          <span className="text-dark-amethyst-300 text-sm shrink-0">to</span>
+          <span className="text-muted-foreground/50 text-xs shrink-0">to</span>
           <input
             type="number"
             value={salaryMax}
             onChange={(e) => setSalaryMax(e.target.value)}
             placeholder="Max"
-            className="w-full h-9 px-3 rounded-lg text-sm text-dark-amethyst-800 border border-dark-amethyst-100 bg-dark-amethyst-50 outline-none focus:border-dark-amethyst-400 transition placeholder:text-dark-amethyst-300"
+            className="w-full h-8 px-2 rounded-md text-xs text-foreground border border-border bg-muted/50 outline-none focus:ring-1 focus:ring-ring focus:bg-background transition placeholder:text-muted-foreground/60"
           />
         </div>
       </div>
 
-
-      <div className="space-y-2.5">
-        <h4 className="text-xs font-semibold text-dark-amethyst-800 uppercase tracking-wide">Job Type</h4>
-        <div className="space-y-2">
+      <div className="space-y-1.5">
+        <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Job Type</h4>
+        <div className="space-y-1.5">
           {[
             { label: 'Full Time', value: 'full_time' },
             { label: 'Part Time', value: 'part_time' },
           ].map(({ label, value }) => (
-            <label key={value} className="flex items-center gap-2.5 cursor-pointer group">
+            <label key={value} className="flex items-center gap-2 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={jobType === value}
                 onChange={() => setJobType(jobType === value ? '' : value)}
-                className="w-4 h-4 rounded border-dark-amethyst-200 accent-dark-amethyst-600 cursor-pointer"
+                className="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer"
               />
-              <span className="text-sm text-dark-amethyst-700 group-hover:text-dark-amethyst-900 transition">
+              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                 {label}
               </span>
             </label>
@@ -82,23 +80,22 @@ export default function JobFilters({
         </div>
       </div>
 
-
-      <div className="space-y-2.5">
-        <h4 className="text-xs font-semibold text-dark-amethyst-800 uppercase tracking-wide">On-site / Remote</h4>
-        <div className="space-y-2">
+      <div className="space-y-1.5">
+        <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">On-site / Remote</h4>
+        <div className="space-y-1.5">
           {[
             { label: 'On-site', value: 'on_site' },
             { label: 'Remote', value: 'remote' },
             { label: 'Hybrid', value: 'hybrid' },
           ].map(({ label, value }) => (
-            <label key={value} className="flex items-center gap-2.5 cursor-pointer group">
+            <label key={value} className="flex items-center gap-2 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={workLocation === value}
                 onChange={() => setWorkLocation(workLocation === value ? '' : value)}
-                className="w-4 h-4 rounded border-dark-amethyst-200 accent-dark-amethyst-600 cursor-pointer"
+                className="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer"
               />
-              <span className="text-sm text-dark-amethyst-700 group-hover:text-dark-amethyst-900 transition">
+              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                 {label}
               </span>
             </label>
@@ -106,27 +103,24 @@ export default function JobFilters({
         </div>
       </div>
 
-
-      <div className="space-y-2.5">
-        <h4 className="text-xs font-semibold text-dark-amethyst-800 uppercase tracking-wide">Seniority Level</h4>
-        <div className="space-y-2">
+      <div className="space-y-1.5">
+        <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Seniority Level</h4>
+        <div className="space-y-1.5">
           {Object.values(SENIORITY_LEVEL).map((lvl) => (
-            <label key={lvl} className="flex items-center gap-2.5 cursor-pointer group">
+            <label key={lvl} className="flex items-center gap-2 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={level === lvl}
                 onChange={() => setLevel(level === lvl ? '' : lvl)}
-                className="w-4 h-4 rounded border-dark-amethyst-200 accent-dark-amethyst-600 cursor-pointer"
+                className="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer"
               />
-              <span className="text-sm text-dark-amethyst-700 group-hover:text-dark-amethyst-900 transition capitalize">
+              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors capitalize">
                 {lvl}
               </span>
             </label>
           ))}
         </div>
       </div>
-
-      
 
     </div>
   );

@@ -122,10 +122,11 @@ export default function SignUpPage() {
           </div>
         )}
 
+        {/* تم تعديل لون كلمة Create account لتصبح بيضاء صريحة text-white */}
         <button
           type="submit"
           disabled={loading}
-          className={`w-full h-11 rounded-xl text-primary-foreground text-sm font-semibold transition-all duration-200 cursor-pointer bg-primary
+          className={`w-full h-11 rounded-xl text-white text-sm font-semibold transition-all duration-200 cursor-pointer bg-primary
             ${loading ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"}`}
           style={{ boxShadow: "0 2px 12px rgba(1,73,124,0.15)" }}
         >
