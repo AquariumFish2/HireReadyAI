@@ -1,11 +1,14 @@
+// src\features\recruiter\pages\RecruiterDashboardPage.jsx
 import React from "react";
+import { useEffect, useState } from "react";
 import { useDashboardData } from "../hooks/useDashboardData";
 import DashboardStats from "../components/DashboardStats";
 import DashboardCharts from "../components/DashboardCharts";
 import DashboardJobsTable from "../components/DashboardJobsTable";
-import { useEffect, useState } from "react";
 import { fetchCurrentUserName } from "../services/dashboard.service";
-import { useUser } from "@/features/auth/context/user.context";
+import { useUser } from "../../auth/context/user.context";
+
+import { useTranslation } from "react-i18next";
 export default function RecruiterDashboardPage() {
   const {
     jobs,
@@ -16,9 +19,11 @@ export default function RecruiterDashboardPage() {
     isLoading,
     error,
   } = useDashboardData();
+  const { t } = useTranslation();
 
   const { profile } = useUser();
   const [fullName, setFullName] = useState("");
+
   useEffect(() => {
     async function loadName() {
       if (!profile?.id) return;
@@ -33,13 +38,14 @@ export default function RecruiterDashboardPage() {
 
     loadName();
   }, [profile?.id]);
+
   if (isLoading) {
     return (
-      <div className="p-8 flex justify-center items-center h-64 font-sans">
-        <div className="flex flex-col items-center">
-          <div className="w-8 h-8 border-2 border-dark-amethyst-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-sm text-dark-amethyst-400">
-            Loading dashboard...
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="bg-white border border-slate-200/80 rounded-xl px-8 py-6 shadow-sm flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-slate-100 border-t-[#0f294a] rounded-full animate-spin"></div>
+          <p className="text-xs text-slate-500 font-medium">
+            {t("recruiter_dashboard.loading")}
           </p>
         </div>
       </div>
@@ -48,44 +54,39 @@ export default function RecruiterDashboardPage() {
 
   if (error) {
     return (
-      <div className="p-8 font-sans">
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm border border-red-100">
-          Failed to load dashboard data: {error}
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="bg-red-50 text-red-700 p-6 rounded-xl text-sm border border-red-100 max-w-md w-full shadow-sm">
+          <span className="font-bold block mb-1">Error Loading Data</span>
+          {error}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-8 font-sans">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-col gap-1">
-          {/* Top row */}
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <h1
-              className="text-3xl font-bold text-dark-amethyst-950 tracking-tight"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              Dashboard
+    <div className="min-h-screen bg-slate-50/60 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+              {t("recruiter_dashboard.title")}
             </h1>
-
-            {/* Welcome user badge */}
-            <div className="px-4 py-2 rounded-full bg-dark-amethyst-50 border border-dark-amethyst-100 text-sm text-dark-amethyst-700 font-medium">
-              Welcome,{" "}
-              <span className="text-dark-amethyst-900 font-semibold">
-                {fullName || "User"} !
-              </span>{" "}
-            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              {t("recruiter_dashboard.subtitle")}
+            </p>
           </div>
 
-          {/* Subtitle */}
-          <p className="text-sm text-dark-amethyst-400">
-            Overview of your active job postings and applicants.
-          </p>
+          <div className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-600 font-semibold shadow-sm">
+            {t("sign_in.headline")},{" "}
+            <span className="text-[#0f294a]">{fullName || "Recruiter"}</span>
+          </div>
         </div>
 
+        {/* Stats Grid */}
         <DashboardStats stats={stats} />
 
+        {/* Charts Section */}
         {pipelineSummaryData && topJobsData.length > 0 && (
           <DashboardCharts
             pipelineSummaryData={pipelineSummaryData}
@@ -94,7 +95,10 @@ export default function RecruiterDashboardPage() {
           />
         )}
 
-        <DashboardJobsTable jobs={jobs} />
+        {/* Jobs Table */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-1 shadow-sm">
+          <DashboardJobsTable jobs={jobs} />
+        </div>
       </div>
     </div>
   );

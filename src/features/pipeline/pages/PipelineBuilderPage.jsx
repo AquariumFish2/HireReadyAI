@@ -1,11 +1,14 @@
+//src\features\pipeline\pages\PipelineBuilderPage.jsx
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { usePipeline } from "../hooks/usePipeline";
 import PipelineBuilder from "../components/PipelineBuilder";
+import { useTranslation } from "react-i18next";
 
 export default function PipelineBuilderPage() {
   const { jobId } = useParams();
+  const { t } = useTranslation();
   const {
     job,
     stages,
@@ -36,7 +39,7 @@ export default function PipelineBuilderPage() {
           className="inline-flex items-center gap-1.5 text-sm text-dark-amethyst-600 hover:text-dark-amethyst-700 font-medium transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Pipelines
+          {t("pipeline_builder.back_to_pipelines")}
         </Link>
       </div>
     );
@@ -58,9 +61,15 @@ export default function PipelineBuilderPage() {
             className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-dark-amethyst-700 transition-colors shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Pipelines</span>
+            <span className="hidden sm:inline">
+              {" "}
+              {t("pipeline_builder.pipelines")}
+            </span>
           </Link>
-          <span className="text-gray-300 shrink-0" aria-hidden> / </span>
+          <span className="text-gray-300 shrink-0" aria-hidden>
+            {" "}
+            /{" "}
+          </span>
           <span className="text-sm font-semibold text-dark-amethyst-950 truncate">
             {job?.title}
           </span>

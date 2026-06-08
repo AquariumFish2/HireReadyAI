@@ -5,7 +5,6 @@ import { useApplications } from "@/features/applications/context/application.con
 import ApplicantHeader from "../components/ApplicantHeader";
 import StatsCards from "../components/StatsCards";
 import ApplicationsList from "../components/ApplicationsList";
-import FeedbackTips from "../components/FeedbackTips";
 import InterviewsList from "../components/InterviewList";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -22,9 +21,11 @@ export default function ApplicantPage() {
     updateApplicationStage,
   } = useApplications();
 
+
   useEffect(() => {
     setLocalProfile(profile);
   }, [profile]);
+
 
   useEffect(() => {
     if (user?.id) {
@@ -157,8 +158,6 @@ export default function ApplicantPage() {
                 updateApplicationStage(appId, newStage);
               }}
             />
-
-            <FeedbackTips />
           </div>
         </div>
       </div>

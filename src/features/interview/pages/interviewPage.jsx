@@ -9,6 +9,7 @@ import {
   fetchStageQuestions,
   generateNextQuestion,
 } from "../services/interview.service";
+import { useTranslation } from "react-i18next";
 import {
   Loader2,
   ChevronLeft,
@@ -85,7 +86,7 @@ function Spinner({ label, icon: Icon = Loader2 }) {
 export default function InterviewPage() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [phase, setPhase] = useState(PHASE.INIT);
   const [applicationStage, setApplicationStage] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -140,7 +141,7 @@ export default function InterviewPage() {
       try {
         const stage = await fetchActiveInterviewStage(applicationId);
         if (!stage) {
-          setErrorMsg("No active interview stage found for this application.");
+          setErrorMsg(t("interview_page.errors.no_active_stage"));
           setPhase(PHASE.ERROR);
           return;
         }
@@ -196,7 +197,7 @@ export default function InterviewPage() {
         }
       } catch (err) {
         console.error("Interview init error:", err);
-        setErrorMsg(err.message ?? "Failed to load interview session.");
+        setErrorMsg(err.message ?? t("interview_page.errors.load_failed"));
         setPhase(PHASE.ERROR);
       }
     })();
@@ -426,8 +427,10 @@ export default function InterviewPage() {
                 )}
                 <span className="text-xs text-muted-foreground text-right">
                   {maxQuestions - questionNumber > 0
-                    ? `${maxQuestions - questionNumber} question${maxQuestions - questionNumber !== 1 ? "s" : ""} remaining`
-                    : "This is the final question"}
+                    ? t("interview_page.progress.remaining", {
+                        count: maxQuestions - questionNumber,
+                      })
+                    : t("interview_page.progress.final")}
                 </span>
               </div>
             </>
@@ -446,7 +449,7 @@ export default function InterviewPage() {
               {/* Heading */}
               <div className="space-y-2">
                 <h2 className="font-display text-2xl font-semibold text-foreground">
-                  Interview Complete
+                  {t("interview_page.finished.title")}
                 </h2>
                 <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
                   Your responses have been submitted and evaluated. The hiring
@@ -454,11 +457,55 @@ export default function InterviewPage() {
                 </p>
               </div>
 
+              {/* Score */}
+              {sessionSummary && (
+                <div className="rounded-xl border bg-secondary/50 p-6 space-y-4 text-left">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">
+                      {t("interview_page.finished.overall_score")}
+                    </span>
+                    <span
+                      className={`font-display text-3xl font-semibold tracking-tight ${scoreColor}`}
+                    >
+                      {sessionSummary.overall_score}
+                      <span className="text-base font-normal text-muted-foreground">
+                        /100
+                      </span>
+                    </span>
+                  </div>
+
+                  {sessionSummary.recommendation && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {t("interview_page.finished.recommendation")}
+                      </span>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium border capitalize ${
+                          sessionSummary.recommendation === "proceed"
+                            ? "bg-success/10 text-success border-success/20"
+                            : sessionSummary.recommendation === "reject"
+                              ? "bg-destructive/10 text-destructive border-destructive/20"
+                              : "bg-warning/15 text-[#8a5a00] border-warning/30"
+                        }`}
+                      >
+                        {sessionSummary.recommendation}
+                      </span>
+                    </div>
+                  )}
+
+                  {sessionSummary.reasoning && (
+                    <p className="text-sm text-muted-foreground leading-relaxed border-t border-border pt-4">
+                      {sessionSummary.reasoning}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <button
                 onClick={() => navigate(`/applications/${applicationId}`)}
                 className="w-full max-w-md bg-primary text-primary-foreground rounded-xl px-4 py-3 text-sm font-medium hover:opacity-90 transition-all shadow-lg shadow-primary/30"
               >
-                Back to Application
+                {t("interview_page.finished.back_to_application")}
               </button>
             </div>
           )}
@@ -471,7 +518,7 @@ export default function InterviewPage() {
               </div>
               <div className="space-y-1.5">
                 <h3 className="font-display text-lg font-semibold text-foreground">
-                  Something went wrong
+                  {t("interview_page.errors.title")}
                 </h3>
                 <p className="text-sm text-muted-foreground">{errorMsg}</p>
               </div>
@@ -479,7 +526,7 @@ export default function InterviewPage() {
                 onClick={() => navigate(-1)}
                 className="border border-border bg-card text-foreground rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-secondary transition-colors"
               >
-                Go Back
+                {t("interview_page.errors.go_back")}
               </button>
             </div>
           )}

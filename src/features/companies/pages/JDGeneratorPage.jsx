@@ -1,8 +1,10 @@
+//src\features\companies\pages\JDGeneratorPage.jsx
 import { useState } from "react";
 import { SENIORITY_LEVEL } from "@/shared/constants/enums";
 import { useJobs } from "@/features/jobs/hooks/useJobs";
 import { supabase } from "@/shared/services/supabase";
 import { seedAnchorStages } from "@/features/recruiter/services/candidatesPipline.service";
+import { useTranslation } from "react-i18next";
 import {
   Building2,
   MapPin,
@@ -15,6 +17,10 @@ import {
   ChevronUp,
   ChevronDown,
   X,
+  Sparkles,
+  AlertTriangle,
+  Check,
+  Upload,
 } from "lucide-react";
 
 const SUPABASE_FUNCTION_URL =
@@ -22,7 +28,7 @@ const SUPABASE_FUNCTION_URL =
 
 export default function JDGeneratorPage({ company, profile }) {
   const { createJob } = useJobs();
-
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [seniority, setSeniority] = useState("");
   const [workLocation, setWorkLocation] = useState("");
@@ -94,23 +100,16 @@ export default function JDGeneratorPage({ company, profile }) {
   }
 
   const inputClass =
-    "w-full h-11 rounded-xl px-4 text-sm text-dark-amethyst-700 bg-white border border-dark-amethyst-100 outline-none transition-all duration-200 placeholder:text-dark-amethyst-300";
-  const selectClass =
-    "w-full h-11 rounded-xl px-4 text-sm text-dark-amethyst-700 bg-white border border-dark-amethyst-100 outline-none transition-all duration-200";
-  const labelClass =
-    "text-xs font-semibold text-dark-amethyst-600 uppercase tracking-wide";
+    "w-full h-10 rounded-xl px-3.5 text-sm text-foreground bg-background border border-input outline-none transition-all duration-200 placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:opacity-50 disabled:cursor-not-allowed";
 
-  const handleFocus = (e) => {
-    e.target.style.borderColor = "#8400ff";
-    e.target.style.boxShadow = "0 0 0 3px rgba(132,0,255,0.08)";
-  };
-  const handleBlur = (e) => {
-    e.target.style.borderColor = "";
-    e.target.style.boxShadow = "none";
-  };
+  const selectClass =
+    "w-full h-10 rounded-xl px-3.5 text-sm text-foreground bg-background border border-input outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary cursor-pointer";
+
+  const labelClass =
+    "text-[11px] font-bold text-muted-foreground/80 uppercase tracking-wider";
 
   const fieldClass = (base, errorKey) =>
-    `${base} ${errors[errorKey] ? "!border-red-400" : ""}`;
+    `${base} ${errors[errorKey] ? "!border-destructive/60 focus-visible:ring-destructive/20 focus-visible:border-destructive" : ""}`;
 
   function validate() {
     const newErrors = {};
@@ -204,7 +203,6 @@ export default function JDGeneratorPage({ company, profile }) {
     setShowQuestionsModal(false);
 
     try {
-      // Step 1: Create the job posting
       const newJob = await createJob({
         company_id: company.id,
         created_by_profile_id: profile?.id || null,
@@ -260,25 +258,17 @@ export default function JDGeneratorPage({ company, profile }) {
 
   if (published) {
     return (
-      <div className="min-h-screen bg-dark-amethyst-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 font-sans">
         <div className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-full bg-dark-amethyst-100 border border-dark-amethyst-200 flex items-center justify-center mx-auto mb-6">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M20 6L9 17l-5-5"
-                stroke="#6900cc"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+          <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5 shadow-xs">
+            <Check className="w-6 h-6 text-primary" strokeWidth={2.5} />
           </div>
-          <h2 className="text-dark-amethyst-950 text-2xl font-bold mb-3">
-            Job Published!
+          <h2 className="text-sidebar text-xl font-bold mb-1.5">
+            {t("jd_generator.published.title")}
           </h2>
-          <p className="text-dark-amethyst-700 text-sm leading-7 mb-8">
-            <span>{title}</span> has been published and is now visible to
-            applicants.
+          <p className="text-muted-foreground/80 text-xs font-medium leading-relaxed mb-6">
+            <span className="font-bold text-sidebar">{title}</span>{" "}
+            {t("jd_generator.published.message")}
           </p>
           <button
             onClick={() => {
@@ -304,9 +294,9 @@ export default function JDGeneratorPage({ company, profile }) {
               });
               setQuestions([]);
             }}
-            className="px-6 py-2.5 rounded-xl text-white text-sm font-medium bg-dark-amethyst-600 hover:bg-dark-amethyst-700 transition"
+            className="h-10 px-5 rounded-xl text-white text-xs font-semibold bg-primary hover:bg-primary-hover transition shadow-xs cursor-pointer select-none"
           >
-            Generate another JD
+            {t("jd_generator.published.generate_another")}
           </button>
         </div>
       </div>
@@ -314,327 +304,279 @@ export default function JDGeneratorPage({ company, profile }) {
   }
 
   return (
-    <>
-      <div className="min-h-screen bg-dark-amethyst-50 p-6">
-        <div className="max-w-7xl mx-auto mb-6 flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-dark-amethyst-950">
-              Job Description Generator
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handlePublish}
-              disabled={!generated || publishing}
-              className={`px-4 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2 transition
+    <div className="min-h-screen bg-background p-4 sm:p-6 font-sans">
+      {/* Upper Navigation / Bar */}
+      <div className="max-w-6xl mx-auto mb-4 flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-base font-bold text-sidebar">
+            {t("jd_generator.header.title")}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="px-4 h-9 rounded-xl text-xs font-semibold border border-border text-muted-foreground hover:bg-secondary/40 transition bg-background cursor-pointer select-none">
+            {t("jd_generator.header.save_draft")}
+          </button>
+          <button
+            onClick={handlePublish}
+            disabled={!generated || publishing}
+            className={`px-4 h-9 rounded-xl text-xs font-semibold text-white flex items-center gap-1.5 transition select-none
               ${
                 generated && !publishing
-                  ? "bg-dark-amethyst-600 hover:bg-dark-amethyst-700 cursor-pointer"
-                  : "bg-dark-amethyst-300 cursor-not-allowed"
+                  ? "bg-primary hover:bg-primary-hover cursor-pointer shadow-xs"
+                  : "bg-muted text-muted-foreground/60 cursor-not-allowed border border-border/40"
               }`}
-              style={
-                generated ? { boxShadow: "0 2px 12px rgba(132,0,255,0.2)" } : {}
-              }
+            style={
+              generated ? { boxShadow: "0 2px 12px rgba(132,0,255,0.2)" } : {}
+            }
+          >
+            {publishing ? (
+              <>
+                <span className="inline-block w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                {t("jd_generator.header.publishing")}
+              </>
+            ) : (
+              <>
+                <Upload className="w-3.5 h-3.5" />
+                {t("jd_generator.header.publish")}
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        {/* Column 1: Role Brief Form */}
+        <div className="bg-background rounded-xl border border-border/60 p-5 shadow-xs">
+          <h2 className="text-sm font-bold text-sidebar mb-0.5">
+            {t("jd_generator.form.title")}
+          </h2>
+          <p className="text-muted-foreground/70 text-xs mb-5">
+            {t("jd_generator.form.subtitle")}
+          </p>
+
+          <form
+            onSubmit={handleGenerate}
+            className="flex flex-col gap-4"
+            dir="ltr"
+          >
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>Role title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setErrors((p) => ({ ...p, title: "" }));
+                }}
+                placeholder="Job title"
+                className={fieldClass(inputClass, "title")}
+              />
+              {errors.title && (
+                <p className="text-xs font-medium text-destructive mt-0.5">
+                  {errors.title}
+                </p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Seniority</label>
+                <select
+                  value={seniority}
+                  onChange={(e) => {
+                    setSeniority(e.target.value);
+                    setErrors((p) => ({ ...p, seniority: "" }));
+                  }}
+                  className={fieldClass(selectClass, "seniority")}
+                >
+                  <option value="">Select seniority</option>
+                  {Object.values(SENIORITY_LEVEL).map((lvl) => (
+                    <option key={lvl} value={lvl} className="capitalize">
+                      {lvl}
+                    </option>
+                  ))}
+                </select>
+                {errors.seniority && (
+                  <p className="text-xs font-medium text-destructive mt-0.5">
+                    {errors.seniority}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Job type</label>
+                <select
+                  value={jobType}
+                  onChange={(e) => {
+                    setJobType(e.target.value);
+                    setErrors((p) => ({ ...p, jobType: "" }));
+                  }}
+                  className={fieldClass(selectClass, "jobType")}
+                >
+                  <option value="">Select type</option>
+                  <option value="full_time">Full Time</option>
+                  <option value="part_time">Part Time</option>
+                </select>
+                {errors.jobType && (
+                  <p className="text-xs font-medium text-destructive mt-0.5">
+                    {errors.jobType}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>Work Type</label>
+              <select
+                value={workLocation}
+                onChange={(e) => {
+                  setWorkLocation(e.target.value);
+                  setErrors((p) => ({ ...p, workLocation: "" }));
+                }}
+                className={fieldClass(selectClass, "workLocation")}
+              >
+                <option value="">Select Work Type</option>
+                <option value="on_site">On-Site</option>
+                <option value="remote">Remote</option>
+                <option value="hybrid">Hybrid</option>
+              </select>
+              {errors.workLocation && (
+                <p className="text-xs font-medium text-destructive mt-0.5">
+                  {errors.workLocation}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>Experience required</label>
+              <input
+                type="text"
+                value={experienceYears}
+                onChange={(e) => {
+                  setExperienceYears(e.target.value);
+                  setErrors((p) => ({ ...p, experienceYears: "" }));
+                }}
+                placeholder="e.g. 1-3 years"
+                className={fieldClass(inputClass, "experienceYears")}
+              />
+              {errors.experienceYears && (
+                <p className="text-xs font-medium text-destructive mt-0.5">
+                  {errors.experienceYears}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>
+                Required skills
+                <span className="text-muted-foreground/50 normal-case font-normal">
+                  (optional)
+                </span>
+              </label>
+              <input
+                type="text"
+                value={requiredSkills}
+                onChange={(e) => setRequiredSkills(e.target.value)}
+                placeholder="Required skills"
+                className={inputClass}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>
+                Salary range (EGP)
+                <span className="text-muted-foreground/50 normal-case font-normal">
+                  (optional)
+                </span>
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={salaryMin}
+                  onChange={(e) => setSalaryMin(e.target.value)}
+                  placeholder="Min"
+                  className={inputClass}
+                />
+                <span className="text-muted-foreground/60 text-xs shrink-0 font-medium">
+                  to
+                </span>
+                <input
+                  type="number"
+                  value={salaryMax}
+                  onChange={(e) => setSalaryMax(e.target.value)}
+                  placeholder="Max"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>
+                Key notes
+                <span className="text-muted-foreground/50 normal-case font-normal">
+                  (optional)
+                </span>
+              </label>
+              <textarea
+                rows={4}
+                value={keyNotes}
+                onChange={(e) => setKeyNotes(e.target.value)}
+                placeholder="Additional hiring notes..."
+                className="w-full rounded-xl px-3.5 py-2.5 text-sm text-foreground bg-background border border-input outline-none transition-all duration-200 placeholder:text-muted-foreground/50 resize-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary"
+              />
+            </div>
+
+            {generateError && (
+              <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+
+                {generateError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={generating}
+              className={`w-full h-10 rounded-xl text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 select-none shadow-xs
+                ${generating ? "bg-primary/60 cursor-not-allowed" : "bg-primary hover:bg-primary-hover cursor-pointer"}`}
             >
-              {publishing ? (
+              {generating ? (
                 <>
-                  <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  Publishing…
+                  <span className="inline-block w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  {t("jd_generator.form.buttons.generating")}
                 </>
               ) : (
                 <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 19V5M5 12l7-7 7 7"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  Publish JD
+                  {t("jd_generator.form.buttons.generate")}
+                  <Sparkles className="w-3.5 h-3.5" />
                 </>
               )}
             </button>
-          </div>
+          </form>
         </div>
-
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-7">
-            <h2 className="text-base font-bold text-dark-amethyst-950 mb-1">
-              Role brief
-            </h2>
-            <p className="text-dark-amethyst-400 text-sm mb-6">
-              Fill in the basics - AI handles the rest.
-            </p>
-
-            <form onSubmit={handleGenerate} className="flex flex-col gap-5">
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Role title</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    setErrors((p) => ({ ...p, title: "" }));
-                  }}
-                  placeholder="Job title"
-                  className={fieldClass(inputClass, "title")}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-                {errors.title && (
-                  <p className="text-xs text-red-500 mt-0.5">{errors.title}</p>
-                )}
+        {/* Column 2: Live Preview Panel */}
+        <div className="bg-background rounded-xl border border-border/60 p-5 shadow-xs min-h-[450px] lg:h-full">
+          {!generated ? (
+            <div className="flex flex-col items-center justify-center h-full py-20 text-center">
+              <div className="w-12 h-12 rounded-xl bg-secondary/40 border border-border flex items-center justify-center mb-3.5 text-muted-foreground/70">
+                <Sparkles className="w-5 h-5 text-primary" />
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>Seniority</label>
-                  <select
-                    value={seniority}
-                    onChange={(e) => {
-                      setSeniority(e.target.value);
-                      setErrors((p) => ({ ...p, seniority: "" }));
-                    }}
-                    className={fieldClass(selectClass, "seniority")}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                  >
-                    <option value="">Select seniority</option>
-                    {Object.values(SENIORITY_LEVEL).map((lvl) => (
-                      <option key={lvl} value={lvl} className="capitalize">
-                        {lvl}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.seniority && (
-                    <p className="text-xs text-red-500 mt-0.5">
-                      {errors.seniority}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>Job type</label>
-                  <select
-                    value={jobType}
-                    onChange={(e) => {
-                      setJobType(e.target.value);
-                      setErrors((p) => ({ ...p, jobType: "" }));
-                    }}
-                    className={fieldClass(selectClass, "jobType")}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                  >
-                    <option value="">Select type</option>
-                    <option value="full_time">Full Time</option>
-                    <option value="part_time">Part Time</option>
-                  </select>
-                  {errors.jobType && (
-                    <p className="text-xs text-red-500 mt-0.5">
-                      {errors.jobType}
-                    </p>
-                  )}
-                </div>
+              <p className="text-sidebar font-semibold text-xs">
+                {t("jd_generator.preview.empty_title")}
+              </p>
+              <p className="text-muted-foreground/70 text-[11px] mt-0.5">
+                {t("jd_generator.preview.empty_subtitle")}
+              </p>
+            </div>
+          ) : (
+            <>
+            <div className="space-y-5">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] font-bold text-primary/90 flex items-center gap-1 bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-md">
+                  <Sparkles className="w-3 h-3" />
+                  {t("jd_generator.preview.ai_generated")}
+                </span>
               </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Work type</label>
-                <select
-                  value={workLocation}
-                  onChange={(e) => {
-                    setWorkLocation(e.target.value);
-                    setErrors((p) => ({ ...p, workLocation: "" }));
-                  }}
-                  className={fieldClass(selectClass, "workLocation")}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                >
-                  <option value="">Select work type</option>
-                  <option value="on_site">On-site</option>
-                  <option value="remote">Remote</option>
-                  <option value="hybrid">Hybrid</option>
-                </select>
-                {errors.workLocation && (
-                  <p className="text-xs text-red-500 mt-0.5">
-                    {errors.workLocation}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Experience required</label>
-                <input
-                  type="text"
-                  value={experienceYears}
-                  onChange={(e) => {
-                    setExperienceYears(e.target.value);
-                    setErrors((p) => ({ ...p, experienceYears: "" }));
-                  }}
-                  placeholder="e.g. 1-3 years"
-                  className={fieldClass(inputClass, "experienceYears")}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-                {errors.experienceYears && (
-                  <p className="text-xs text-red-500 mt-0.5">
-                    {errors.experienceYears}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>
-                  Required skills{" "}
-                  <span className="text-dark-amethyst-400 normal-case font-normal">
-                    (optional)
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  value={requiredSkills}
-                  onChange={(e) => setRequiredSkills(e.target.value)}
-                  placeholder="Required skills"
-                  className={inputClass}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>
-                  Salary range (EGP){" "}
-                  <span className="text-dark-amethyst-400 normal-case font-normal">
-                    (optional)
-                  </span>
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={salaryMin}
-                    onChange={(e) => {
-                      setSalaryMin(e.target.value);
-                      setErrors((p) => ({ ...p, salary: "" }));
-                    }}
-                    placeholder="Min"
-                    className={fieldClass(inputClass, "salary")}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                  />
-                  <span className="text-dark-amethyst-300 text-sm shrink-0">
-                    to
-                  </span>
-                  <input
-                    type="number"
-                    value={salaryMax}
-                    onChange={(e) => {
-                      setSalaryMax(e.target.value);
-                      setErrors((p) => ({ ...p, salary: "" }));
-                    }}
-                    placeholder="Max"
-                    className={fieldClass(inputClass, "salary")}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                  />
-                </div>
-                {errors.salary && (
-                  <p className="text-xs text-red-500 mt-0.5">{errors.salary}</p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>
-                  Key notes{" "}
-                  <span className="text-dark-amethyst-400 normal-case font-normal">
-                    (optional)
-                  </span>
-                </label>
-                <textarea
-                  rows={5}
-                  value={keyNotes}
-                  onChange={(e) => setKeyNotes(e.target.value)}
-                  placeholder="Additional hiring notes..."
-                  className="w-full rounded-xl px-4 py-3 text-sm text-dark-amethyst-900 bg-white border border-dark-amethyst-100 outline-none transition-all duration-200 placeholder:text-dark-amethyst-300 resize-none"
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                />
-              </div>
-
-              {generateError && (
-                <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs text-red-600 bg-red-50 border border-red-200">
-                  <span>⚠</span>
-                  {generateError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={generating}
-                className={`w-full h-11 rounded-xl text-white text-sm font-semibold transition flex items-center justify-center gap-2
-                ${generating ? "bg-dark-amethyst-400 cursor-not-allowed" : "bg-dark-amethyst-600 hover:bg-dark-amethyst-700"}`}
-                style={{ boxShadow: "0 2px 12px rgba(132,0,255,0.2)" }}
-              >
-                {generating ? (
-                  <>
-                    <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                    Generating…
-                  </>
-                ) : (
-                  <>
-                    Generate JD
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                        stroke="white"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-dark-amethyst-100 p-7">
-            {!generated ? (
-              <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
-                <div className="w-16 h-16 rounded-full bg-dark-amethyst-50 border border-dark-amethyst-100 flex items-center justify-center mb-4">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                      stroke="#8400ff"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <p className="text-dark-amethyst-700 font-medium text-sm">
-                  Fill in the role brief
-                </p>
-                <p className="text-dark-amethyst-400 text-xs mt-1">
-                  and click Generate JD to see the preview
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-dark-amethyst-500 flex items-center gap-1.5">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                        stroke="#8400ff"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    AI Generated
-                  </span>
-                </div>
 
                 <div>
                   <h2 className="text-xl font-bold text-dark-amethyst-950">
@@ -688,205 +630,141 @@ export default function JDGeneratorPage({ company, profile }) {
                   </div>
                 </div>
 
+              {publishError && (
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+
+                  {publishError}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Questions Modal */}
+        {showQuestionsModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-dark-amethyst-100 shrink-0">
                 <div>
-                  <h3 className="text-sm font-bold text-dark-amethyst-950 mb-2">
-                    About the role
-                  </h3>
-                  <p className="text-dark-amethyst-900 text-sm leading-relaxed">
-                    {aiResult?.description}
+                  <h2 className="text-lg font-bold text-dark-amethyst-950">
+                    Application Questions
+                  </h2>
+                  <p className="text-xs text-dark-amethyst-400 mt-0.5">
+                    Add questions applicants will answer when applying
                   </p>
                 </div>
-
-                {aiResult?.responsibilities?.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-bold text-dark-amethyst-950 mb-2">
-                      What you'll do
-                    </h3>
-                    <ul className="space-y-1.5">
-                      {aiResult.responsibilities.map((item, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-2 text-dark-amethyst-900 text-sm"
-                        >
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-dark-amethyst-400 shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {aiResult?.requirements?.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-bold text-dark-amethyst-950 mb-2">
-                      What we're looking for
-                    </h3>
-                    <ul className="space-y-1.5">
-                      {aiResult.requirements.map((item, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-2 text-dark-amethyst-900 text-sm"
-                        >
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-dark-amethyst-400 shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {aiResult?.skills?.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-bold text-dark-amethyst-950 mb-3">
-                      Skills & Tools
-                    </h3>
-                    <div className="grid grid-cols-2 gap-y-2">
-                      {aiResult.skills.map((skill, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-2 text-sm text-dark-amethyst-900"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-dark-amethyst-500" />
-                          {skill}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {publishError && (
-                  <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs text-red-600 bg-red-50 border border-red-200">
-                    <span>⚠</span>
-                    {publishError}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Questions Modal */}
-      {showQuestionsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-dark-amethyst-100 shrink-0">
-              <div>
-                <h2 className="text-lg font-bold text-dark-amethyst-950">
-                  Application Questions
-                </h2>
-                <p className="text-xs text-dark-amethyst-400 mt-0.5">
-                  Add questions applicants will answer when applying
-                </p>
-              </div>
-              <button
-                onClick={() => setShowQuestionsModal(false)}
-                className="p-1.5 rounded-lg text-dark-amethyst-400 hover:text-dark-amethyst-600 hover:bg-dark-amethyst-50 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Body */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
-              {questions.length === 0 && (
-                <p className="text-sm text-dark-amethyst-400 italic text-center py-8">
-                  No questions yet. Click "Add Question" to get started.
-                </p>
-              )}
-              {questions.map((q, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-2 bg-dark-amethyst-50 rounded-xl p-3 border border-dark-amethyst-100"
+                <button
+                  onClick={() => setShowQuestionsModal(false)}
+                  className="p-1.5 rounded-lg text-dark-amethyst-400 hover:text-dark-amethyst-600 hover:bg-dark-amethyst-50 transition"
                 >
-                  <div className="flex flex-col gap-0.5 pt-0.5">
-                    <button
-                      onClick={() => moveUp(i)}
-                      disabled={i === 0}
-                      className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
-                    >
-                      <ChevronUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => moveDown(i)}
-                      disabled={i === questions.length - 1}
-                      className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
-                    >
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <input
-                      type="text"
-                      value={q.question}
-                      onChange={(e) =>
-                        updateQuestion(i, "question", e.target.value)
-                      }
-                      placeholder="Write your question..."
-                      className="w-full h-9 rounded-lg px-3 text-sm text-dark-amethyst-900 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition placeholder:text-dark-amethyst-300"
-                    />
-                    <select
-                      value={q.type}
-                      onChange={(e) =>
-                        updateQuestion(i, "type", e.target.value)
-                      }
-                      className="h-8 rounded-lg px-2 text-xs text-dark-amethyst-600 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition"
-                    >
-                      {questionsTypes.map((t) => (
-                        <option key={t} value={t}>
-                          {t.replace("_", " ")}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button
-                    onClick={() => removeQuestion(i)}
-                    className="p-1.5 rounded-lg text-dark-amethyst-400 hover:text-red-500 hover:bg-red-50 transition shrink-0 mt-0.5"
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+                {questions.length === 0 && (
+                  <p className="text-sm text-dark-amethyst-400 italic text-center py-8">
+                    No questions yet. Click "Add Question" to get started.
+                  </p>
+                )}
+                {questions.map((q, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-2 bg-dark-amethyst-50 rounded-xl p-3 border border-dark-amethyst-100"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <div className="flex flex-col gap-0.5 pt-0.5">
+                      <button
+                        onClick={() => moveUp(i)}
+                        disabled={i === 0}
+                        className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
+                      >
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => moveDown(i)}
+                        disabled={i === questions.length - 1}
+                        className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
+                      >
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="text"
+                        value={q.question}
+                        onChange={(e) =>
+                          updateQuestion(i, "question", e.target.value)
+                        }
+                        placeholder="Write your question..."
+                        className="w-full h-9 rounded-lg px-3 text-sm text-dark-amethyst-900 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition placeholder:text-dark-amethyst-300"
+                      />
+                      <select
+                        value={q.type}
+                        onChange={(e) =>
+                          updateQuestion(i, "type", e.target.value)
+                        }
+                        className="h-8 rounded-lg px-2 text-xs text-dark-amethyst-600 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition"
+                      >
+                        {questionsTypes.map((t) => (
+                          <option key={t} value={t}>
+                            {t.replace("_", " ")}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <button
+                      onClick={() => removeQuestion(i)}
+                      className="p-1.5 rounded-lg text-dark-amethyst-400 hover:text-red-500 hover:bg-red-50 transition shrink-0 mt-0.5"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between px-6 py-4 border-t border-dark-amethyst-100 bg-dark-amethyst-50 rounded-b-2xl shrink-0">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={addQuestion}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-600 bg-white border border-dark-amethyst-200 hover:bg-dark-amethyst-50 transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Question
+                  </button>
+                  {questions.length > 0 && (
+                    <span className="text-xs text-dark-amethyst-400">
+                      {questions.length} question
+                      {questions.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => executePublish(false)}
+                    disabled={publishing}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-500 bg-white border border-dark-amethyst-200 hover:bg-dark-amethyst-50 transition disabled:opacity-50"
+                  >
+                    Skip
+                  </button>
+                  <button
+                    onClick={() => executePublish(true)}
+                    disabled={publishing}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-dark-amethyst-600 hover:bg-dark-amethyst-700 transition disabled:opacity-50"
+                  >
+                    {publishing ? "Publishing..." : "Confirm & Publish"}
                   </button>
                 </div>
-              ))}
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-dark-amethyst-100 bg-dark-amethyst-50 rounded-b-2xl shrink-0">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={addQuestion}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-600 bg-white border border-dark-amethyst-200 hover:bg-dark-amethyst-50 transition"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Add Question
-                </button>
-                {questions.length > 0 && (
-                  <span className="text-xs text-dark-amethyst-400">
-                    {questions.length} question
-                    {questions.length !== 1 ? "s" : ""}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => executePublish(false)}
-                  disabled={publishing}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-500 bg-white border border-dark-amethyst-200 hover:bg-dark-amethyst-50 transition disabled:opacity-50"
-                >
-                  Skip
-                </button>
-                <button
-                  onClick={() => executePublish(true)}
-                  disabled={publishing}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-dark-amethyst-600 hover:bg-dark-amethyst-700 transition disabled:opacity-50"
-                >
-                  {publishing ? "Publishing..." : "Confirm & Publish"}
-                </button>
               </div>
             </div>
           </div>
+        )}
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }
+       

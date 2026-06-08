@@ -1,3 +1,4 @@
+//src\features\shortlist\components\ShortlistDetailPanel.jsx
 import { useState, useRef, useEffect } from "react";
 import {
   ThumbsUp,
@@ -12,6 +13,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/shared/services/supabase";
 import OfferEmailModal from "./OfferEmailModal";
+import { useTranslation } from "react-i18next";
+import { t } from "i18next";
 
 function getInitials(name = "") {
   return name
@@ -21,58 +24,51 @@ function getInitials(name = "") {
     .slice(0, 2)
     .toUpperCase();
 }
-function getAvatarColor(name = "") {
-  const colors = [
-    "bg-violet-500",
-    "bg-sky-500",
-    "bg-emerald-500",
-    "bg-amber-500",
-    "bg-rose-500",
-    "bg-indigo-500",
-    "bg-teal-500",
-    "bg-fuchsia-500",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++)
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
+
+// HireReadyAI Avatar style - Consistent brand identity tint
+function getAvatarStyles() {
+  return "bg-primary/10 text-primary";
 }
+
 function timeAgo(dateString) {
   if (!dateString) return "";
   const diff = Date.now() - new Date(dateString).getTime();
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  if (days > 0) return `${days}d ago`;
-  if (hours > 0) return `${hours}h ago`;
-  return "Just now";
+  if (days > 0) return t("shortlist.timeAgo.days", { count: days });
+  if (hours > 0) return t("shortlist.timeAgo.hours", { count: hours });
+  return t("shortlist.timeAgo.justNow");
 }
 
+// Semantic tag colors aligned with Design System states
 const TAG_COLORS = {
-  "Strong Fit": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Leaning hire": "bg-sky-50 text-sky-700 border-sky-200",
-  "Needs Review": "bg-amber-50 text-amber-700 border-amber-200",
+  "Strong Fit": "bg-success/10 text-success border-success/20",
+  "Leaning hire": "bg-accent/10 text-accent border-accent/20",
+  "Needs Review": "bg-warning/15 text-[#8a5a00] border-warning/30",
 };
 
+// Vote Config mapped to semantic system values
 const VOTE_CONFIG = {
   up: {
     label: "Up",
     Icon: ThumbsUp,
-    active: "bg-emerald-500 text-white",
+    active: "bg-success text-white",
     inactive:
-      "bg-gray-100 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600",
+      "bg-secondary text-muted-foreground hover:bg-success/10 hover:text-success",
   },
   neutral: {
     label: "Neutral",
     Icon: Minus,
-    active: "bg-gray-500 text-white",
-    inactive: "bg-gray-100 text-gray-500 hover:bg-gray-200",
+    active: "bg-muted-foreground text-white",
+    inactive: "bg-secondary text-muted-foreground hover:bg-muted",
   },
   down: {
     label: "Down",
     Icon: ThumbsDown,
-    active: "bg-red-500 text-white",
-    inactive: "bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500",
+    active: "bg-destructive text-white",
+    inactive:
+      "bg-secondary text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
   },
 };
 
@@ -84,13 +80,13 @@ export default function ShortlistDetailPanel({
   onClose,
   onCastVote,
   onReject,
-  onAdvanceToOffer,
   onPostNote,
   isOverlay,
   recruiterName = "",
   recruiterEmail = "",
   companyName = "",
 }) {
+  const { t } = useTranslation();
   const [noteBody, setNoteBody] = useState("");
   const [visibleToTeam, setVisibleToTeam] = useState(true);
   const [showRejectInput, setShowRejectInput] = useState(false);
@@ -160,50 +156,50 @@ export default function ShortlistDetailPanel({
 
   return (
     <>
-      {/* Backdrop on overlay mode */}
+      {/* Backdrop overlay utilizing system muted foreground opacity */}
       {isOverlay && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-xs z-100"
+          className="fixed inset-0 bg-foreground/40 backdrop-blur-sm z-[100]"
           onClick={onClose}
         />
       )}
 
       <div
-        className={`bg-white flex flex-col overflow-hidden border-l border-gray-100 ${
+        className={`bg-background flex flex-col overflow-hidden border-l border-border ${
           isOverlay
-            ? "fixed right-0 top-0 bottom-0 z-110 w-[380px] shadow-2xl"
+            ? "fixed right-0 top-0 bottom-0 z-[110] w-[380px] shadow-[var(--shadow-lift)]"
             : "w-[380px] shrink-0 h-full"
         }`}
       >
         {/* Header */}
-        <div className="px-5 pt-5 pb-4 border-b border-gray-100 bg-white shrink-0">
+        <div className="px-5 pt-5 pb-4 border-b border-border bg-background shrink-0">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
               <div
-                className={`w-11 h-11 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 ${getAvatarColor(candidate?.full_name)}`}
+                className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${getAvatarStyles()}`}
               >
                 {getInitials(candidate?.full_name)}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-foreground font-display text-[17px]">
                     {candidate?.full_name}
                   </span>
                   {composite_score != null && (
                     <span
                       className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
                         composite_score >= 80
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          ? "bg-success/10 text-success border-success/20"
                           : composite_score >= 65
-                            ? "bg-amber-50 text-amber-700 border-amber-200"
-                            : "bg-gray-50 text-gray-600 border-gray-200"
+                            ? "bg-warning/15 text-[#8a5a00] border-warning/30"
+                            : "bg-secondary text-muted-foreground border-border"
                       }`}
                     >
                       {composite_score}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   {candidate?.headline || candidate?.role}
                 </p>
                 <div className="flex items-center gap-3 text-xs text-gray-400 mt-1">
@@ -214,7 +210,10 @@ export default function ShortlistDetailPanel({
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${TAG_COLORS[tag] || "bg-gray-100 text-gray-600 border-gray-200"}`}
+                      className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${
+                        TAG_COLORS[tag] ||
+                        "bg-secondary text-muted-foreground border-border"
+                      }`}
                     >
                       {tag}
                     </span>
@@ -224,7 +223,7 @@ export default function ShortlistDetailPanel({
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 shrink-0"
+              className="p-1.5 hover:bg-secondary rounded-lg text-muted-foreground shrink-0 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -234,26 +233,25 @@ export default function ShortlistDetailPanel({
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto">
           {/* YOUR VOTE */}
-          <div className="px-5 py-4 border-b border-gray-100">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-3">
-              Your Vote
+          <div className="px-5 py-4 border-b border-border">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground mb-3 font-display">
+              {t("shortlist.yourVote")}
             </p>
             {myVote ? (
               <div
-                className={`rounded-lg px-4 py-3 text-sm font-medium mb-3 ${
+                className={`rounded-lg px-4 py-3 text-sm font-medium mb-3 border ${
                   myVote === "up"
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    ? "bg-success/10 text-success border-success/20"
                     : myVote === "down"
-                      ? "bg-red-50 text-red-600 border border-red-200"
-                      : "bg-gray-50 text-gray-600 border border-gray-200"
+                      ? "bg-destructive/10 text-destructive border-destructive/20"
+                      : "bg-secondary text-muted-foreground border-border"
                 }`}
               >
-                You voted <strong className="capitalize">{myVote}</strong> — tap
-                again to undo
+                {t("shortlist.votedMessage", { vote: myVote })}
               </div>
             ) : (
-              <p className="text-xs text-gray-400 mb-3">
-                You haven't voted yet.
+              <p className="text-xs text-muted-foreground mb-3">
+                {t("shortlist.noVoteYet")}
               </p>
             )}
             <div className="flex gap-2">
@@ -264,7 +262,9 @@ export default function ShortlistDetailPanel({
                     onClick={() =>
                       onCastVote(app.id, myVote === value ? null : value)
                     }
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${myVote === value ? active : inactive}`}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                      myVote === value ? active : inactive
+                    }`}
                   >
                     <Icon className="w-3.5 h-3.5" /> {label}
                   </button>
@@ -274,19 +274,19 @@ export default function ShortlistDetailPanel({
           </div>
 
           {/* TEAM VOTES */}
-          <div className="px-5 py-4 border-b border-gray-100">
+          <div className="px-5 py-4 border-b border-border">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400">
-                Team Votes
+              <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground font-display">
+                {t("shortlist.teamVotes")}
               </p>
-              <span className="text-xs text-gray-500">
-                {totalVoters} / ? cast
+              <span className="text-xs text-muted-foreground">
+                {totalVoters} cast
               </span>
             </div>
             {totalVoters > 0 && (
-              <div className="w-full bg-gray-100 rounded-full h-1.5 mb-3 overflow-hidden">
+              <div className="w-full bg-secondary rounded-full h-1.5 mb-3 overflow-hidden">
                 <div
-                  className="h-1.5 rounded-full bg-emerald-400 transition-all"
+                  className="h-1.5 rounded-full bg-success transition-all"
                   style={{
                     width: `${(upVotes / Math.max(totalVoters, 1)) * 100}%`,
                   }}
@@ -301,99 +301,105 @@ export default function ShortlistDetailPanel({
                 >
                   <div className="flex items-center gap-2">
                     <div
-                      className={`w-7 h-7 rounded-full text-[10px] font-bold flex items-center justify-center text-white ${getAvatarColor(v.profiles?.full_name)}`}
+                      className={`w-7 h-7 rounded-full text-[10px] font-bold flex items-center justify-center ${getAvatarStyles()}`}
                     >
                       {getInitials(v.profiles?.full_name)}
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-800">
+                      <p className="text-xs font-medium text-foreground">
                         {v.profiles?.full_name}
                       </p>
-                      <p className="text-[10px] text-gray-400">
+                      <p className="text-[10px] text-muted-foreground">
                         {v.profiles?.headline || v.profiles?.role}
                       </p>
                     </div>
                   </div>
                   <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
                       v.vote === "up"
-                        ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                        ? "bg-success/10 text-success border-success/20"
                         : v.vote === "down"
-                          ? "bg-red-50 text-red-500 border border-red-200"
-                          : "bg-gray-100 text-gray-500 border border-gray-200"
+                          ? "bg-destructive/10 text-destructive border-destructive/20"
+                          : "bg-secondary text-muted-foreground border-border"
                     }`}
                   >
                     {v.vote === "up"
-                      ? "↑ Up"
+                      ? t("shortlist.vote.up")
                       : v.vote === "down"
-                        ? "↓ Down"
-                        : "— Neutral"}
+                        ? t("shortlist.vote.down")
+                        : t("shortlist.vote.neutral")}
                   </span>
                 </div>
               ))}
               {votes.length === 0 && (
-                <p className="text-xs text-gray-400">No votes yet.</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("shortlist.noVotes")}
+                </p>
               )}
             </div>
           </div>
 
-          {/* AI RATIONALE */}
-          <div className="px-5 py-4 border-b border-gray-100">
-            <div className="bg-mauve-magic-50 border border-mauve-magic-200 rounded-xl p-4">
+          {/* AI RATIONALE - Uses Accent Tokens */}
+          <div className="px-5 py-4 border-b border-border">
+            <div className="bg-accent/5 border border-accent/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-mauve-magic-500" />
-                  <p className="text-[10px] font-bold tracking-widest uppercase text-mauve-magic-600">
-                    AI Rationale
+                  <Sparkles className="w-3.5 h-3.5 text-accent" />
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-accent font-display">
+                    {t("shortlist.aiRationale")}
                   </p>
                 </div>
                 {ai_confidence != null && (
-                  <span className="text-[10px] font-bold text-mauve-magic-700 bg-mauve-magic-100 px-2 py-0.5 rounded-full">
-                    Confidence {Math.round(ai_confidence * 100)}%
+                  <span className="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+                    {t("shortlist.confidence", {
+                      value: Math.round(ai_confidence * 100),
+                    })}
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">
+              <p className="text-sm text-foreground leading-relaxed">
                 {ai_rationale ||
                   "No AI rationale available for this candidate."}
               </p>
               {!is_rejected && (
-                <button className="mt-3 text-xs font-semibold text-mauve-magic-600 hover:text-mauve-magic-800 transition-colors">
-                  — Proceed to next stage
+                <button className="mt-3 text-xs font-semibold text-accent hover:opacity-90 transition-opacity">
+                  {t("shortlist.proceedNext")}
                 </button>
               )}
             </div>
           </div>
 
           {/* TEAM NOTES */}
-          <div className="px-5 py-4 border-b border-gray-100">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-3">
-              Team Notes
+          <div className="px-5 py-4 border-b border-border">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground mb-3 font-display">
+              {t("shortlist.teamNotes")}
             </p>
             {notesLoading ? (
-              <div className="text-xs text-gray-400">Loading notes...</div>
+              <div className="text-xs text-muted-foreground">
+                {t("shortlist.loadingNotes")}
+              </div>
             ) : (
               <div className="space-y-3 mb-3">
                 {notes.length === 0 && (
-                  <p className="text-xs text-gray-400">
-                    No notes yet. Be the first to leave one.
+                  <p className="text-xs text-muted-foreground">
+                    {t("shortlist.noNotes")}
                   </p>
                 )}
                 {notes.map((note) => (
                   <div
                     key={note.id}
-                    className="bg-gray-50 rounded-lg p-3 border border-gray-100"
+                    className="bg-secondary/50 rounded-lg p-3 border border-border"
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-semibold text-gray-800">
-                        {note.profiles?.full_name || "Team member"}
+                      <span className="text-xs font-semibold text-foreground">
+                        {note.profiles?.full_name || t("shortlist.teamMember")}
                       </span>
-                      <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
+                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                         <Clock className="w-3 h-3" />
                         {timeAgo(note.created_at)}
                       </div>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
                       {note.body}
                     </p>
                   </div>
@@ -406,33 +412,35 @@ export default function ShortlistDetailPanel({
               value={noteBody}
               onChange={(e) => setNoteBody(e.target.value)}
               placeholder="Leave a note for the hiring team..."
-              className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 text-gray-700 placeholder-gray-400"
+              className="w-full text-xs border border-border bg-background rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 text-foreground placeholder:text-muted-foreground"
             />
             <div className="flex items-center justify-between mt-2">
-              <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer">
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
                 <input
                   type="checkbox"
                   checked={visibleToTeam}
                   onChange={(e) => setVisibleToTeam(e.target.checked)}
-                  className="accent-dark-amethyst-500"
+                  className="accent-primary rounded"
                 />
                 <UserCheck className="w-3 h-3" />
-                Visible to hiring team
+                {t("shortlist.visibleToTeam")}
               </label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setNoteBody("")}
-                  className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Cancel
+                  {t("shortlist.cancel")}
                 </button>
                 <button
                   onClick={handlePostNote}
                   disabled={!noteBody.trim() || postingNote}
-                  className="flex items-center gap-1.5 text-xs font-semibold bg-dark-amethyst-600 hover:bg-dark-amethyst-700 text-white px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 text-xs font-semibold bg-primary text-white px-3 py-1.5 rounded-lg transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   <Send className="w-3 h-3" />
-                  {postingNote ? "Posting..." : "Post note"}
+                  {postingNote
+                    ? t("shortlist.posting")
+                    : t("shortlist.postNote")}
                 </button>
               </div>
             </div>
@@ -441,31 +449,33 @@ export default function ShortlistDetailPanel({
 
         {/* ACTION BUTTONS */}
         {!is_rejected ? (
-          <div className="px-5 py-4 border-t border-gray-100 bg-white shrink-0 space-y-2">
+          <div className="px-5 py-4 border-t border-border bg-background shrink-0 space-y-2">
             {showRejectInput ? (
               <div className="space-y-2">
-                <p className="text-xs text-gray-500 font-medium">
-                  Rejection reason (pre-filled from AI):
+                <p className="text-xs text-muted-foreground font-medium">
+                  {t("shortlist.rejectionReason")}
                 </p>
                 <textarea
                   rows={3}
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
-                  className="w-full text-xs border border-red-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-red-300 text-gray-700"
+                  className="w-full text-xs border border-destructive/30 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-destructive/20 text-foreground"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => setShowRejectInput(false)}
-                    className="flex-1 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="flex-1 py-2 border border-border bg-background rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary transition-colors"
                   >
-                    Cancel
+                    {t("shortlist.cancel")}
                   </button>
                   <button
                     onClick={handleReject}
                     disabled={rejecting}
-                    className="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                    className="flex-1 py-2 bg-destructive text-white rounded-lg text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
                   >
-                    {rejecting ? "Rejecting..." : "Confirm reject"}
+                    {rejecting
+                      ? t("shortlist.rejecting")
+                      : t("shortlist.confirmReject")}
                   </button>
                 </div>
               </div>
@@ -486,7 +496,8 @@ export default function ShortlistDetailPanel({
                 <button
                   onClick={() => {
                     setShowRejectInput(true);
-                    if (!rejectReason && ai_rationale) setRejectReason(ai_rationale);
+                    if (!rejectReason && ai_rationale)
+                      setRejectReason(ai_rationale);
                   }}
                   disabled={hasOffer}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
@@ -501,12 +512,12 @@ export default function ShortlistDetailPanel({
             )}
           </div>
         ) : (
-          <div className="px-5 py-4 border-t border-gray-100 bg-red-50 shrink-0">
-            <p className="text-xs text-red-500 font-semibold mb-1">
-              This candidate was rejected
+          <div className="px-5 py-4 border-t border-border bg-destructive/10 shrink-0">
+            <p className="text-xs text-destructive font-semibold mb-1">
+              {t("shortlist.rejected")}
             </p>
             {rejection_reason && (
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 {rejection_reason}
               </p>
             )}

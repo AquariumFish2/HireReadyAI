@@ -1,3 +1,4 @@
+//src\features\pipeline\components\StageLibrary.jsx
 import React from "react";
 import {
   FileText,
@@ -12,6 +13,7 @@ import {
   Award,
 } from "lucide-react";
 import { STAGE_LIBRARY } from "../constants/stageLibrary";
+import { useTranslation } from "react-i18next";
 
 const ICON_MAP = {
   FileText,
@@ -27,13 +29,16 @@ const ICON_MAP = {
 };
 
 export default function StageLibrary({ onAddStage }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 pt-4 pb-3 border-b border-gray-100">
         <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">
-          Stage Library
+          {t("stage_details.stage_library")}
         </p>
-        <p className="text-xs text-gray-500 mt-0.5">Click to append</p>
+        <p className="text-xs text-gray-500 mt-0.5">
+          {t("stage_details.click_to_append")}
+        </p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1.5">

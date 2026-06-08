@@ -1,10 +1,12 @@
+//src\features\interview\components\MultipleChoiceQuestion.jsx
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, HelpCircle } from "lucide-react";
 
 export default function MultipleChoiceQuestion({ question, onAnswer }) {
   const [selected, setSelected] = useState(null);
   const options = question?.options ?? [];
-
+  const { t } = useTranslation();
   const handleSubmit = () => {
     if (selected === null) return;
     onAnswer(selected);
@@ -66,7 +68,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }) {
           className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <CheckCircle2 className="size-4" />
-          Submit Answer →
+          {t("code_question.submit_answer")} →
         </button>
       </div>
     </div>

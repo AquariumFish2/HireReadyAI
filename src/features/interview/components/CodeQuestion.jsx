@@ -1,6 +1,8 @@
+//src\features\interview\components\CodeQuestion.jsx
 import { useEffect, useRef, useState } from "react";
 import { executeCode } from "../services/wandbox.service";
 import { Loader2, Play, Terminal, Clock, Cpu, CheckCircle2, XCircle, ChevronDown, ChevronRight, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const PLACEHOLDER = {
   javascript: "// Write your JavaScript solution here\n\n",
@@ -26,6 +28,7 @@ export default function CodeQuestion({ question, onAnswer }) {
   const lang = question?.language?.toLowerCase() ?? "default";
   const langInfo = LANG_INFO[lang] ?? LANG_INFO.default;
   const placeholder = PLACEHOLDER[lang] ?? PLACEHOLDER.default;
+  const { t } = useTranslation();
 
   const [code, setCode] = useState(placeholder);
   const [consoleOutput, setConsoleOutput] = useState(null);
@@ -42,7 +45,9 @@ export default function CodeQuestion({ question, onAnswer }) {
     const ta = textareaRef.current;
     const ln = lineNumRef.current;
     if (!ta || !ln) return;
-    const onScroll = () => { ln.scrollTop = ta.scrollTop; };
+    const onScroll = () => {
+      ln.scrollTop = ta.scrollTop;
+    };
     ta.addEventListener("scroll", onScroll);
     return () => ta.removeEventListener("scroll", onScroll);
   }, []);
@@ -57,7 +62,8 @@ export default function CodeQuestion({ question, onAnswer }) {
     if (e.key === "Tab") {
       e.preventDefault();
       const { selectionStart, selectionEnd } = e.target;
-      const newCode = code.slice(0, selectionStart) + "  " + code.slice(selectionEnd);
+      const newCode =
+        code.slice(0, selectionStart) + "  " + code.slice(selectionEnd);
       setCode(newCode);
       requestAnimationFrame(() => {
         const ta = textareaRef.current;
@@ -137,7 +143,8 @@ export default function CodeQuestion({ question, onAnswer }) {
                 width: "44px",
                 background: "var(--color-muted)",
                 borderRight: "1px solid var(--color-border)",
-                fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+                fontFamily:
+                "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
                 fontSize: "13px",
                 lineHeight: "21px",
                 color: "var(--color-muted-foreground)",
@@ -158,7 +165,8 @@ export default function CodeQuestion({ question, onAnswer }) {
               style={{
                 background: "var(--color-card)",
                 color: "var(--color-foreground)",
-                fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+                fontFamily:
+                "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
                 fontSize: "13px",
                 lineHeight: "21px",
                 caretColor: "var(--color-ring)",
@@ -329,7 +337,7 @@ export default function CodeQuestion({ question, onAnswer }) {
             className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <CheckCircle2 className="size-4" />
-            Submit Answer →
+            {t("code_question.submit_answer")} →
           </button>
         </div>
       )}

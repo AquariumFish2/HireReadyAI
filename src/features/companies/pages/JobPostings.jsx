@@ -1,13 +1,14 @@
+//src\features\companies\pages\JobPostings.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateJobPosting } from "../services/companies.service";
 import { getPipeline } from "../../pipeline/services/pipeline.service";
-
 import JobSidebar from "../components/job-postings/JobSidebar";
 import JobDetailHeader from "../components/job-postings/JobDetailHeader";
 import JobInfoGrid from "../components/job-postings/JobInfoGrid";
 import JobContentCards from "../components/job-postings/JobContentCards";
 import JobPipelinePreview from "../components/job-postings/JobPipelinePreview";
+import { useTranslation } from "react-i18next";
 
 export default function JobPostings({ jobs, searchQuery, company }) {
   const navigate = useNavigate();
@@ -18,10 +19,9 @@ export default function JobPostings({ jobs, searchQuery, company }) {
   const [editForm, setEditForm] = useState(null);
   const [saving, setSaving] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const [pipelineStages, setPipelineStages] = useState([]);
   const [loadingStages, setLoadingStages] = useState(false);
-
+  const { t } = useTranslation();
   // Sync local jobs with props
   useEffect(() => {
     setLocalJobs(jobs);
@@ -30,7 +30,8 @@ export default function JobPostings({ jobs, searchQuery, company }) {
     }
   }, [jobs, selectedJobId]);
 
-  const selectedJob = localJobs.find((j) => j.id === selectedJobId) || localJobs[0];
+  const selectedJob =
+    localJobs.find((j) => j.id === selectedJobId) || localJobs[0];
 
   // Fetch pipeline for selected job
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function JobPostings({ jobs, searchQuery, company }) {
         const pipeline = await getPipeline(selectedJobId);
         setPipelineStages(pipeline?.recruitment_stages || []);
       } catch (err) {
-        console.error("Failed to load pipeline stages", err);
+        console.error(t("job_postings.failed_stages"), err);
         setPipelineStages([]);
       } finally {
         setLoadingStages(false);
@@ -80,24 +81,26 @@ export default function JobPostings({ jobs, searchQuery, company }) {
       };
 
       const updatedJob = await updateJobPosting(selectedJobId, updates);
-      
+
       // Update local state
       setLocalJobs((prev) =>
-        prev.map((job) => (job.id === selectedJobId ? { ...job, ...updatedJob } : job))
+        prev.map((job) =>
+          job.id === selectedJobId ? { ...job, ...updatedJob } : job,
+        ),
       );
       setIsEditing(false);
     } catch (err) {
       console.error("Failed to update job", err);
-      alert("Failed to update job details.");
+      alert(t("job_postings.failed_update"));
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full font-sans bg-gray-50/50">
+    <div className="flex flex-col md:flex-row h-full font-sans bg-background">
       {/* Left Sidebar - Job List */}
-      <JobSidebar 
+      <JobSidebar
         jobs={localJobs}
         activeTab={activeTab}
         searchQuery={searchQuery}
@@ -110,15 +113,14 @@ export default function JobPostings({ jobs, searchQuery, company }) {
       />
 
       {/* Main Detail View */}
-      <div className="flex-1 bg-white h-full md:overflow-y-auto">
+      <div className="flex-1 bg-background h-full md:overflow-y-auto border-l border-border/40">
         {!selectedJob ? (
-          <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-            Select a job to view details
+          <div className="h-full flex items-center justify-center text-muted-foreground/60 text-xs font-medium">
+            {t("job_postings.empty_state")}
           </div>
         ) : (
-          <div className="max-w-4xl mx-auto p-6 lg:p-10 pb-24">
-            
-            <JobDetailHeader 
+          <div className="max-w-4xl mx-auto p-5 lg:p-8 pb-16 space-y-4">
+            <JobDetailHeader
               selectedJob={selectedJob}
               isEditing={isEditing}
               editForm={editForm}
@@ -130,7 +132,7 @@ export default function JobPostings({ jobs, searchQuery, company }) {
               onOpenSidebar={() => setIsSidebarOpen(true)}
             />
 
-            <JobInfoGrid 
+            <JobInfoGrid
               selectedJob={selectedJob}
               isEditing={isEditing}
               editForm={editForm}
@@ -138,15 +140,15 @@ export default function JobPostings({ jobs, searchQuery, company }) {
               company={company}
             />
 
-            <div className="space-y-6">
-              <JobContentCards 
+            <div className="space-y-4">
+              <JobContentCards
                 selectedJob={selectedJob}
                 isEditing={isEditing}
                 editForm={editForm}
                 setEditForm={setEditForm}
               />
 
-              <JobPipelinePreview 
+              <JobPipelinePreview
                 pipelineStages={pipelineStages}
                 loadingStages={loadingStages}
                 selectedJobId={selectedJobId}
@@ -154,7 +156,6 @@ export default function JobPostings({ jobs, searchQuery, company }) {
                 navigate={navigate}
               />
             </div>
-
           </div>
         )}
       </div>

@@ -1,3 +1,4 @@
+//src\features\pipeline\components\StageCard.jsx
 import React from "react";
 import { GripVertical, Trash2, Lock } from "lucide-react";
 

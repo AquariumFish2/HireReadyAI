@@ -1,6 +1,8 @@
+//src\features\pipeline\components\PipelineCard.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { GitBranch } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const SENIORITY_COLORS = {
   intern: "bg-sky-100 text-sky-700",
@@ -15,15 +17,15 @@ export default function PipelineCard({ pipeline }) {
   const stageCount = stages.length;
   const previewStages = stages.slice(0, 4);
   const overflow = stageCount - 4;
+  const { t } = useTranslation();
 
   const createdDate = new Date(pipeline.created_at).toLocaleDateString(
     "en-US",
-    { month: "short", day: "numeric", year: "numeric" }
+    { month: "short", day: "numeric", year: "numeric" },
   );
 
   const seniorityColor =
-    SENIORITY_COLORS[pipeline.seniority_level] ||
-    "bg-gray-100 text-gray-600";
+    SENIORITY_COLORS[pipeline.seniority_level] || "bg-gray-100 text-gray-600";
 
   return (
     <Link
@@ -49,7 +51,9 @@ export default function PipelineCard({ pipeline }) {
       <h3 className="font-bold text-dark-amethyst-950 text-base mb-1 group-hover:text-dark-amethyst-700 transition-colors leading-snug">
         {pipeline.title}
       </h3>
-      <p className="text-xs text-gray-400 mb-4">Created {createdDate}</p>
+      <p className="text-xs text-gray-400 mb-4">
+        {t("pipeline_builder.created")} {createdDate}
+      </p>
 
       {/* Stage Preview */}
       {stageCount > 0 ? (
@@ -71,7 +75,9 @@ export default function PipelineCard({ pipeline }) {
           )}
         </div>
       ) : (
-        <p className="text-xs text-gray-400 italic mb-4">No stages yet</p>
+        <p className="text-xs text-gray-400 italic mb-4">
+          {t("pipeline_builder.empty.title")}
+        </p>
       )}
 
       {/* Footer */}

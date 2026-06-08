@@ -1,4 +1,6 @@
+//src\features\interview\components\TextQuestion.jsx
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
 const MIN_LENGTH = 30;
@@ -7,7 +9,7 @@ export default function TextQuestion({ onAnswer }) {
   const [value, setValue] = useState("");
   const charCount = value.trim().length;
   const tooShort = charCount < MIN_LENGTH;
-
+  const { t } = useTranslation();
   const handleSubmit = () => {
     if (tooShort) return;
     onAnswer(value.trim());
@@ -56,7 +58,7 @@ export default function TextQuestion({ onAnswer }) {
           className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <CheckCircle2 className="size-4" />
-          Submit Answer →
+          {t("code_question.submit_answer")} →
         </button>
       </div>
     </div>

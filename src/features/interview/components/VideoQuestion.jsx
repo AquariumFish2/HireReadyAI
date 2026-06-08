@@ -1,17 +1,22 @@
+//src\features\interview\components\VideoQuestion.jsx
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/shared/services/supabase";
 import { uploadRecording } from "../services/video_storage_service";
 import { Camera, CheckCircle2, Redo2, Video, StopCircle } from "lucide-react";
-
+import { useTranslation } from "react-i18next";
 const MAX_SECONDS = 180;
 
-export default function VideoQuestion({ question, applicationStageId, onAnswer }) {
+export default function VideoQuestion({
+  question,
+  applicationStageId,
+  onAnswer,
+}) {
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [timeLeft, setTimeLeft] = useState(MAX_SECONDS);
   const [videoUrl, setVideoUrl] = useState(null);
   const [status, setStatus] = useState("idle");
-
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const recorderRef = useRef(null);
   const streamRef = useRef(null);
@@ -21,7 +26,10 @@ export default function VideoQuestion({ question, applicationStageId, onAnswer }
 
   const requestCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
       setPermissionGranted(true);
@@ -47,7 +55,9 @@ export default function VideoQuestion({ question, applicationStageId, onAnswer }
 
     let recorder;
     try {
-      recorder = new MediaRecorder(streamRef.current, { mimeType: "video/webm; codecs=vp9" });
+      recorder = new MediaRecorder(streamRef.current, {
+        mimeType: "video/webm; codecs=vp9",
+      });
     } catch {
       recorder = new MediaRecorder(streamRef.current);
     }
@@ -93,11 +103,16 @@ export default function VideoQuestion({ question, applicationStageId, onAnswer }
     setStatus("uploading");
 
     try {
-      const { fileName } = await uploadRecording(blobRef.current, applicationStageId, question.id);
+      const { fileName } = await uploadRecording(
+        blobRef.current,
+        applicationStageId,
+        question.id,
+      );
 
-      const { data: whisperData, error: whisperErr } = await supabase.functions.invoke("whisper-api", {
-        body: { audioPath: fileName, questionId: question.id },
-      });
+      const { data: whisperData, error: whisperErr } =
+        await supabase.functions.invoke("whisper-api", {
+          body: { audioPath: fileName, questionId: question.id },
+        });
 
       if (whisperErr) throw whisperErr;
 
@@ -137,16 +152,29 @@ export default function VideoQuestion({ question, applicationStageId, onAnswer }
       {/* Video preview / review */}
       <div className="relative rounded-2xl overflow-hidden bg-[#0a0f1a] aspect-video flex items-center justify-center border border-border shadow-md shadow-cerulean-900/10">
         {videoUrl && status === "reviewing" ? (
-          <video src={videoUrl} controls autoPlay className="w-full h-full object-cover" />
+          <video
+            src={videoUrl}
+            controls
+            autoPlay
+            className="w-full h-full object-cover"
+          />
         ) : (
-          <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
         )}
 
         {/* Recording indicator */}
         {isRecording && (
           <div className="absolute top-3 left-3 flex items-center gap-2.5 bg-foreground/10 backdrop-blur-md rounded-full px-3.5 py-1.5 border border-white/10">
             <span className="size-2.5 rounded-full bg-destructive animate-pulse shadow-md shadow-destructive" />
-            <span className="text-white text-xs font-medium tabular-nums">{fmt(timeLeft)}</span>
+            <span className="text-white text-xs font-medium tabular-nums">
+              {fmt(timeLeft)}
+            </span>
           </div>
         )}
 
@@ -155,8 +183,12 @@ export default function VideoQuestion({ question, applicationStageId, onAnswer }
           <div className="absolute inset-0 bg-foreground/60 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
             <div className="size-10 rounded-xl border-2 border-white/20 border-t-white animate-spin" />
             <div className="text-center">
-              <p className="text-white text-sm font-medium">Transcribing your answer…</p>
-              <p className="text-white/60 text-xs mt-0.5">This may take a few seconds</p>
+              <p className="text-white text-sm font-medium">
+              {t("interview_page.video_question.transcribing")}
+            </p>
+              <p className="text-white/60 text-xs mt-0.5">
+              {t("interview_page.video_question.transcribing_sub")}
+            </p>
             </div>
           </div>
         )}
@@ -200,14 +232,14 @@ export default function VideoQuestion({ question, applicationStageId, onAnswer }
               className="flex items-center justify-center gap-2 border border-border bg-card text-foreground rounded-xl py-3 text-sm font-medium hover:bg-secondary hover:border-primary/30 transition-all"
             >
               <Redo2 className="size-4" />
-              Re-record
+              {t("interview_page.video_question.re_record")}
             </button>
             <button
               onClick={handleSubmit}
               className="flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-3 text-sm font-medium hover:opacity-90 transition-all shadow-lg shadow-primary/30"
             >
               <CheckCircle2 className="size-4" />
-              Submit Answer →
+              {t("interview_page.video_question.submit_answer")} →
             </button>
           </div>
         )}

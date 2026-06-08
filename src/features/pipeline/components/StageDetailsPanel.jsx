@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { STAGE_TYPE_OPTIONS } from "../constants/stageLibrary";
+import { useTranslation } from "react-i18next";
 import { Save } from "lucide-react";
 
 export default function StageDetailsPanel({ stage, stages, onUpdate }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     name: "",
     stage_type: "",
@@ -34,9 +36,12 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mb-3">
           <span className="text-gray-400 text-lg">⚙</span>
         </div>
-        <p className="text-sm font-medium text-gray-600 mb-1">Stage Settings</p>
+        <p className="text-sm font-medium text-gray-600 mb-1">
+          {" "}
+          {t("stage_details.title")}
+        </p>
         <p className="text-xs text-gray-400">
-          Select a stage from the canvas to configure it.
+          {t("stage_details.empty_description")}
         </p>
       </div>
     );
@@ -85,13 +90,13 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
       {/* Header */}
       <div className="px-5 pt-5 pb-4 border-b border-gray-100">
         <p className="text-[10px] font-semibold text-dark-amethyst-600 tracking-widest uppercase mb-0.5">
-          Stage Settings
+          {t("stage_details.title")}
         </p>
         <p className="text-sm font-semibold text-gray-900 leading-tight truncate flex items-center gap-1.5">
-          {form.name || "Untitled Stage"}
+          {form.name || t("stage_details.untitled_stage")}
           {stage.is_locked && (
             <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
-              Locked
+              {t("stage_details.locked")}
             </span>
           )}
         </p>
@@ -104,7 +109,7 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         {/* Stage Name */}
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Stage Name
+            {t("stage_details.fields.stage_name")}
           </label>
           <input
             type="text"
@@ -118,7 +123,7 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         {/* Stage Type */}
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Stage Type
+            {t("stage_details.fields.stage_type")}
           </label>
           <select
             value={form.stage_type}
@@ -126,12 +131,21 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
             onChange={(e) => handleChange("stage_type", e.target.value)}
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500 cursor-pointer disabled:cursor-not-allowed"
           >
-            <option value="">Select type…</option>
+            <option value="">
+              {" "}
+              {t("stage_details.placeholders.select_type")}
+            </option>
             {STAGE_TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
             ))}
+            {stage.is_locked &&
+              !STAGE_TYPE_OPTIONS.some((o) => o.value === form.stage_type) && (
+                <option value={form.stage_type}>
+                  {form.stage_type.replace(/_/g, " ")}
+                </option>
+              )}
             {stage.is_locked &&
               !STAGE_TYPE_OPTIONS.some((o) => o.value === form.stage_type) && (
                 <option value={form.stage_type}>
@@ -145,7 +159,7 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-semibold text-gray-600">
-              Weight
+              {t("stage_details.fields.weight")}
             </label>
             <span className="text-xs font-bold text-dark-amethyst-600">
               {weightPct}%
@@ -165,7 +179,7 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         {/* Description */}
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Description
+            {t("stage_details.fields.description")}
           </label>
           <textarea
             rows={3}
@@ -173,7 +187,26 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
             disabled={stage.is_locked}
             onChange={(e) => handleChange("description", e.target.value)}
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow resize-none disabled:bg-gray-50 disabled:text-gray-500"
-            placeholder="Describe what happens in this stage…"
+            placeholder={t("stage_details.placeholders.description")}
+          />
+        </div>
+
+        {/* Number of Questions */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+            Number of Questions
+          </label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            value={form.num_questions || 0}
+            disabled={stage.is_locked}
+            onChange={(e) =>
+              handleChange("num_questions", parseInt(e.target.value) || 0)
+            }
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
+            placeholder="Enter number of questions…"
           />
         </div>
 
@@ -199,13 +232,13 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
         {/* Out-of-scope fields — rendered disabled as placeholders */}
         <div className="space-y-3 pt-2 border-t border-gray-100">
           <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">
-            Advanced (Coming Soon)
+            {t("stage_details.advanced.title")}
           </p>
           {[
-            "AI Evaluation",
-            "Manual Review Required",
-            "Auto Advance",
-            "Auto Reject",
+            t("stage_details.advanced.ai_evaluation"),
+            t("stage_details.advanced.manual_review"),
+            t("stage_details.advanced.auto_advance"),
+            t("stage_details.advanced.auto_reject"),
           ].map((label) => (
             <div
               key={label}

@@ -9,7 +9,9 @@
     "job_postings": "الوظائف",
     "shortlists": "القوائم المختصرة",
     "candidate_pipeline": "خط أنابيب المرشحين",
-    "jd_generator": "مولد الوصف الوظيفي"
+    "jd_generator": "مولد الوصف الوظيفي",
+    "add_job": "إضافة وظيفة",
+    "search_jobs": "ابحث عن وظائف حسب العنوان أو القسم..."
   },
 
   "applicant_dashboard": {
@@ -380,11 +382,590 @@
     "remote": "عن بُعد",
     "hybrid": "هجين",
 
-    "seniority": "المستوى الوظيفي"
+    "seniority": "المستوى الوظيفي",
+    "not_applicable": "غير متاح"
   },
 
   "job_search": {
     "placeholder": "ابحث عن مسمى وظيفي أو كلمة مفتاحية...",
     "button": "ابحث عن وظائف"
+  },
+
+  "company_layout": {
+    "loading": "جارٍ التحميل...",
+    "error": "خطأ:"
+  },
+
+  "company_profile": {
+    "profile": {
+      "title": "ملف الشركة",
+      "subtitle": "إدارة تفاصيل مساحة العمل وهوية الشركة.",
+
+      "fields": {
+        "company_name": "اسم الشركة",
+        "industry": "المجال",
+        "company_size": "حجم الشركة",
+        "created_at": "تاريخ الإنشاء",
+        "employees": "{{count}} موظف"
+      }
+    },
+
+    "framework": {
+      "title": "إطار الكفاءات",
+      "subtitle": "قم برفع إطار التقييم الخاص بك لتحليله بواسطة الذكاء الاصطناعي.",
+      "upload": "اضغط لرفع ملف إطار الكفاءات",
+      "file_types": "ملفات PDF أو DOCX حتى 25 ميجابايت",
+      "active": "نشط ومفهرس"
+    },
+
+    "team": {
+      "title": "أعضاء الفريق",
+      "subtitle": "قم بدعوة أعضاء فريق التوظيف وإدارة صلاحياتهم.",
+
+      "placeholders": {
+        "full_name": "الاسم الكامل",
+        "email": "البريد الإلكتروني"
+      },
+
+      "invite": "دعوة",
+      "invite_success": "تمت دعوة العضو بنجاح!",
+
+      "unknown": "غير معروف",
+      "team_member": "عضو فريق"
+    }
+  },
+
+  "jd_generator": {
+    "published": {
+      "title": "تم نشر الوظيفة!",
+      "message": "تم نشر وظيفة  وأصبحت متاحة الآن للمتقدمين.",
+      "generate_another": "إنشاء وصف وظيفي آخر"
+    },
+
+    "header": {
+      "title": "مولد الوصف الوظيفي",
+      "save_draft": "حفظ كمسودة",
+      "publish": "نشر الوظيفة",
+      "publishing": "جارٍ النشر…"
+    },
+
+    "form": {
+      "title": "ملخص الوظيفة",
+      "subtitle": "أدخل المعلومات الأساسية واترك الباقي للذكاء الاصطناعي.",
+
+      "labels": {
+        "role_title": "المسمى الوظيفي",
+        "seniority": "المستوى الوظيفي",
+        "job_type": "نوع الوظيفة",
+        "work_type": "نمط العمل",
+        "experience": "الخبرة المطلوبة",
+        "required_skills": "المهارات المطلوبة",
+        "salary_range": "نطاق الراتب (جنيه مصري)",
+        "key_notes": "ملاحظات إضافية"
+      },
+
+      "placeholders": {
+        "job_title": "المسمى الوظيفي",
+        "select_seniority": "اختر المستوى الوظيفي",
+        "select_type": "اختر نوع الوظيفة",
+        "select_work_type": "اختر نمط العمل",
+        "experience": "مثال: 1-3 سنوات",
+        "required_skills": "المهارات المطلوبة",
+        "salary_min": "الحد الأدنى",
+        "salary_max": "الحد الأقصى",
+        "additional_notes": "ملاحظات إضافية للتوظيف..."
+      },
+
+      "optional": "(اختياري)",
+
+      "buttons": {
+        "generate": "إنشاء الوصف الوظيفي",
+        "generating": "جارٍ الإنشاء…"
+      }
+    },
+
+    "validation": {
+      "title_required": "المسمى الوظيفي مطلوب",
+      "seniority_required": "يرجى اختيار المستوى الوظيفي",
+      "job_type_required": "يرجى اختيار نوع الوظيفة",
+      "work_type_required": "يرجى اختيار نمط العمل",
+      "experience_required": "يرجى تحديد الخبرة المطلوبة"
+    },
+
+    "preview": {
+      "empty_title": "أدخل تفاصيل الوظيفة",
+      "empty_subtitle": "ثم اضغط على إنشاء الوصف الوظيفي لمعاينة النتيجة",
+
+      "ai_generated": "تم إنشاؤه بالذكاء الاصطناعي",
+
+      "salary_confidential": "الراتب: سري",
+
+      "sections": {
+        "about_role": "نبذة عن الوظيفة",
+        "responsibilities": "المهام والمسؤوليات",
+        "requirements": "المتطلبات",
+        "skills": "المهارات والأدوات"
+      }
+    },
+    "errors": {
+      "generate_failed": "فشل إنشاء الوصف الوظيفي"
+    }
+  },
+
+  "job_postings": {
+    "empty_state": "اختر وظيفة لعرض التفاصيل",
+    "loading_stages": "جاري تحميل مراحل التوظيف...",
+    "failed_stages": "فشل تحميل مراحل التوظيف",
+    "failed_update": "فشل تحديث بيانات الوظيفة",
+    "select_job": "اختر وظيفة",
+    "sidebar": {
+      "open": "مفتوحة",
+      "closed": "مغلقة"
+    },
+    "edit": {
+      "edit_job": "تعديل الوظيفة",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "saving": "جاري الحفظ..."
+    }
+  },
+
+  "no_company_view": {
+    "loading": "جاري تحميل الشركات...",
+    "sign_out": "تسجيل الخروج",
+
+    "create": {
+      "title": "إنشاء شركة جديدة",
+      "company_name": "اسم الشركة",
+      "industry": "المجال",
+      "company_size": "حجم الشركة",
+      "location": "الموقع",
+
+      "placeholders": {
+        "name": "شركة أكمي",
+        "industry": "مثال: التكنولوجيا، الرعاية الصحية",
+        "size": "عدد الموظفين",
+        "location": "المدينة، الدولة"
+      },
+
+      "buttons": {
+        "cancel": "إلغاء",
+        "create": "إنشاء الشركة",
+        "creating": "جاري الإنشاء..."
+      }
+    },
+
+    "join": {
+      "title": "انضم أو أنشئ شركة",
+      "subtitle": "اختر شركة للبدء مع HireReadyAI أو أنشئ شركتك الخاصة",
+      "create_button": "إنشاء شركة جديدة",
+      "no_companies": "لا توجد شركات متاحة للانضمام.",
+      "create_company": "إنشاء شركة",
+      "join": "انضم",
+      "joining": "جاري الانضمام..."
+    }
+  },
+
+  "job_content_cards": {
+    "job_summary": "ملخص الوظيفة",
+    "no_description": "لا يوجد وصف متاح.",
+
+    "responsibilities": "المسؤوليات",
+    "requirements": "المتطلبات",
+    "skills": "المهارات",
+
+    "none_specified": "غير محدد.",
+
+    "placeholders": {
+      "add_item": "اكتب واضغط Enter للإضافة...",
+      "add_skill": "إضافة مهارة..."
+    }
+  },
+
+  "job_detail_header": {
+    "regenerate": "إعادة إنشاء باستخدام الذكاء الاصطناعي",
+    "edit": "تعديل",
+    "cancel": "إلغاء",
+    "saving": "جاري الحفظ...",
+    "save": "حفظ",
+    "full_time": "دوام كامل",
+    "any_seniority": "أي مستوى خبرة",
+    "any_location": "أي موقع"
+  },
+
+  "job_info_grid": {
+    "seniority_level": "مستوى الأقدمية",
+    "location": "الموقع",
+    "work_type": "نمط العمل",
+    "type": "نوع الوظيفة",
+    "salary": "الراتب",
+    "published": "تاريخ النشر",
+    "ai_shortlist": "القائمة المختصرة بالذكاء الاصطناعي",
+    "strong_fits": "مرشحين مناسبين بقوة",
+    "open_candidate_board": "لوحة المرشحين",
+    "view_public_posting": "عرض الإعلان العام",
+    "copy_link": "نسخ الرابط",
+    "recently": "مؤخراً"
+  },
+
+  "job_pipeline_preview": {
+    "title": "مسار التوظيف الخاص بهذه الوظيفة",
+    "pipeline": "خط التوظيف",
+    "stages": "مراحل",
+    "owned_by_job": "تابع لإعلان الوظيفة",
+    "edit_pipeline": "تعديل مسار التوظيف",
+    "no_stages": "لا توجد مراحل مضافة لهذا المسار.",
+    "stage_label": "مرحلة",
+    "ai": "ذكاء اصطناعي"
+  },
+
+  "job_sidebar": {
+    "open_roles": "الوظائف المفتوحة",
+    "click_to_view": "اضغط لعرض التفاصيل",
+    "no_jobs": "لا توجد وظائف.",
+    "any_seniority": "أي مستوى خبرة",
+    "applicant": "متقدم",
+    "applicant_plural": "متقدمين",
+    "published": "منشور",
+    "closed": "مغلق"
+  },
+
+  "interview_page": {
+    "labels": {
+      "interview": "المقابلة"
+    },
+
+    "loading": {
+      "first_question": "جارٍ تجهيز أول سؤال…",
+      "evaluating": "جارٍ تقييم إجابتك وتوليد السؤال التالي…"
+    },
+
+    "errors": {
+      "no_active_stage": "لا يوجد مرحلة مقابلة نشطة لهذا الطلب.",
+      "load_failed": "فشل في تحميل جلسة المقابلة.",
+      "generate_failed": "فشل في إنشاء سؤال المقابلة.",
+      "title": "حدث خطأ ما",
+      "go_back": "العودة"
+    },
+
+    "question_types": {
+      "video": "فيديو",
+      "text": "نص",
+      "multiple_choice": "اختيار من متعدد",
+      "code": "برمجة"
+    },
+
+    "finished": {
+      "title": "انتهت المقابلة",
+      "subtitle": "تم إرسال إجاباتك وتقييمها. سيقوم فريق التوظيف بمراجعة النتائج.",
+      "overall_score": "النتيجة الإجمالية",
+      "recommendation": "التوصية",
+      "back_to_application": "العودة للتقديم"
+    },
+
+    "progress": {
+      "remaining": "متبقي {{count}} أسئلة",
+      "final": "هذا هو السؤال الأخير"
+    },
+
+    "video_question": {
+      "camera_required_title": "مطلوب السماح بالكاميرا",
+      "camera_required_desc": "من فضلك اسمح بالوصول لتسجيل إجابتك",
+      "camera_required_alert": "يجب السماح بالكاميرا والميكروفون لتسجيل إجابتك.",
+      "enable_camera": "تفعيل الكاميرا والميكروفون",
+
+      "start_recording": "ابدأ التسجيل (حد أقصى 3 دقائق)",
+      "stop_recording": "إيقاف التسجيل",
+
+      "re_record": "إعادة التسجيل",
+      "submit_answer": "إرسال الإجابة →",
+
+      "transcribing": "جاري تحويل إجابتك إلى نص…",
+      "transcribing_sub": "قد يستغرق ذلك بضع ثواني",
+
+      "max_time": "3 دقائق كحد أقصى"
+    }
+  },
+
+  "code_question": {
+    "submit_answer": "إرسال الإجابة"
+  },
+
+  "pipeline_builder": {
+    "back_to_pipelines": "العودة إلى مسارات التوظيف",
+    "pipelines": "المسارات",
+    "title": "خط سير التوظيف",
+    "desktop": {
+      "subtitle": "اسحب المراحل لإعادة الترتيب أو اضغط للتعديل.",
+      "empty_desc": "اضغط على أي مرحلة من المكتبة لإضافتها هنا."
+    },
+    "mobile": {
+      "subtitle": "اضغط على مرحلة للتعديل أو أضف من المكتبة.",
+      "empty_desc": "اضغط على زر المكتبة لإضافة المراحل."
+    },
+    "empty": {
+      "title": "لا توجد مراحل بعد"
+    },
+    "library": {
+      "label": "المكتبة",
+      "title": "مكتبة المراحل",
+      "close": "إغلاق المكتبة"
+    },
+    "settings": "الإعدادات",
+    "close_settings": " غلق الإعدادات",
+    "created": "تم الأنشاء",
+    "details": {
+      "title": "إعدادات المرحلة"
+    }
+  },
+
+  "stage_details": {
+    "title": "إعدادات المرحلة",
+    "empty_description": "اختر مرحلة من المخطط لتعديل إعداداتها.",
+    "untitled_stage": "مرحلة بدون اسم",
+    "locked": "مقفلة",
+    "stage_library": "مكتبة المراحل",
+    "click_to_append": "انقر للإلحاق",
+
+    "fields": {
+      "stage_name": "اسم المرحلة",
+      "stage_type": "نوع المرحلة",
+      "weight": "الوزن",
+      "description": "الوصف"
+    },
+
+    "placeholders": {
+      "select_type": "اختر النوع…",
+      "description": "صف ما يحدث في هذه المرحلة…"
+    },
+
+    "advanced": {
+      "title": "إعدادات متقدمة (قريباً)",
+      "ai_evaluation": "التقييم بالذكاء الاصطناعي",
+      "manual_review": "مراجعة يدوية مطلوبة",
+      "auto_advance": "الانتقال التلقائي",
+      "auto_reject": "الرفض التلقائي"
+    }
+  },
+
+  "candidate_pipeline": {
+    "title": "مسار المرشحين",
+    "no_jobs": "لا توجد وظائف",
+    "candidates_in_flight": "مرشح قيد التوظيف",
+    "search_placeholder": "ابحث عن مرشح...",
+    "stage_score": "درجة المرحلة",
+    "unknown_candidate": "مرشح غير معروف",
+
+    "filters": {
+      "title": "الفلاتر",
+      "fit": "الملاءمة:",
+      "all": "الكل"
+    },
+
+    "fit": {
+      "strong_fit": "ملائم جدًا",
+      "good_fit": "ملائم",
+      "needs_review": "يحتاج مراجعة",
+      "low_fit": "ملاءمة منخفضة",
+      "rejected": "مرفوض"
+    },
+
+    "min_score": "الحد الأدنى للدرجة",
+    "save": "حفظ",
+    "auto_advance": "ترقية تلقائية",
+    "drop_here": "اسحب هنا",
+    "auto_managed": "تتم إدارته تلقائيًا",
+    "locked_stage": "مرحلة مقفلة — لا يمكن نقل المرشحين إليها",
+
+    "empty": {
+      "title": "لا يوجد مرشحون حتى الآن",
+      "subtitle": "سيظهر المرشحون هنا بمجرد بدء استقبال الطلبات."
+    },
+
+    "alerts": {
+      "advanced_success": "تمت ترقية {{count}} مرشح بنجاح",
+      "no_match": "لا يوجد مرشحون مطابقون للمعايير",
+      "auto_advance_failed": "فشلت الترقية التلقائية",
+      "shortlist_success": "تمت ترقية {{count}} مرشح إلى القائمة المختصرة بنجاح!",
+      "no_candidates": "لا يوجد مرشحون يستوفون شروط الترقية التلقائية.",
+      "failed": "فشلت عملية الترقية التلقائية للمرشحين."
+    }
+  },
+
+  "recruiter_dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً،",
+    "user": "مستخدم",
+    "subtitle": "نظرة عامة على الوظائف النشطة والمتقدمين لديك.",
+    "loading": "جارٍ تحميل لوحة التحكم...",
+    "error": "فشل تحميل بيانات لوحة التحكم: {{error}}"
+  },
+
+  "dashboard_charts": {
+    "pipeline_summary": {
+      "title": "ملخص مسار التوظيف",
+      "subtitle": "عبر جميع الوظائف النشطة · آخر 7 أيام",
+      "live": "مباشر",
+      "stages": {
+        "applied": "تم التقديم",
+        "screened": "تمت المراجعة",
+        "testing": "الاختبارات",
+        "interviewed": "تمت المقابلة",
+        "shortlisted": "القائمة المختصرة"
+      }
+    },
+    "top_jobs": {
+      "title": "أكثر الوظائف من حيث المتقدمين",
+      "subtitle": "إعلانات الوظائف الأكثر نشاطًا"
+    }
+  },
+
+  "dashboard_jobs_table": {
+    "title": "نظرة عامة على الوظائف النشطة",
+    "no_jobs": "لا توجد وظائف متاحة",
+    "view_shortlist": "عرض القائمة المختصرة",
+    "columns": {
+      "job_title": "المسمى الوظيفي",
+      "company": "الشركة",
+      "applicants": "المتقدمون",
+      "tested": "خضعوا للاختبار",
+      "interview": "المقابلة",
+      "waiting_action": "بانتظار إجراء",
+      "shortlisted": "القائمة المختصرة",
+      "actions": "الإجراءات"
+    }
+  },
+
+  "dashboard_stats": {
+    "total_jobs": "إجمالي الوظائف",
+    "total_applicants": "إجمالي المتقدمين",
+    "accepted": "مقبول",
+    "rejected": "مرفوض"
+  },
+
+  "add_interview": {
+    "enter_question": "أدخل كل سؤال في سطر جديد.",
+    "title": "إرسال دعوة مقابلة",
+    "description": "إرسال دعوة مقابلة للمتقدم",
+    "buttons": {
+      "open": "فتح النافذة",
+      "send": "إرسال المقابلة",
+      "sending": "جاري الإرسال..."
+    },
+    "labels": {
+      "application_id": "معرّف الطلب",
+      "job_id": "معرّف الوظيفة",
+      "rerecord_after": "إعادة التسجيل متاحة بعد)"
+    },
+    "errors": {
+      "required_ids": "معرّف الطلب ومعرّف الوظيفة مطلوبان",
+      "rerecord_positive": "يجب أن تكون دقائق إعادة التسجيل أكبر من 0"
+    }
+  },
+
+  "shortlists": {
+    "ai_match": "مطابقة الذكاء الاصطناعي",
+    "title": "القائمة المختصرة",
+    "subtitle": "أفضل المرشحين المقترحين بواسطة الذكاء الاصطناعي · في انتظار قرار فريق التوظيف",
+    "search": "ابحث عن المرشحين...",
+    "select_job": "اختر وظيفة",
+    "filters": "الفلاتر",
+    "sort_label": "ترتيب",
+    "empty": "لا يوجد مرشحون في هذه القائمة المختصرة حتى الآن.",
+    "sort": {
+      "consensus": "الإجماع",
+      "ai_score": "تقييم الذكاء الاصطناعي",
+      "name": "الاسم"
+    }
+  },
+
+  "shortlist": {
+    "yourVote": "تصويتك",
+    "noVoteYet": "لم تقم بالتصويت بعد",
+    "votedMessage": "لقد صوت بـ {{vote}} — اضغط مرة أخرى للإلغاء",
+
+    "teamVotes": "تصويت الفريق",
+    "votesCast": "{{count}} / ? صوت",
+    "noVotes": "لا توجد أصوات بعد",
+
+    "vote": {
+      "up": "↑ موافق",
+      "down": "↓ غير موافق",
+      "neutral": "— محايد"
+    },
+
+    "aiRationale": "تفسير الذكاء الاصطناعي",
+    "confidence": "الثقة {{value}}%",
+    "noAiRationale": "لا يوجد تفسير متاح لهذا المرشح",
+    "proceedNext": "— الانتقال للمرحلة التالية",
+
+    "teamNotes": "ملاحظات الفريق",
+    "loadingNotes": "جاري تحميل الملاحظات...",
+    "noNotes": "لا توجد ملاحظات بعد، كن أول من يضيف",
+    "teamMember": "عضو الفريق",
+    "notePlaceholder": "اكتب ملاحظة لفريق التوظيف...",
+    "visibleToTeam": "مرئية لفريق التوظيف",
+    "cancel": "إلغاء",
+    "postNote": "نشر الملاحظة",
+    "posting": "جارٍ النشر...",
+
+    "rejectionReason": "سبب الرفض (مقترح من الذكاء الاصطناعي):",
+    "confirmReject": "تأكيد الرفض",
+    "rejecting": "جارٍ الرفض...",
+    "moveRejected": "نقل إلى المرفوضين",
+    "rejected": "تم رفض هذا المرشح",
+
+    "timeAgo": {
+      "justNow": "الآن",
+      "hours": "منذ {{count}} ساعة",
+      "days": "منذ {{count}} يوم"
+    },
+    "upVotes": "أصوات الموافقة",
+    "neutral": "محايد",
+    "downVotes": "أصوات الرفض",
+    "shortlisted": "مرشحًا في القائمة المختصرة",
+    "awaitingVote": "بانتظار أول تصويت",
+    "aiSuggestion": "الذكاء الاصطناعي يقترح ترقية أفضل {{count}} إلى المقابلة المباشرة",
+
+    "noCandidates": "لا يوجد مرشحين في القائمة المختصرة",
+    "rank": "الترتيب",
+    "candidate": "المرشح",
+    "cv": "السيرة الذاتية",
+    "tests": "الاختبارات",
+    "interview": "المقابلة",
+    "composite": "النتيجة الكلية",
+    "teamVote": "تصويت الفريق",
+    "noHeadline": "بدون وصف وظيفي",
+    "up": "إيجابي",
+    "down": "سلبي",
+    "rankLabel": "ترتيب",
+
+    "compare": {
+      "emptyState": "اختر مرشحين من الجدول أعلاه للمقارنة بينهم جنبًا إلى جنب.",
+      "title": "مقارنة جنبًا إلى جنب",
+      "description": "اختر 2-3 مرشحين لمقارنة التفاصيل بشكل دقيق. اسحب لإعادة الترتيب."
+    }
+  },
+
+  "shortlistInsights": {
+    "upVotes": "أصوات الموافقة",
+    "neutral": "محايد",
+    "downVotes": "أصوات الرفض",
+    "shortlisted": "مرشحًا في القائمة المختصرة",
+    "awaitingVote": "بانتظار أول تصويت",
+    "aiSuggestion": "الذكاء الاصطناعي يقترح ترقية أفضل {{count}} إلى المقابلة المباشرة",
+
+    "noCandidates": "لا يوجد مرشحين في القائمة المختصرة",
+    "rank": "الترتيب",
+    "candidate": "المرشح",
+    "cv": "السيرة الذاتية",
+    "tests": "الاختبارات",
+    "interview": "المقابلة",
+    "composite": "النتيجة الكلية",
+    "teamVote": "تصويت الفريق",
+    "noHeadline": "بدون وصف وظيفي",
+    "up": "إيجابي",
+    "down": "سلبي",
+    "rankLabel": "ترتيب"
   }
 }
