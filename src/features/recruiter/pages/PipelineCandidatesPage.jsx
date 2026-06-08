@@ -406,7 +406,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       return c.is_rejected;
     if (
       filterFit !== t("candidate_pipeline.filters.all") &&
-      getFit(c.score, c.is_rejected, c.is_rejected, t).label !== filterFit
+      getFit(c.score, c.is_rejected, t).label !== filterFit
     )
       return false;
 

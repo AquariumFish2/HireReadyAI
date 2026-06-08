@@ -55,7 +55,6 @@ export default function JobSidebar({
             <p className="text-xs text-gray-500 mt-0.5">
               {t("job_sidebar.click_to_view")}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5">Click to view details</p>
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -92,23 +91,30 @@ export default function JobSidebar({
                     setIsEditing(false);
                     onClose(); // Auto close on mobile
                   }}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left border transition-all group cursor-pointer ${isSelected
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left border transition-all group cursor-pointer ${
+                    isSelected
                       ? "bg-accent text-accent-foreground border-border"
                       : "bg-background border-transparent hover:bg-muted/60 hover:border-border/40 shadow-xs hover:shadow-none"
-                    }`}
+                  }`}
                 >
-                  <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors ${isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                    }`}>
+                  <div
+                    className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                    }`}
+                  >
                     <Briefcase className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                      <p className={`text-xs font-semibold leading-snug truncate transition-colors ${isSelected
-                          ? "text-foreground"
-                          : "text-foreground/90 group-hover:text-foreground"
-                        }`}>
+                      <p
+                        className={`text-xs font-semibold leading-snug truncate transition-colors ${
+                          isSelected
+                            ? "text-foreground"
+                            : "text-foreground/90 group-hover:text-foreground"
+                        }`}
+                      >
                         {job.title}
                       </p>
                       {status === "Published" ? (

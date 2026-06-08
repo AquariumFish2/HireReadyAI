@@ -44,7 +44,9 @@ export default function RecruiterDashboardPage() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="bg-white border border-slate-200/80 rounded-xl px-8 py-6 shadow-sm flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-3 border-slate-100 border-t-[#0f294a] rounded-full animate-spin"></div>
-          <p className="text-xs text-slate-500 font-medium">{t("recruiter_dashboard.loading")}</p>
+          <p className="text-xs text-slate-500 font-medium">
+            {t("recruiter_dashboard.loading")}
+          </p>
         </div>
       </div>
     );
@@ -64,7 +66,6 @@ export default function RecruiterDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50/60 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>
@@ -72,12 +73,12 @@ export default function RecruiterDashboardPage() {
               {t("recruiter_dashboard.title")}
             </h1>
             <p className="text-xs text-slate-400 mt-1">
-              Overview of your active job postings and applicants.
+              {t("recruiter_dashboard.subtitle")}
             </p>
           </div>
 
           <div className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-600 font-semibold shadow-sm">
-            Welcome back,{" "}
+            {t("sign_in.headline")},{" "}
             <span className="text-[#0f294a]">{fullName || "Recruiter"}</span>
           </div>
         </div>

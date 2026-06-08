@@ -15,7 +15,7 @@ import {
   Sparkles,
   AlertTriangle,
   Check,
-  Upload
+  Upload,
 } from "lucide-react";
 
 const SUPABASE_FUNCTION_URL =
@@ -171,7 +171,6 @@ export default function JDGeneratorPage({ company, profile }) {
     }
   }
 
-
   if (published) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 font-sans">
@@ -183,7 +182,8 @@ export default function JDGeneratorPage({ company, profile }) {
             {t("jd_generator.published.title")}
           </h2>
           <p className="text-muted-foreground/80 text-xs font-medium leading-relaxed mb-6">
-            <span className="font-bold text-sidebar">{title}</span> {t("jd_generator.published.message")}
+            <span className="font-bold text-sidebar">{title}</span>{" "}
+            {t("jd_generator.published.message")}
           </p>
           <button
             onClick={() => {
@@ -219,7 +219,6 @@ export default function JDGeneratorPage({ company, profile }) {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6 font-sans">
-
       {/* Upper Navigation / Bar */}
       <div className="max-w-6xl mx-auto mb-4 flex items-center justify-between gap-4">
         <div>
@@ -252,7 +251,7 @@ export default function JDGeneratorPage({ company, profile }) {
             ) : (
               <>
                 <Upload className="w-3.5 h-3.5" />
-                Publish JD
+                {t("jd_generator.header.publish")}
               </>
             )}
           </button>
@@ -260,17 +259,19 @@ export default function JDGeneratorPage({ company, profile }) {
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-
         {/* Column 1: Role Brief Form */}
         <div className="bg-background rounded-xl border border-border/60 p-5 shadow-xs">
-          <h2 className="text-sm font-bold text-sidebar mb-0.5">Role brief</h2>
+          <h2 className="text-sm font-bold text-sidebar mb-0.5">
+            {t("jd_generator.form.title")}
+          </h2>
           <p className="text-muted-foreground/70 text-xs mb-5">
-            Fill in the basics — AI handles the rest.
+            {t("jd_generator.form.subtitle")}
           </p>
 
           <form
             onSubmit={handleGenerate}
-            className="flex flex-col gap-4"dir="ltr"
+            className="flex flex-col gap-4"
+            dir="ltr"
           >
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>Role title</label>
@@ -285,7 +286,9 @@ export default function JDGeneratorPage({ company, profile }) {
                 className={fieldClass(inputClass, "title")}
               />
               {errors.title && (
-                <p className="text-xs font-medium text-destructive mt-0.5">{errors.title}</p>
+                <p className="text-xs font-medium text-destructive mt-0.5">
+                  {errors.title}
+                </p>
               )}
             </div>
 
@@ -336,7 +339,6 @@ export default function JDGeneratorPage({ company, profile }) {
               </div>
             </div>
 
-
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>Work Type</label>
               <select
@@ -358,7 +360,6 @@ export default function JDGeneratorPage({ company, profile }) {
                 </p>
               )}
             </div>
-
 
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>Experience required</label>
@@ -395,7 +396,6 @@ export default function JDGeneratorPage({ company, profile }) {
               />
             </div>
 
-
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>
                 Salary range (EGP)
@@ -424,7 +424,6 @@ export default function JDGeneratorPage({ company, profile }) {
               </div>
             </div>
 
-
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>
                 Key notes
@@ -444,7 +443,7 @@ export default function JDGeneratorPage({ company, profile }) {
             {generateError && (
               <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20">
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                
+
                 {generateError}
               </div>
             )}
@@ -462,33 +461,35 @@ export default function JDGeneratorPage({ company, profile }) {
                 </>
               ) : (
                 <>
-                  Generate JD
+                  {t("jd_generator.form.buttons.generate")}
                   <Sparkles className="w-3.5 h-3.5" />
                 </>
               )}
             </button>
           </form>
         </div>
-{/* Column 2: Live Preview Panel */}
+        {/* Column 2: Live Preview Panel */}
         <div className="bg-background rounded-xl border border-border/60 p-5 shadow-xs min-h-[450px] lg:h-full">
           {!generated ? (
             <div className="flex flex-col items-center justify-center h-full py-20 text-center">
               <div className="w-12 h-12 rounded-xl bg-secondary/40 border border-border flex items-center justify-center mb-3.5 text-muted-foreground/70">
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-sidebar font-semibold text-xs">Fill in the role brief</p>
-              <p className="text-muted-foreground/70 text-[11px] mt-0.5">and click Generate JD to preview the output</p>
+              <p className="text-sidebar font-semibold text-xs">
+                {t("jd_generator.preview.empty_title")}
+              </p>
+              <p className="text-muted-foreground/70 text-[11px] mt-0.5">
+                {t("jd_generator.preview.empty_subtitle")}
+              </p>
             </div>
           ) : (
             <div className="space-y-5">
-
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[11px] font-bold text-primary/90 flex items-center gap-1 bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-md">
                   <Sparkles className="w-3 h-3" />
-                  AI Generated
+                  {t("jd_generator.preview.ai_generated")}
                 </span>
               </div>
-
 
               <div>
                 <h2 className="text-base font-bold text-sidebar">
@@ -498,7 +499,10 @@ export default function JDGeneratorPage({ company, profile }) {
                 <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1.5 text-xs font-medium text-muted-foreground/80">
                   {company?.name && (
                     <div className="flex items-center gap-1.5">
-                      <Building2 size={14} className="text-muted-foreground/60" />
+                      <Building2
+                        size={14}
+                        className="text-muted-foreground/60"
+                      />
                       <span>{company.name}</span>
                     </div>
                   )}
@@ -511,13 +515,20 @@ export default function JDGeneratorPage({ company, profile }) {
                   {previewMeta.workLocation && (
                     <div className="flex items-center gap-1.5">
                       <Monitor size={14} className="text-muted-foreground/60" />
-                      <span className="capitalize">{previewMeta.workLocation.replace("_", " ")}</span>
+                      <span className="capitalize">
+                        {previewMeta.workLocation.replace("_", " ")}
+                      </span>
                     </div>
                   )}
                   {previewMeta.jobType && (
                     <div className="flex items-center gap-1.5">
-                      <Briefcase size={14} className="text-muted-foreground/60" />
-                      <span className="capitalize">{previewMeta.jobType.replace("_", " ")}</span>
+                      <Briefcase
+                        size={14}
+                        className="text-muted-foreground/60"
+                      />
+                      <span className="capitalize">
+                        {previewMeta.jobType.replace("_", " ")}
+                      </span>
                     </div>
                   )}
                   {previewMeta.seniority && (
@@ -526,7 +537,9 @@ export default function JDGeneratorPage({ company, profile }) {
                         size={14}
                         className="text-muted-foreground/60"
                       />
-                      <span className="capitalize">{previewMeta.seniority}</span>
+                      <span className="capitalize">
+                        {previewMeta.seniority}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -542,10 +555,13 @@ export default function JDGeneratorPage({ company, profile }) {
               </div>
 
               <div className="border-t border-border/40 pt-4">
-                <h3 className="text-xs font-bold text-sidebar mb-1">About the role</h3>
-                <p className="text-muted-foreground/90 text-xs font-medium leading-relaxed">{aiResult?.description}</p>
+                <h3 className="text-xs font-bold text-sidebar mb-1">
+                  About the role
+                </h3>
+                <p className="text-muted-foreground/90 text-xs font-medium leading-relaxed">
+                  {aiResult?.description}
+                </p>
               </div>
-
 
               {aiResult?.responsibilities?.length > 0 && (
                 <div className="border-t border-border/40 pt-4">
@@ -566,7 +582,6 @@ export default function JDGeneratorPage({ company, profile }) {
                 </div>
               )}
 
-
               {aiResult?.requirements?.length > 0 && (
                 <div className="border-t border-border/40 pt-4">
                   <h3 className="text-xs font-bold text-sidebar mb-2">
@@ -585,7 +600,6 @@ export default function JDGeneratorPage({ company, profile }) {
                   </ul>
                 </div>
               )}
-
 
               {aiResult?.skills?.length > 0 && (
                 <div className="border-t border-border/40 pt-4">
@@ -609,7 +623,7 @@ export default function JDGeneratorPage({ company, profile }) {
               {publishError && (
                 <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20">
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                  
+
                   {publishError}
                 </div>
               )}

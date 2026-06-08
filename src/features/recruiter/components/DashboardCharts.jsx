@@ -35,13 +35,12 @@ export default function DashboardCharts({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6 font-sans">
-
       {/* ── Pipeline Summary Component ────────────────────────────────────────── */}
       <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm p-5 col-span-1 lg:col-span-2 xl:col-span-1">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-base font-bold text-slate-900 tracking-tight">
-              Pipeline summary
+              {t("dashboard_charts.pipeline_summary.title")}
             </h3>
             <p className="text-xs text-slate-400">
               {t("dashboard_charts.pipeline_summary.subtitle")}
@@ -119,11 +118,24 @@ export default function DashboardCharts({
             >
               <defs>
                 <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.15} />
-                  <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0} />
+                  <stop
+                    offset="5%"
+                    stopColor={COLORS.primary}
+                    stopOpacity={0.15}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={COLORS.primary}
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.border} opacity={0.4} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={COLORS.border}
+                opacity={0.4}
+              />
               <XAxis
                 dataKey="day"
                 axisLine={false}
@@ -140,11 +152,11 @@ export default function DashboardCharts({
               <Tooltip
                 contentStyle={{
                   backgroundColor: COLORS.bg,
-                  borderRadius: '8px',
+                  borderRadius: "8px",
                   border: `1px solid ${COLORS.border}`,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                  fontSize: '11px',
-                  color: COLORS.text
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  fontSize: "11px",
+                  color: COLORS.text,
                 }}
               />
               <Area
@@ -164,7 +176,7 @@ export default function DashboardCharts({
       <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm p-5">
         <div className="mb-4">
           <h3 className="text-base font-bold text-slate-900 tracking-tight">
-            Top Jobs by Applicants
+            {t("dashboard_charts.top_jobs.title")}
           </h3>
           <p className="text-xs text-slate-400">
             {t("dashboard_charts.top_jobs.subtitle")}
@@ -176,7 +188,12 @@ export default function DashboardCharts({
               data={topJobsData}
               margin={{ top: 5, right: 10, left: -25, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={COLORS.border} opacity={0.4} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={COLORS.border}
+                opacity={0.4}
+              />
               <XAxis
                 dataKey="name"
                 axisLine={false}
@@ -191,19 +208,20 @@ export default function DashboardCharts({
                 tickCount={4}
               />
               <Tooltip
-                cursor={{ fill: '#f1f5f9', opacity: 0.6 }}
+                cursor={{ fill: "#f1f5f9", opacity: 0.6 }}
                 contentStyle={{
                   backgroundColor: COLORS.bg,
-                  borderRadius: '8px',
+                  borderRadius: "8px",
                   border: `1px solid ${COLORS.border}`,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                  fontSize: '11px',
-                  color: COLORS.text
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  fontSize: "11px",
+                  color: COLORS.text,
                 }}
               />
               <Bar
                 dataKey="applicants"
-                fill={COLORS.primary} opacity={0.85}
+                fill={COLORS.primary}
+                opacity={0.85}
                 radius={[4, 4, 0, 0]}
                 barSize={24}
               />

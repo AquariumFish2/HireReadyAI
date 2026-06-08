@@ -139,7 +139,7 @@ export default function JobsPage() {
             {t("jobs_page.title")}
           </h1>
           <p className="text-slate-300/80 text-sm max-w-lg leading-relaxed">
-            Browse our latest job openings and apply to the best opportunities today.
+            {t("jobs_page.subtitle")}
           </p>
         </div>
       </div>
