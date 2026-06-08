@@ -46,7 +46,8 @@ export default function JobInfoGrid({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-            <TrendingUp className="w-3.5 h-3.5 text-dark-amethyst-500" /> Seniority Level
+            <TrendingUp className="w-3.5 h-3.5 text-dark-amethyst-500" />{" "}
+            Seniority Level
           </div>
           {isEditing ? (
             <input
@@ -164,7 +165,9 @@ export default function JobInfoGrid({
 
       <div className="flex flex-wrap items-center gap-3 pt-5 border-t border-gray-100">
         <button
-          onClick={() => navigate(`/recruiter/candidatespipline?jobId=${selectedJob.id}&companyId=${company?.id}`)}
+          onClick={() =>
+            navigate(`/companies/candidates?jobId=${selectedJob.id}`)
+          }
           className="flex items-center gap-2 bg-dark-amethyst-600 hover:bg-dark-amethyst-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"
         >
           <User className="w-4 h-4" />

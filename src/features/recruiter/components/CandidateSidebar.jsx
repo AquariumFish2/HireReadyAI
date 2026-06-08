@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   X,
@@ -6,7 +7,10 @@ import {
   Sparkles,
   Check,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
+import { rejectApplication, unrejectApplication } from "../../shortlist/services/shortlist.service";
+import { moveToStage } from "../services/candidatesPipline.service";
 
 function getInitials(name = "") {
   return (
@@ -66,8 +70,10 @@ const StatusBadge = ({ status, isRejected }) => {
   );
 };
 
-export default function CandidateSidebar({ candidate, onClose }) {
+export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
   const navigate = useNavigate();
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState("");
   if (!candidate) return null;
 
   const { profile, stagesData = [], answers } = candidate;
@@ -124,6 +130,61 @@ export default function CandidateSidebar({ candidate, onClose }) {
     } catch {}
   }
 
+  const currentStageIndex = sortedStages.findIndex(
+    (s) => s.recruitment_stages?.id === candidate.currentStageId,
+  );
+  const nextStage =
+    currentStageIndex >= 0 && currentStageIndex < sortedStages.length - 1
+      ? sortedStages[currentStageIndex + 1]
+      : null;
+  const nextStageType = nextStage?.recruitment_stages?.stage_type;
+  const canAdvance =
+    hasCurrentStageScore &&
+    nextStage &&
+    nextStageType !== "offer" &&
+    nextStageType !== "shortlist";
+
+  const handleReject = async () => {
+    setActionLoading(true);
+    setActionError("");
+    try {
+      await rejectApplication(candidate.id, currentEval?.reasoning || "");
+      onUpdate?.(candidate.id, { is_rejected: true });
+    } catch (err) {
+      setActionError(err.message || "Failed to reject candidate");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUnreject = async () => {
+    setActionLoading(true);
+    setActionError("");
+    try {
+      await unrejectApplication(candidate.id);
+      onUpdate?.(candidate.id, { is_rejected: false });
+    } catch (err) {
+      setActionError(err.message || "Failed to un-reject candidate");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleAdvance = async () => {
+    if (!nextStage) return;
+    setActionLoading(true);
+    setActionError("");
+    try {
+      await moveToStage(candidate.id, nextStage.recruitment_stages.id);
+      onUpdate?.(candidate.id, { currentStageId: nextStage.recruitment_stages.id });
+      onClose();
+    } catch (err) {
+      setActionError(err.message || "Failed to advance candidate");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return (
     <>
       <div
@@ -155,9 +216,11 @@ export default function CandidateSidebar({ candidate, onClose }) {
                 <h2 className="text-lg font-bold text-slate-900">
                   {candidate.name}
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-500 border border-red-100">
-                  Reject
-                </span>
+                {candidate.is_rejected && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-500 border border-red-100">
+                    Rejected
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium flex-wrap">
                 {answers?.info?.email && (
@@ -245,16 +308,39 @@ export default function CandidateSidebar({ candidate, onClose }) {
                   "Evaluation completed, but no detailed reasoning was provided."}
               </p>
 
-              {hasCurrentStageScore && (
-                <div className="flex gap-3 items-center">
-                  <button className="flex items-center gap-2 bg-yale-blue-600 text-white font-semibold text-sm px-4 py-2 rounded-xl hover:bg-yale-blue-700 transition-colors shadow-sm">
-                    <Check className="w-4 h-4" />
+              <div className="flex gap-3 items-center">
+                {!candidate.is_rejected && canAdvance && (
+                  <button
+                    onClick={handleAdvance}
+                    disabled={actionLoading}
+                    className="flex items-center gap-2 bg-yale-blue-600 text-white font-semibold text-sm px-4 py-2 rounded-xl hover:bg-yale-blue-700 transition-colors shadow-sm disabled:opacity-50"
+                  >
+                    {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                     Advance to next stage
                   </button>
-                  <button className="bg-white border border-slate-200 text-slate-600 font-semibold text-sm px-4 py-2 rounded-xl hover:bg-slate-50 transition-colors">
+                )}
+                {candidate.is_rejected ? (
+                  <button
+                    onClick={handleUnreject}
+                    disabled={actionLoading}
+                    className="flex items-center gap-2 bg-emerald-600 text-white font-semibold text-sm px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-50"
+                  >
+                    {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                    Un-reject
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleReject}
+                    disabled={actionLoading}
+                    className="bg-white border border-slate-200 text-slate-600 font-semibold text-sm px-4 py-2 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                     Reject
                   </button>
-                </div>
+                )}
+              </div>
+              {actionError && (
+                <p className="text-xs text-red-600 mt-2">{actionError}</p>
               )}
             </div>
 

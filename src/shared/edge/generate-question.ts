@@ -529,15 +529,22 @@ serve(async (req) => {
   const shouldFinalize = isSessionOver || aiResult.is_final;
 
   if (shouldFinalize) {
+    // Compute stage score as the average of all individually scored questions
+    const scoredQuestions = deduped.filter((q) => q.score != null);
+    const avgScore = scoredQuestions.length > 0
+      ? Math.round(scoredQuestions.reduce((sum, q) => sum + (q.score ?? 0), 0) / scoredQuestions.length)
+      : (aiResult.answer_evaluation?.score ?? 0);
+
     const summary = aiResult.session_summary || {
-      overall_score: aiResult.answer_evaluation?.score ?? 0,
+      overall_score: avgScore,
       recommendation: "review",
       reasoning: "Session concluded automatically. AI failed to generate a proper summary.",
       strengths: [],
       weaknesses: [],
     };
 
-    const { overall_score, recommendation, reasoning, strengths, weaknesses } = summary;
+    const { recommendation, reasoning, strengths, weaknesses } = summary;
+    const overall_score = avgScore;
 
     await supabase.from("application_stage_evaluations").upsert(
       {
@@ -552,20 +559,13 @@ serve(async (req) => {
       { onConflict: "application_stage_id" }
     );
 
-    // Update stage status and set is_rejected based on pass_score
+    // Update stage status based on pass_score
     const passScore = stage.pass_score ?? 55;
     const stagePassed = overall_score >= passScore;
     await supabase
       .from("application_stages")
       .update({ status: stagePassed ? "passed" : "failed", score: overall_score, completed_at: new Date().toISOString() })
       .eq("id", applicationStageId);
-
-    if (!stagePassed) {
-      await supabase
-        .from("applications")
-        .update({ is_rejected: true })
-        .eq("id", application.id);
-    }
 
     return new Response(
       JSON.stringify({

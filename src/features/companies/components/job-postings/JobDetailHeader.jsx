@@ -1,4 +1,4 @@
-import { Wand2, Edit, X, Save, Menu } from "lucide-react";
+import {  Edit, X, Save, Menu } from "lucide-react";
 
 export default function JobDetailHeader({
   selectedJob,
@@ -51,11 +51,6 @@ export default function JobDetailHeader({
       <div className="flex items-center gap-3 shrink-0">
         {!isEditing ? (
           <>
-            <button className="flex items-center gap-2 bg-gradient-to-r from-mauve-magic-500 to-dark-amethyst-500 hover:from-mauve-magic-600 hover:to-dark-amethyst-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm">
-              <Wand2 className="w-4 h-4" />
-              {/* TODO:  */}
-              Regenerate with AI
-            </button>
             <button
               onClick={handleEditClick}
               className="flex items-center gap-2 border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs"

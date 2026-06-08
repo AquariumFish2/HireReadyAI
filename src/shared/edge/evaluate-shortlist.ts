@@ -275,6 +275,7 @@ TAGS GUIDELINES:
 
   return {
     applicationId,
+    jobId: job.id,
     score,
     recommendation,
     passed,
@@ -320,18 +321,36 @@ serve(async (req) => {
     }
   }
 
-  // Rank passed candidates by score descending
-  const passedResults = results
-    .filter(r => r.passed)
-    .sort((a, b) => b.score - a.score);
-
-  for (let i = 0; i < passedResults.length; i++) {
-    const rank = i + 1;
-    const r = passedResults[i];
-    await supabase
+  // Re-rank ALL shortlist entries per job (including pre-existing ones)
+  const jobIds = [...new Set(results.map(r => r.jobId).filter(Boolean))];
+  for (const jobId of jobIds) {
+    const { data: entries } = await supabase
       .from("shortlist_entries")
-      .update({ rank })
-      .eq("application_id", r.applicationId);
+      .select("application_id")
+      .eq("job_id", jobId);
+
+    if (!entries || entries.length === 0) continue;
+
+    const appIds = entries.map(e => e.application_id);
+    const { data: apps } = await supabase
+      .from("applications")
+      .select("id, composite_score")
+      .in("id", appIds);
+
+    if (!apps) continue;
+
+    const scoreMap = new Map(apps.map(a => [a.id, a.composite_score ?? 0]));
+    const ranked = entries
+      .map(e => ({ application_id: e.application_id, score: scoreMap.get(e.application_id) ?? 0 }))
+      .sort((a, b) => b.score - a.score);
+
+    for (let i = 0; i < ranked.length; i++) {
+      await supabase
+        .from("shortlist_entries")
+        .update({ rank: i + 1 })
+        .eq("application_id", ranked[i].application_id)
+        .eq("job_id", jobId);
+    }
   }
 
   return new Response(

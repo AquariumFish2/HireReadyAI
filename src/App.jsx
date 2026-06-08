@@ -9,6 +9,7 @@ import AuthCallback from "@/features/auth/pages/AuthCallback";
 import GoogleRoleSelect from "@/features/auth/pages/GoogleRoleSelect";
 import { USER_ROLE } from "@/shared/constants/enums";
 import ApplicantPage from "@/features/applicant/pages/ApplicantPage";
+import ApplicantFeedbackPage from "@/features/applicant/pages/ApplicantFeedbackPage";
 import JobsPage from "@/features/jobs/pages/JobsPage";
 import CompanyLayout from "./features/companies/pages/CompanyLayout";
 import MainLayout from "@/shared/ui/MainLayout";
@@ -77,6 +78,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={[USER_ROLE.applicant]}>
               <InterviewPage></InterviewPage>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/applicant/feedback"
+          element={
+            <ProtectedRoute allowedRoles={[USER_ROLE.applicant]}>
+              <ApplicantFeedbackPage />
             </ProtectedRoute>
           }
         />

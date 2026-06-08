@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Lock, Search, SlidersHorizontal, Sparkles, X, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import {
   getPipelineCandidates,
@@ -483,12 +484,17 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
     }
   }
 
-  // Initialize selected job
+  // Initialize selected job from URL param or first job
+  const [searchParams] = useSearchParams();
   useEffect(() => {
-    if (jobs.length > 0 && !selectedJobId) {
+    if (jobs.length === 0) return;
+    const urlJobId = searchParams.get("jobId");
+    if (urlJobId && jobs.some(j => j.id === urlJobId)) {
+      setSelectedJobId(urlJobId);
+    } else if (!selectedJobId) {
       setSelectedJobId(jobs[0].id);
     }
-  }, [jobs, selectedJobId]);
+  }, [jobs, selectedJobId, searchParams]);
 
   // Load stages when job changes
   useEffect(() => {
@@ -920,9 +926,17 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       )}
 
       {selectedCandidate && (
-        <CandidateSidebar 
-          candidate={selectedCandidate} 
-          onClose={() => setSelectedCandidate(null)} 
+        <CandidateSidebar
+          candidate={selectedCandidate}
+          onClose={() => setSelectedCandidate(null)}
+          onUpdate={(id, updates) => {
+            setCandidates((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+            );
+            setSelectedCandidate((prev) =>
+              prev?.id === id ? { ...prev, ...updates } : prev,
+            );
+          }}
         />
       )}
 

@@ -341,10 +341,10 @@ serve(async (req) => {
       );
     }
 
-    // Update applications.cv_score and set is_rejected if below threshold
+    // Update applications.cv_score
     await supabase
       .from("applications")
-      .update({ cv_score: cvScore, is_rejected: stageStatus === "failed" })
+      .update({ cv_score: cvScore })
       .eq("id", applicationId);
 
     return new Response(

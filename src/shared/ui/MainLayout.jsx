@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   FileCheck,
+  FileText,
   LogOut,
   LayoutDashboard,
   CheckCircle,
@@ -28,6 +29,7 @@ export default function MainLayout() {
   const links = isApplicant
     ? [
         { to: "/applicant", label: "nav.my_applications", icon: FileCheck },
+        { to: "/applicant/feedback", label: "nav.my_feedback", icon: FileText },
         { to: "/jobs", label: "nav.explore_jobs", icon: Briefcase },
       ]
     : [
@@ -59,12 +61,20 @@ export default function MainLayout() {
         },
       ];
 
-  const isActive = (path) => {
-    if (path === "/companies/profile" && location.pathname === "/companies") {
-      return true;
+  const activeLink = (() => {
+    const current = location.pathname;
+    let best = null;
+    let bestLen = 0;
+    for (const link of links) {
+      const p = link.to;
+      const matches = current === p || current.startsWith(p + "/") || (p === "/companies/profile" && current === "/companies");
+      if (matches && p.length > bestLen) {
+        bestLen = p.length;
+        best = p;
+      }
     }
-    return location.pathname.startsWith(path);
-  };
+    return best;
+  })();
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -103,7 +113,7 @@ export default function MainLayout() {
             <nav className="space-y-1">
               {links.map((link) => {
                 const Icon = link.icon;
-                const active = isActive(link.to);
+                const active = link.to === activeLink;
                 return (
                   <Link
                     key={link.to}

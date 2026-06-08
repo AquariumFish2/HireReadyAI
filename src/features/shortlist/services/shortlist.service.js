@@ -118,6 +118,14 @@ export const rejectApplication = async (applicationId, reason) => {
   if (error) throw error;
 };
 
+export const unrejectApplication = async (applicationId) => {
+  const { error } = await supabase
+    .from("applications")
+    .update({ is_rejected: false, rejection_reason: null })
+    .eq("id", applicationId);
+  if (error) throw error;
+};
+
 /**
  * Advance an application to the Offer stage.
  */

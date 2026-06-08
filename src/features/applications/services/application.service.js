@@ -31,11 +31,19 @@ export const fetchApplicationsByApplicantId = async (applicantId) => {
         id,
         stage_id,
         score,
+        ai_feedback,
         recruitment_stages (
           id,
           name,
           stage_type,
           order_index
+        ),
+        application_stage_evaluations (
+          ai_score,
+          reasoning,
+          recommendation,
+          strengths,
+          weaknesses
         )
       )
     `,
