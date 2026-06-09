@@ -985,5 +985,20 @@
     "up": "Up",
     "down": "Down",
     "rankLabel": "Rank"
+  },
+
+  "landing": {
+    "nav": {
+      "get_started": "Get Started"
+    },
+    "hero": {
+      "headline": "Hire Smarter. Apply Faster.",
+      "subheadline": "AI-powered platform connecting top talent with forward-thinking companies. Find your dream job or hire the perfect candidate \u2014 all in one place.",
+      "cta_applicant": "Find Your Dream Job",
+      "cta_recruiter": "Hire Top Talent"
+    },
+    "trusted_by": {
+      "heading": "Trusted by 2000+ Companies"
+    }
   }
 }

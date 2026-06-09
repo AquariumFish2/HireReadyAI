@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
+import LandingPage from "@/features/landing/Pages/LandingPage";
 import SignInPage from "@/features/auth/pages/SignInPage";
 import SignUpPage from "@/features/auth/pages/SignUpPage";
 import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
@@ -29,11 +30,11 @@ function RootRedirect() {
   }
 
   if (!user) {
-    return <Navigate to="/auth/sign-in" replace />;
+    return <LandingPage />;
   }
 
   if (!profile) {
-    return <Navigate to="/auth/sign-in" replace />;
+    return <LandingPage />;
   }
 
   if (profile.role === USER_ROLE.applicant) {
