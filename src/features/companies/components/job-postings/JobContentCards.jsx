@@ -34,13 +34,13 @@ export default function JobContentCards({
     <div className="space-y-4 font-sans">
       {/* Job Summary */}
       <div className="bg-background border border-border/60 rounded-xl shadow-xs p-5 hover:border-accent/30 transition-colors duration-200">
-        <h3 className="text-sm font-bold text-sidebar uppercase tracking-wider mb-3">
+        <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">
           {t("job_content_cards.job_summary")}
         </h3>
         {isEditing ? (
           <textarea
             rows={3}
-            className="w-full text-sm font-medium text-sidebar bg-background border border-border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all resize-y"
+            className="w-full text-sm font-medium text-foreground bg-background border border-border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all resize-y"
             value={editForm.description || ""}
             onChange={(e) =>
               setEditForm({ ...editForm, description: e.target.value })
@@ -56,7 +56,7 @@ export default function JobContentCards({
       <div className="grid md:grid-cols-2 gap-4">
         {/* Responsibilities */}
         <div className="bg-background border border-border/60 rounded-xl shadow-xs p-5 hover:border-accent/30 transition-colors duration-200">
-          <h3 className="text-sm font-bold text-sidebar uppercase tracking-wider mb-3">
+          <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">
             {t("job_content_cards.responsibilities")}
           </h3>
           <ul className="space-y-2.5">
@@ -77,7 +77,7 @@ export default function JobContentCards({
                         newArr[i] = e.target.value;
                         setEditForm({ ...editForm, responsibilities: newArr });
                       }}
-                      className="w-full text-sm font-medium bg-secondary/20 border border-border rounded-lg h-9 px-2.5 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                      className="w-full text-sm font-medium text-foreground bg-muted border border-border rounded-lg h-9 px-2.5 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                     />
                   </li>
                 ))}
@@ -88,7 +88,7 @@ export default function JobContentCards({
                     onKeyDown={(e) =>
                       handleArrayInputKeyDown(e, "responsibilities")
                     }
-                    className="w-full text-sm font-medium bg-background border border-border border-dashed rounded-lg h-9 px-3 text-muted-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                    className="w-full text-sm font-medium text-foreground bg-background border border-border border-dashed rounded-lg h-9 px-3 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                   />
                 </li>
               </>
@@ -114,7 +114,7 @@ export default function JobContentCards({
 
         {/* Requirements */}
         <div className="bg-background border border-border/60 rounded-xl shadow-xs p-5 hover:border-accent/30 transition-colors duration-200">
-          <h3 className="text-sm font-bold text-sidebar uppercase tracking-wider mb-3">
+          <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">
             {t("job_content_cards.requirements")}
           </h3>
           <ul className="space-y-2.5">
@@ -135,7 +135,7 @@ export default function JobContentCards({
                         newArr[i] = e.target.value;
                         setEditForm({ ...editForm, requirements: newArr });
                       }}
-                      className="w-full text-sm font-medium bg-secondary/20 border border-border rounded-lg h-9 px-2.5 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                      className="w-full text-sm font-medium text-foreground bg-muted border border-border rounded-lg h-9 px-2.5 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                     />
                   </li>
                 ))}
@@ -146,7 +146,7 @@ export default function JobContentCards({
                     onKeyDown={(e) =>
                       handleArrayInputKeyDown(e, "requirements")
                     }
-                    className="w-full text-sm font-medium bg-background border border-border border-dashed rounded-lg h-9 px-3 text-muted-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                    className="w-full text-sm font-medium text-foreground bg-background border border-border border-dashed rounded-lg h-9 px-3 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                   />
                 </li>
               </>
@@ -164,7 +164,6 @@ export default function JobContentCards({
               (!selectedJob.requirements ||
                 selectedJob.requirements.length === 0) && (
                 <span className="text-xs text-muted-foreground/50 font-medium pl-0.5">
-                  {" "}
                   {t("job_content_cards.none_specified")}
                 </span>
               )}
@@ -174,8 +173,7 @@ export default function JobContentCards({
 
       {/* Skills */}
       <div className="bg-background border border-border/60 rounded-xl shadow-xs p-5 hover:border-accent/30 transition-colors duration-200">
-        <h3 className="text-sm font-bold text-sidebar uppercase tracking-wider mb-3">
-          {" "}
+        <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">
           {t("job_content_cards.skills")}
         </h3>
         <div className="flex flex-wrap gap-2">
@@ -199,7 +197,7 @@ export default function JobContentCards({
                 type="text"
                 placeholder={t("job_content_cards.placeholders.add_skill")}
                 onKeyDown={(e) => handleArrayInputKeyDown(e, "skills")}
-                className="text-xs font-semibold bg-background border border-border border-dashed rounded-full px-3 h-8 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary placeholder:text-muted-foreground/40 transition-all w-28"
+                className="text-xs font-semibold text-foreground bg-background border border-border border-dashed rounded-full px-3 h-8 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary placeholder:text-muted-foreground/40 transition-all w-28"
               />
             </>
           ) : (
@@ -215,7 +213,6 @@ export default function JobContentCards({
           {!isEditing &&
             (!selectedJob.skills || selectedJob.skills.length === 0) && (
               <span className="text-xs text-muted-foreground/50 font-medium pl-0.5">
-                {" "}
                 {t("job_content_cards.none_specified")}
               </span>
             )}

@@ -1,4 +1,4 @@
-import {  Edit, X, Save, Menu } from "lucide-react";
+import { Edit, X, Save, Menu } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function JobDetailHeader({
@@ -20,16 +20,16 @@ export default function JobDetailHeader({
         <div className="flex items-center gap-2.5">
           <button
             onClick={onOpenSidebar}
-            className="lg:hidden p-1.5 -ml-1 text-muted-foreground hover:text-sidebar hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer"
+            className="lg:hidden p-1.5 -ml-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          <h1 className="text-xl lg:text-2xl font-bold text-sidebar tracking-tight flex-1">
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground tracking-tight flex-1">
             {isEditing ? (
               <input
                 type="text"
-                className="w-full h-10 font-bold bg-background border border-border rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                className="w-full h-10 font-bold text-foreground bg-background border border-border rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                 value={editForm.title}
                 onChange={(e) =>
                   setEditForm({ ...editForm, title: e.target.value })
@@ -42,15 +42,16 @@ export default function JobDetailHeader({
         </div>
 
         <div className="flex items-center flex-wrap gap-2 text-xs font-semibold text-muted-foreground/80 capitalize pl-1">
-          <span className="bg-secondary/40 px-2 py-0.5 rounded-md border border-border/40">
+          <span className="bg-muted px-2 py-0.5 rounded-md border border-border/40">
             {selectedJob.seniority_level || "Any Seniority"}
           </span>
           <span className="text-muted-foreground/30 font-normal">&middot;</span>
-          <span className="bg-secondary/40 px-2 py-0.5 rounded-md border border-border/40">
-            {selectedJob.work_location?.replace("_", " ").trim() || "Any Location"}
+          <span className="bg-muted px-2 py-0.5 rounded-md border border-border/40">
+            {selectedJob.work_location?.replace("_", " ").trim() ||
+              "Any Location"}
           </span>
           <span className="text-muted-foreground/30 font-normal">&middot;</span>
-          <span className="bg-secondary/40 px-2 py-0.5 rounded-md border border-border/40">
+          <span className="bg-muted px-2 py-0.5 rounded-md border border-border/40">
             {selectedJob.job_type?.replace("_", "-") || "Full-time"}
           </span>
         </div>
@@ -61,7 +62,7 @@ export default function JobDetailHeader({
           <>
             <button
               onClick={handleEditClick}
-              className="flex items-center gap-1.5 border border-border text-sidebar bg-background hover:bg-secondary/50 px-3.5 h-9 rounded-lg text-xs font-semibold transition-colors shadow-xs cursor-pointer select-none"
+              className="flex items-center gap-1.5 border border-border text-foreground bg-background hover:bg-muted px-3.5 h-9 rounded-lg text-xs font-semibold transition-colors shadow-xs cursor-pointer select-none"
             >
               <Edit className="w-3.5 h-3.5" />
               {t("job_detail_header.edit")}
@@ -71,7 +72,7 @@ export default function JobDetailHeader({
           <>
             <button
               onClick={handleCancelEdit}
-              className="flex items-center gap-1.5 border border-border text-sidebar bg-background hover:bg-secondary/50 px-3.5 h-9 rounded-lg text-xs font-semibold transition-colors cursor-pointer select-none"
+              className="flex items-center gap-1.5 border border-border text-foreground bg-background hover:bg-muted px-3.5 h-9 rounded-lg text-xs font-semibold transition-colors cursor-pointer select-none"
             >
               <X className="w-3.5 h-3.5" />
               {t("job_detail_header.cancel")}

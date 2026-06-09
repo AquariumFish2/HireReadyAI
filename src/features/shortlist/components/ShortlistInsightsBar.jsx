@@ -41,19 +41,19 @@ export default function ShortlistInsightsBar({ insightsSummary }) {
             Down votes <span className="font-bold">{down}</span>
           </span>
         </div>
-        <span className="text-gray-200 hidden sm:block">|</span>
-        <span className="text-gray-500 text-xs hidden sm:block">
-          <span className="font-semibold text-gray-800">{total}</span>{" "}
+        <span className="text-border hidden sm:block">|</span>
+        <span className="text-muted-foreground text-xs hidden sm:block">
+          <span className="font-semibold text-foreground">{total}</span>
           shortlisted
           {awaitingVote > 0 && (
             <>
               {" "}
               ·{" "}
-              <span className="font-semibold text-amber-600">
+              <span className="font-semibold text-warning">
                 {awaitingVote}
               </span>{" "}
               awaiting first vote
-              <span className="font-semibold text-[#8a5a00]">
+              <span className="font-semibold text-warning">
                 {awaitingVote}
               </span>{" "}
               {t("shortlistInsights.awaitingVote")}

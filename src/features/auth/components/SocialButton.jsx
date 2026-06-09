@@ -1,3 +1,4 @@
+//src\features\auth\components\SocialButton.jsx
 const providers = {
   google: {
     label: "Continue with Google",
@@ -31,8 +32,7 @@ export default function SocialButton({ provider = "google", onClick }) {
     <button
       type="button"
       onClick={onClick}
-
-      className="w-full h-11 rounded-xl text-sm font-medium text-sidebar flex items-center justify-center gap-2.5 bg-background border border-border hover:bg-secondary hover:border-accent/40 transition-all duration-200 cursor-pointer"
+      className="w-full h-11 rounded-xl text-sm font-medium text-foreground flex items-center justify-center gap-2.5 bg-background border border-border hover:bg-muted hover:border-accent/40 transition-all duration-200 cursor-pointer"
     >
       {icon}
       {label}

@@ -7,7 +7,7 @@ import { createApplication } from "../services/application.service";
 import { triggerCvReview } from "../services/cv-review.service";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js?url";
-
+import { CheckCircle2, XCircle } from "lucide-react";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 import { supabase } from "@/shared/services/supabase";
 import QuestionCard from "../components/apply/QuestionCard";
@@ -239,7 +239,7 @@ export default function ApplyJobPage() {
 
       setToast({
         type: "success",
-        message: "Application submitted successfully!",
+        message: t("apply_job.toast.success"),
       });
 
       setTimeout(() => {
@@ -249,7 +249,7 @@ export default function ApplyJobPage() {
       console.error(" Submit error:", err);
       setToast({
         type: "error",
-        message: "Something went wrong!",
+        message: t("apply_job.errors.something_wrong"),
       });
     } finally {
       setLoading(false);
@@ -259,16 +259,17 @@ export default function ApplyJobPage() {
   return (
     <>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           <div
             className={`px-3.5 py-2 rounded-xl shadow-xs text-sm font-semibold border flex items-center gap-2
-            ${toast.type === "success"
+            ${
+              toast.type === "success"
                 ? "bg-green-500/10 text-green-600 border-green-500/20"
                 : "bg-destructive/10 text-destructive border-destructive/20"
-              }
+            }
           `}
           >
-            <span>{toast.type === "success" ? "✅" : "❌"}</span>
+            <span>{toast.type === "success" ? "✓" : "×"}</span>
             <span>{toast.message}</span>
           </div>
         </div>
@@ -287,10 +288,11 @@ export default function ApplyJobPage() {
               {steps.map((s, i) => (
                 <span
                   key={i}
-                  className={`font-bold transition-colors duration-200 uppercase tracking-wider ${i <= step
+                  className={`font-bold transition-colors duration-200 uppercase tracking-wider ${
+                    i <= step
                       ? "text-accent font-extrabold"
                       : "text-muted-foreground/40"
-                    }`}
+                  }`}
                 >
                   {s}
                 </span>
@@ -319,10 +321,11 @@ export default function ApplyJobPage() {
                     type="text"
                     value={form.fullName || ""}
                     className={`w-full h-10 rounded-lg px-3 text-sm bg-background font-medium border outline-none transition-all focus:ring-2 focus:ring-primary/10 focus:border-primary
-                    ${errors.fullName
+                    ${
+                      errors.fullName
                         ? "border-destructive focus:ring-destructive/10 focus:border-destructive"
                         : "border-border"
-                      }`}
+                    }`}
                     onChange={(e) => {
                       setForm((prev) => ({
                         ...prev,
@@ -332,7 +335,9 @@ export default function ApplyJobPage() {
                     }}
                   />
                   {errors.fullName && (
-                    <p className="text-xs text-destructive font-medium mt-1 pl-0.5">{errors.fullName}</p>
+                    <p className="text-xs text-destructive font-medium mt-1 pl-0.5">
+                      {errors.fullName}
+                    </p>
                   )}
                 </div>
 
@@ -345,10 +350,11 @@ export default function ApplyJobPage() {
                     type="email"
                     value={form.email || ""}
                     className={`w-full h-10 rounded-lg px-3 text-sm bg-background font-medium border outline-none transition-all focus:ring-2 focus:ring-primary/10 focus:border-primary
-                    ${errors.email
+                    ${
+                      errors.email
                         ? "border-destructive focus:ring-destructive/10 focus:border-destructive"
                         : "border-border"
-                      }`}
+                    }`}
                     onChange={(e) => {
                       setForm((prev) => ({
                         ...prev,
@@ -358,23 +364,26 @@ export default function ApplyJobPage() {
                     }}
                   />
                   {errors.email && (
-                    <p className="text-xs text-destructive font-medium mt-1 pl-0.5">{errors.email}</p>
+                    <p className="text-xs text-destructive font-medium mt-1 pl-0.5">
+                      {errors.email}
+                    </p>
                   )}
                 </div>
 
                 {/* PHONE */}
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                   Phone *
+                    Phone *
                   </label>
                   <input
                     type="tel"
                     value={form.phone || ""}
                     className={`w-full h-10 rounded-lg px-3 text-sm bg-background font-medium border outline-none transition-all focus:ring-2 focus:ring-primary/10 focus:border-primary
-                    ${errors.phone
+                    ${
+                      errors.phone
                         ? "border-destructive focus:ring-destructive/10 focus:border-destructive"
                         : "border-border"
-                      }`}
+                    }`}
                     onChange={(e) => {
                       setForm((prev) => ({
                         ...prev,
@@ -384,7 +393,9 @@ export default function ApplyJobPage() {
                     }}
                   />
                   {errors.phone && (
-                    <p className="text-xs text-destructive font-medium mt-1 pl-0.5">{errors.phone}</p>
+                    <p className="text-xs text-destructive font-medium mt-1 pl-0.5">
+                      {errors.phone}
+                    </p>
                   )}
                 </div>
               </div>
@@ -397,10 +408,11 @@ export default function ApplyJobPage() {
                 </label>
                 <label
                   className={`block border border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200
-                  ${errors.resume
+                  ${
+                    errors.resume
                       ? "border-destructive/60 bg-destructive/5"
                       : "border-border bg-secondary/10 hover:border-accent/40 hover:bg-secondary/30"
-                    }`}
+                  }`}
                 >
                   <input
                     type="file"
@@ -424,7 +436,9 @@ export default function ApplyJobPage() {
                   </p>
                 </label>
                 {errors.resume && (
-                  <p className="text-xs text-destructive font-medium mt-1.5 pl-0.5">{errors.resume}</p>
+                  <p className="text-xs text-destructive font-medium mt-1.5 pl-0.5">
+                    {errors.resume}
+                  </p>
                 )}
               </div>
             )}

@@ -1,4 +1,3 @@
-//src\features\companies\pages\CompanyProfile.jsx
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,7 +21,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Profile Card */}
         <div className="bg-background p-5 rounded-xl border border-border/60 shadow-xs hover:border-accent/20 transition-colors duration-200">
-          <h2 className="text-base font-bold text-sidebar mb-0.5">
+          <h2 className="text-base font-bold text-foreground mb-0.5">
             {t("company_profile.profile.title")}
           </h2>
           <p className="text-xs text-muted-foreground/70 mb-5">
@@ -34,7 +33,6 @@ export default function CompanyProfile({ company, members, onInvite }) {
               {company?.name?.charAt(0).toUpperCase() || "?"}
             </div>
 
-            {/* Grid fields layout */}
             <div
               dir="ltr"
               className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full grow"
@@ -47,7 +45,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
                   type="text"
                   disabled
                   value={company?.name || ""}
-                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-secondary/15 text-sidebar font-medium"
+                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-muted text-foreground font-medium"
                 />
               </div>
               <div>
@@ -58,7 +56,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
                   type="text"
                   disabled
                   value={company?.industry || ""}
-                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-secondary/15 text-sidebar font-medium"
+                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-muted text-foreground font-medium"
                 />
               </div>
               <div>
@@ -73,7 +71,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
                       ? `${company.size.toLocaleString()} employees`
                       : ""
                   }
-                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-secondary/15 text-sidebar font-medium"
+                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-muted text-foreground font-medium"
                 />
               </div>
               <div>
@@ -88,7 +86,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
                       ? new Date(company.created_at).toLocaleDateString()
                       : ""
                   }
-                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-secondary/15 text-sidebar font-medium"
+                  className="w-full h-9 px-3 border border-border rounded-lg text-sm bg-muted text-foreground font-medium"
                 />
               </div>
             </div>
@@ -97,7 +95,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
 
         {/* Team Members Card */}
         <div className="bg-background p-5 rounded-xl border border-border/60 shadow-xs hover:border-accent/20 transition-colors duration-200">
-          <h2 className="text-base font-bold text-sidebar mb-0.5">
+          <h2 className="text-base font-bold text-foreground mb-0.5">
             {t("company_profile.team.title")}
           </h2>
           <p className="text-xs text-muted-foreground/70 mb-4">
@@ -107,7 +105,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
           <form
             dir="ltr"
             onSubmit={handleInviteSubmit}
-            className="flex flex-col sm:flex-row gap-2 mb-4.5 bg-secondary/20 p-2.5 rounded-lg border border-border/50"
+            className="flex flex-col sm:flex-row gap-2 mb-4.5 bg-muted/50 p-2.5 rounded-lg border border-border/50"
           >
             <input
               required
@@ -115,7 +113,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
               value={memberName}
               onChange={(e) => setMemberName(e.target.value)}
               placeholder="Full Name"
-              className="w-full sm:flex-1 h-9 px-3 bg-background border border-border rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+              className="w-full sm:flex-1 h-9 px-3 bg-background border border-border rounded-lg text-xs text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
             />
             <input
               required
@@ -123,13 +121,13 @@ export default function CompanyProfile({ company, members, onInvite }) {
               value={memberEmail}
               onChange={(e) => setMemberEmail(e.target.value)}
               placeholder="Email"
-              className="w-full sm:flex-1 h-9 px-3 bg-background border border-border rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+              className="w-full sm:flex-1 h-9 px-3 bg-background border border-border rounded-lg text-xs text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
             />
             <button
               type="submit"
               className="w-full sm:w-auto flex items-center justify-center gap-1 bg-primary hover:bg-primary-hover text-white px-4 h-9 rounded-lg text-xs font-semibold transition-colors shadow-xs cursor-pointer select-none"
             >
-              <Plus className="w-3.5 h-3.5" />{" "}
+              <Plus className="w-3.5 h-3.5" />
               {t("company_profile.team.invite")}
             </button>
           </form>
@@ -151,7 +149,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
                       : "?"}
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-xs font-semibold text-sidebar truncate">
+                    <h4 className="text-xs font-semibold text-foreground truncate">
                       {member.profiles?.full_name ||
                         t("company_profile.team.unknown")}
                     </h4>
@@ -161,7 +159,7 @@ export default function CompanyProfile({ company, members, onInvite }) {
                     </p>
                   </div>
                 </div>
-                <span className="px-2 h-5 flex items-center rounded-md text-[10px] font-bold border border-border bg-secondary/40 text-muted-foreground/90 shrink-0 capitalize">
+                <span className="px-2 h-5 flex items-center rounded-md text-[10px] font-bold border border-border bg-muted text-muted-foreground/90 shrink-0 capitalize">
                   {member.profiles?.role ||
                     t("company_profile.team.team_member")}
                 </span>

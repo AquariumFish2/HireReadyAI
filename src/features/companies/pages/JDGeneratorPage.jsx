@@ -263,11 +263,11 @@ export default function JDGeneratorPage({ company, profile }) {
           <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5 shadow-xs">
             <Check className="w-6 h-6 text-primary" strokeWidth={2.5} />
           </div>
-          <h2 className="text-sidebar text-xl font-bold mb-1.5">
+          <h2 className="text-foreground text-xl font-bold mb-1.5">
             {t("jd_generator.published.title")}
           </h2>
           <p className="text-muted-foreground/80 text-xs font-medium leading-relaxed mb-6">
-            <span className="font-bold text-sidebar">{title}</span>{" "}
+            <span className="font-bold text-foreground">{title}</span>{" "}
             {t("jd_generator.published.message")}
           </p>
           <button
@@ -308,7 +308,7 @@ export default function JDGeneratorPage({ company, profile }) {
       {/* Upper Navigation / Bar */}
       <div className="max-w-6xl mx-auto mb-4 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-base font-bold text-sidebar">
+          <h1 className="text-base font-bold text-foreground">
             {t("jd_generator.header.title")}
           </h1>
         </div>
@@ -347,7 +347,7 @@ export default function JDGeneratorPage({ company, profile }) {
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         {/* Column 1: Role Brief Form */}
         <div className="bg-background rounded-xl border border-border/60 p-5 shadow-xs">
-          <h2 className="text-sm font-bold text-sidebar mb-0.5">
+          <h2 className="text-sm font-bold text-foreground mb-0.5">
             {t("jd_generator.form.title")}
           </h2>
           <p className="text-muted-foreground/70 text-xs mb-5">
@@ -561,7 +561,7 @@ export default function JDGeneratorPage({ company, profile }) {
               <div className="w-12 h-12 rounded-xl bg-secondary/40 border border-border flex items-center justify-center mb-3.5 text-muted-foreground/70">
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-sidebar font-semibold text-xs">
+              <p className="text-foreground font-semibold text-xs">
                 {t("jd_generator.preview.empty_title")}
               </p>
               <p className="text-muted-foreground/70 text-[11px] mt-0.5">
@@ -570,19 +570,19 @@ export default function JDGeneratorPage({ company, profile }) {
             </div>
           ) : (
             <>
-            <div className="space-y-5">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-bold text-primary/90 flex items-center gap-1 bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-md">
-                  <Sparkles className="w-3 h-3" />
-                  {t("jd_generator.preview.ai_generated")}
-                </span>
-              </div>
+              <div className="space-y-5">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold text-primary/90 flex items-center gap-1 bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-md">
+                    <Sparkles className="w-3 h-3" />
+                    {t("jd_generator.preview.ai_generated")}
+                  </span>
+                </div>
 
                 <div>
-                  <h2 className="text-xl font-bold text-dark-amethyst-950">
+                  <h2 className="text-xl font-bold text-foreground">
                     {previewMeta.title}
                   </h2>
-                  <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-dark-amethyst-600">
+                  <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
                     {company?.name && (
                       <div className="flex items-center gap-2">
                         <Building2 size={16} className="text-blue-500" />
@@ -611,16 +611,13 @@ export default function JDGeneratorPage({ company, profile }) {
                     )}
                     {previewMeta.seniority && (
                       <div className="flex items-center gap-2">
-                        <TrendingUp
-                          size={16}
-                          className="text-dark-amethyst-500"
-                        />
+                        <TrendingUp size={16} className="text-primary" />
                         <span>{previewMeta.seniority}</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 text-dark-amethyst-600 text-sm mt-2">
+                  <div className="flex items-center gap-2 text-muted-foreground text-sm mt-2">
                     <BanknoteIcon size={16} className="text-green-500" />
                     <span>
                       {salaryMin && salaryMax
@@ -630,141 +627,142 @@ export default function JDGeneratorPage({ company, profile }) {
                   </div>
                 </div>
 
-              {publishError && (
-                <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20">
-                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                {publishError && (
+                  <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
 
-                  {publishError}
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* Questions Modal */}
-        {showQuestionsModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
-              {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-dark-amethyst-100 shrink-0">
-                <div>
-                  <h2 className="text-lg font-bold text-dark-amethyst-950">
-                    Application Questions
-                  </h2>
-                  <p className="text-xs text-dark-amethyst-400 mt-0.5">
-                    Add questions applicants will answer when applying
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowQuestionsModal(false)}
-                  className="p-1.5 rounded-lg text-dark-amethyst-400 hover:text-dark-amethyst-600 hover:bg-dark-amethyst-50 transition"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Body */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
-                {questions.length === 0 && (
-                  <p className="text-sm text-dark-amethyst-400 italic text-center py-8">
-                    No questions yet. Click "Add Question" to get started.
-                  </p>
+                    {publishError}
+                  </div>
                 )}
-                {questions.map((q, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-2 bg-dark-amethyst-50 rounded-xl p-3 border border-dark-amethyst-100"
+              </div>
+            </>
+          )}
+
+          {/* Questions Modal */}
+          {showQuestionsModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+              <div className="bg-card rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[80vh] flex flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+                  <div>
+                    <h2 className="text-lg font-bold text-foreground">
+                      Application Questions
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Add questions applicants will answer when applying
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowQuestionsModal(false)}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition"
                   >
-                    <div className="flex flex-col gap-0.5 pt-0.5">
-                      <button
-                        onClick={() => moveUp(i)}
-                        disabled={i === 0}
-                        className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
-                      >
-                        <ChevronUp className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => moveDown(i)}
-                        disabled={i === questions.length - 1}
-                        className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
-                      >
-                        <ChevronDown className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <input
-                        type="text"
-                        value={q.question}
-                        onChange={(e) =>
-                          updateQuestion(i, "question", e.target.value)
-                        }
-                        placeholder="Write your question..."
-                        className="w-full h-9 rounded-lg px-3 text-sm text-dark-amethyst-900 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition placeholder:text-dark-amethyst-300"
-                      />
-                      <select
-                        value={q.type}
-                        onChange={(e) =>
-                          updateQuestion(i, "type", e.target.value)
-                        }
-                        className="h-8 rounded-lg px-2 text-xs text-dark-amethyst-600 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition"
-                      >
-                        {questionsTypes.map((t) => (
-                          <option key={t} value={t}>
-                            {t.replace("_", " ")}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <button
-                      onClick={() => removeQuestion(i)}
-                      className="p-1.5 rounded-lg text-dark-amethyst-400 hover:text-red-500 hover:bg-red-50 transition shrink-0 mt-0.5"
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+                  {questions.length === 0 && (
+                    <p className="text-sm text-muted-foreground italic text-center py-8">
+                      No questions yet. Click "Add Question" to get started.
+                    </p>
+                  )}
+                  {questions.map((q, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 bg-muted rounded-xl p-3 border border-border"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <div className="flex flex-col gap-0.5 pt-0.5">
+                        <button
+                          onClick={() => moveUp(i)}
+                          disabled={i === 0}
+                          className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
+                        >
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => moveDown(i)}
+                          disabled={i === questions.length - 1}
+                          className="p-0.5 rounded text-dark-amethyst-400 hover:text-dark-amethyst-600 disabled:opacity-20 disabled:cursor-not-allowed transition"
+                        >
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <input
+                          type="text"
+                          value={q.question}
+                          onChange={(e) =>
+                            updateQuestion(i, "question", e.target.value)
+                          }
+                          placeholder="Write your question..."
+                          className="w-full h-9 rounded-lg px-3 text-sm text-dark-amethyst-900 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition placeholder:text-dark-amethyst-300"
+                        />
+                        <select
+                          value={q.type}
+                          onChange={(e) =>
+                            updateQuestion(i, "type", e.target.value)
+                          }
+                          className="h-8 rounded-lg px-2 text-xs text-dark-amethyst-600 bg-white border border-dark-amethyst-200 outline-none focus:border-dark-amethyst-400 transition"
+                        >
+                          {questionsTypes.map((t) => (
+                            <option key={t} value={t}>
+                              {t.replace("_", " ")}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <button
+                        onClick={() => removeQuestion(i)}
+                        className="p-1.5 rounded-lg text-dark-amethyst-400 hover:text-red-500 hover:bg-red-50 transition shrink-0 mt-0.5"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted rounded-b-2xl shrink-0">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={addQuestion}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-600 bg-white border border-dark-amethyst-200 hover:bg-muted transition"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Add Question
+                    </button>
+                    {questions.length > 0 && (
+                      <span className="text-xs text-dark-amethyst-400">
+                        {questions.length} question
+                        {questions.length !== 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => executePublish(false)}
+                      disabled={publishing}
+                      className="px-4 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-500 bg-white border border-dark-amethyst-200 hover:bg-muted transition disabled:opacity-50"
+                    >
+                      Skip
+                    </button>
+                    <button
+                      onClick={() => executePublish(true)}
+                      disabled={publishing}
+                      className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-dark-amethyst-600 hover:bg-dark-amethyst-700 transition disabled:opacity-50"
+                    >
+                      {publishing
+                        ? t("jd_generator.header.publishing")
+                        : t("jd_generator.header.confirm")}
                     </button>
                   </div>
-                ))}
-              </div>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between px-6 py-4 border-t border-dark-amethyst-100 bg-dark-amethyst-50 rounded-b-2xl shrink-0">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={addQuestion}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-600 bg-white border border-dark-amethyst-200 hover:bg-dark-amethyst-50 transition"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    Add Question
-                  </button>
-                  {questions.length > 0 && (
-                    <span className="text-xs text-dark-amethyst-400">
-                      {questions.length} question
-                      {questions.length !== 1 ? "s" : ""}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => executePublish(false)}
-                    disabled={publishing}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-dark-amethyst-500 bg-white border border-dark-amethyst-200 hover:bg-dark-amethyst-50 transition disabled:opacity-50"
-                  >
-                    Skip
-                  </button>
-                  <button
-                    onClick={() => executePublish(true)}
-                    disabled={publishing}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-dark-amethyst-600 hover:bg-dark-amethyst-700 transition disabled:opacity-50"
-                  >
-                    {publishing ? "Publishing..." : "Confirm & Publish"}
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         </div>
       </div>
     </div>
   );
 }
-       

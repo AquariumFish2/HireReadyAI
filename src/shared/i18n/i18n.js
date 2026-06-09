@@ -11,14 +11,13 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: "en",
-    lng: "en",
+    detection: {
+      order: ["localStorage", "navigator"],
+      caches: ["localStorage"],
+    },
     resources: {
-      en: {
-        translation: en,
-      },
-      ar: {
-        translation: ar,
-      },
+      en: { translation: en },
+      ar: { translation: ar },
     },
     interpolation: {
       escapeValue: false,

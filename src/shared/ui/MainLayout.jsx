@@ -70,7 +70,10 @@ export default function MainLayout() {
     let bestLen = 0;
     for (const link of links) {
       const p = link.to;
-      const matches = current === p || current.startsWith(p + "/") || (p === "/companies/profile" && current === "/companies");
+      const matches =
+        current === p ||
+        current.startsWith(p + "/") ||
+        (p === "/companies/profile" && current === "/companies");
       if (matches && p.length > bestLen) {
         bestLen = p.length;
         best = p;
@@ -149,7 +152,11 @@ export default function MainLayout() {
               onClick={toggleTheme}
               className="w-full flex items-center gap-3 text-sm font-medium text-white/80 hover:text-white transition-colors py-2 cursor-pointer"
             >
-              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {darkMode ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
               {darkMode ? t("light_mode") : t("dark_mode")}
             </button>
             <button

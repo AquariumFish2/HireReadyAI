@@ -6,7 +6,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "explore_jobs": "Explore Jobs",
-    "my_feedback":"My Feedback",
+    "my_feedback": "My Feedback",
     "my_applications": "My Applications",
     "company_profile": "Company Profile",
     "job_postings": "Job Postings",
@@ -128,6 +128,10 @@
 
   "apply_job": {
     "title": "Apply for Job",
+    "empty_state":{
+      "no_applications":"You have zero applications",
+      "start_exploring":"Start exploring jobs and apply to kick off your journey"
+    },
 
     "steps": {
       "info": "Info",
@@ -179,7 +183,12 @@
     "features": {
       "match": "Match with top candidates who fit your role",
       "interviews": "Async interviews scored against your framework",
-      "feedback": "Every single applicant gets a timely comprehensive feedback"
+      "feedback": "Every single applicant gets a timely comprehensive feedback",
+
+      "ai_matching": "AI-matched candidates in seconds",
+      "async_interviews": "Async interviews, instantly scored",
+      "bias_feedback": "Bias-checked, structured feedback",
+      "real_replies": "Every applicant gets a real reply"
     }
   },
 
@@ -449,7 +458,8 @@
       "title": "Job Description Generator",
       "save_draft": "Save draft",
       "publish": "Publish JD",
-      "publishing": "Publishing…"
+      "publishing": "Publishing…",
+      "confirm": "Confirm & Publish"
     },
 
     "form": {

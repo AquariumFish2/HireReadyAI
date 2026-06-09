@@ -52,7 +52,7 @@ export default function JobSidebar({
             <p className="text-[10px] font-bold text-muted-foreground/70 tracking-wider uppercase">
               {t("job_sidebar.open_roles")}
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {t("job_sidebar.click_to_view")}
             </p>
           </div>
@@ -93,7 +93,7 @@ export default function JobSidebar({
                   }}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left border transition-all group cursor-pointer ${
                     isSelected
-                      ? "bg-accent text-accent-foreground border-border"
+                      ? "bg-border text-accent-foreground border-border"
                       : "bg-background border-transparent hover:bg-muted/60 hover:border-border/40 shadow-xs hover:shadow-none"
                   }`}
                 >

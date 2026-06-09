@@ -90,7 +90,7 @@ function CompanyLayout() {
 
   if (loading || dataLoading)
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-sidebar font-sans select-none">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground font-sans select-none">
         <div className="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         <p className="mt-2.5 text-muted-foreground text-xs font-semibold tracking-wide">
           {t("company_layout.loading")}
@@ -160,7 +160,10 @@ function CompanyLayout() {
               />
             }
           />
-          <Route path="shortlists" element={<ShortlistsPage jobs={jobs} company={company} />} />
+          <Route
+            path="shortlists"
+            element={<ShortlistsPage jobs={jobs} company={company} />}
+          />
           <Route
             path="shortlists/:jobId"
             element={<ShortlistsPage jobs={jobs} company={company} />}
@@ -169,10 +172,7 @@ function CompanyLayout() {
             path="candidates"
             element={<PipelineCandidatesPage company={company} jobs={jobs} />}
           />
-          <Route
-            path="candidates/:id"
-            element={<CandidateProfilePage />}
-          />
+          <Route path="candidates/:id" element={<CandidateProfilePage />} />
           <Route
             path="candidates/:id/assessments"
             element={<CandidateAssessmentsPage />}
