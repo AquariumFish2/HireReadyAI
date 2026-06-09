@@ -24,14 +24,14 @@ function getInitials(name = "") {
 }
 
 const MetricCard = ({ title, score, colorClass }) => (
-  <div className="flex-1 bg-white border border-slate-200 rounded-2xl p-4 flex flex-col gap-3">
-    <span className="text-xs font-semibold text-slate-500">{title}</span>
-    <span className="text-3xl font-bold text-slate-800 leading-none">
+  <div className="flex-1 bg-surface border border-border rounded-2xl p-4 flex flex-col gap-3">
+    <span className="text-xs font-semibold text-muted-foreground">{title}</span>
+    <span className="text-3xl font-bold text-foreground leading-none">
       {score ?? "--"}
     </span>
-    <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+    <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all duration-700 ${colorClass || "bg-yale-blue-500"}`}
+        className={`h-full rounded-full transition-all duration-700 ${colorClass || "bg-primary"}`}
         style={{ width: `${score ?? 0}%` }}
       />
     </div>
@@ -41,30 +41,30 @@ const MetricCard = ({ title, score, colorClass }) => (
 const StatusBadge = ({ status, isRejected }) => {
   if (isRejected)
     return (
-      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-red-50 text-red-600">
+      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-destructive/10 text-destructive">
         Reject
       </span>
     );
   if (status === "passed")
     return (
-      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100/60 text-emerald-700">
+      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-success/10 text-success">
         Passed
       </span>
     );
   if (status === "in_progress")
     return (
-      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-blue-600">
+      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-primary/10 text-primary">
         In Progress
       </span>
     );
   if (status === "failed")
     return (
-      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-red-100 text-red-700">
+      <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-destructive/10 text-destructive">
         Failed
       </span>
     );
   return (
-    <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-slate-100 text-slate-500">
+    <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-muted border border-border text-muted-foreground">
       Pending
     </span>
   );
@@ -84,7 +84,6 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
       (b.recruitment_stages?.order_index || 0),
   );
 
-  // Find the last stage with an evaluation to display AI recommendation
   const currentStage = sortedStages.find(
     (s) => s.recruitment_stages?.id === candidate.currentStageId,
   );
@@ -100,7 +99,6 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
   const evalsRaw = lastEvalStage?.application_stage_evaluations;
   const currentEval = Array.isArray(evalsRaw) ? evalsRaw[0] : evalsRaw;
 
-  // Compute scores from cv_review's dimension_scores
   const cvReviewStage = sortedStages.find(
     (s) => s.recruitment_stages?.stage_type === "cv_review",
   );
@@ -114,12 +112,10 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
       const dims = feedback.dimension_scores;
       if (dims) {
         hasAppScore = "application_score" in dims;
-        // Resume = average of CV-only dimensions
         const cvValues = cvDimKeys.map(k => dims[k]).filter(v => typeof v === "number");
         if (cvValues.length === cvDimKeys.length) {
           resumeScore = Math.round(cvValues.reduce((a, b) => a + b, 0) / cvDimKeys.length);
         }
-        // AI Match = average of ALL dimensions (including application_score if present)
         const allValues = Object.values(dims).filter((v) => typeof v === "number");
         if (allValues.length > 0) {
           aiMatchScore = Math.round(
@@ -127,7 +123,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
           );
         }
       }
-    } catch {}
+    } catch { }
   }
 
   const currentStageIndex = sortedStages.findIndex(
@@ -187,17 +183,20 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
 
   return (
     <>
+      {/* Backdrop overlay */}
       <div
-        className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 transition-opacity"
+        className="fixed inset-0 bg-black/30 backdrop-blur-xs z-40 transition-opacity"
         onClick={onClose}
       />
-      <div className="fixed top-0 right-0 h-screen w-full max-w-115 bg-white border-l border-slate-200 shadow-2xl z-50 flex flex-col transform transition-transform duration-300 overflow-hidden font-sans">
+
+      {/* Sliding Panel Wrapper */}
+      <div className="fixed top-0 right-0 h-screen w-full max-w-115 bg-surface border-l border-border shadow-2xl z-50 flex flex-col transform transition-transform duration-300 overflow-hidden font-sans">
+
         {/* HEADER */}
-        <div className="flex-none bg-white px-6 py-5 border-b border-slate-100 flex items-start justify-between shrink-0">
+        <div className="flex-none bg-surface px-6 py-5 border-b border-border flex items-start justify-between shrink-0">
           <div className="flex gap-4 items-center">
             {/* Avatar */}
-            <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center shrink-0 overflow-hidden">
-              {/* Mocking the avatar from the image, but using initials if no pic */}
+            <div className="w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 overflow-hidden">
               {profile?.profile_pic ? (
                 <img
                   src={profile.profile_pic}
@@ -205,7 +204,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-pink-600 font-bold text-lg">
+                <span className="text-accent font-bold text-lg">
                   {getInitials(candidate.name)}
                 </span>
               )}
@@ -213,19 +212,19 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
 
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-foreground">
                   {candidate.name}
                 </h2>
                 {candidate.is_rejected && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-500 border border-red-100">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-destructive/10 text-destructive border border-destructive/20">
                     Rejected
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium flex-wrap">
+              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground font-medium flex-wrap">
                 {answers?.info?.email && (
                   <span className="flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-slate-400" />
+                    <Mail className="w-3.5 h-3.5 text-muted-foreground/60" />
                     {answers.info.email}
                   </span>
                 )}
@@ -236,7 +235,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                 )}
                 {profile?.headline && (
                   <span className="flex items-center gap-1.5">
-                    <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                    <Briefcase className="w-3.5 h-3.5 text-muted-foreground/60" />
                     {profile.headline}
                   </span>
                 )}
@@ -245,51 +244,52 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* SCROLLABLE BODY */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-8 bg-[#fafcff]">
-          {/* Top Section: Metrics, AI Rec, Pipeline Progress */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-8 bg-background/40">
+
+          {/* Top Section */}
           <div className="flex flex-col gap-6">
             {/* Metric Cards */}
             <div className="flex gap-3">
               <MetricCard
                 title="Resume"
                 score={resumeScore}
-                colorClass="bg-slate-400"
+                colorClass="bg-muted-foreground/60"
               />
               {hasAppScore && (
                 <MetricCard
                   title="AI Match"
                   score={aiMatchScore}
-                  colorClass="bg-yale-blue-500"
+                  colorClass="bg-primary"
                 />
               )}
               <MetricCard
                 title="Stage"
                 score={candidate.score}
-                colorClass="bg-slate-400"
+                colorClass="bg-accent"
               />
             </div>
 
-            {/* AI Recommendation */}
-            <div className="bg-linear-to-br from-[#f0f9ff] to-[#e6f4ff] rounded-2xl border border-blue-100 p-5 shadow-sm">
+            {/* AI Recommendation Card */}
+            <div className="bg-accent/5 dark:bg-accent/10 rounded-2xl border border-accent/20 p-5 shadow-xs">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-yale-blue-500" />
-                  <span className="text-xs font-bold text-yale-blue-600 tracking-wide uppercase">
+                  <Sparkles className="w-4 h-4 text-accent" />
+                  <span className="text-xs font-bold text-accent tracking-wide uppercase">
                     AI Recommendation
                   </span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-semibold text-slate-500 uppercase">
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">
                     Confidence
                   </span>
-                  <span className="text-sm font-bold text-yale-blue-700 leading-none mt-0.5">
+                  <span className="text-sm font-bold text-accent leading-none mt-0.5">
                     {currentEval?.confidence != null
                       ? `${Math.round(Number(currentEval.confidence) * 100)}%`
                       : "N/A"}
@@ -297,13 +297,13 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                 </div>
               </div>
 
-              <h3 className="text-lg font-bold text-slate-900 mb-2">
+              <h3 className="text-lg font-bold text-foreground mb-2">
                 {currentEval?.recommendation === "reject"
                   ? "Politely reject"
                   : "Advance to next stage"}
               </h3>
 
-              <p className="text-sm text-slate-600 leading-relaxed mb-5">
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                 {currentEval?.reasoning ||
                   "Evaluation completed, but no detailed reasoning was provided."}
               </p>
@@ -313,7 +313,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                   <button
                     onClick={handleAdvance}
                     disabled={actionLoading}
-                    className="flex items-center gap-2 bg-yale-blue-600 text-white font-semibold text-sm px-4 py-2 rounded-xl hover:bg-yale-blue-700 transition-colors shadow-sm disabled:opacity-50"
+                    className="flex items-center gap-2 bg-primary text-primary-foreground font-semibold text-sm px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
                   >
                     {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                     Advance to next stage
@@ -323,7 +323,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                   <button
                     onClick={handleUnreject}
                     disabled={actionLoading}
-                    className="flex items-center gap-2 bg-emerald-600 text-white font-semibold text-sm px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-50"
+                    className="flex items-center gap-2 bg-success text-success-foreground font-semibold text-sm px-4 py-2 rounded-xl hover:bg-success/90 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
                   >
                     {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                     Un-reject
@@ -332,7 +332,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                   <button
                     onClick={handleReject}
                     disabled={actionLoading}
-                    className="bg-white border border-slate-200 text-slate-600 font-semibold text-sm px-4 py-2 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    className="bg-surface border border-border text-foreground font-semibold text-sm px-4 py-2 rounded-xl hover:bg-secondary transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                     Reject
@@ -340,14 +340,14 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                 )}
               </div>
               {actionError && (
-                <p className="text-xs text-red-600 mt-2">{actionError}</p>
+                <p className="text-xs text-destructive mt-2">{actionError}</p>
               )}
             </div>
 
             {/* Pipeline Progress */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <h3 className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">
                   Pipeline Progress
                 </h3>
               </div>
@@ -366,14 +366,14 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                     >
                       <div className="flex items-center gap-3">
                         {isPassed ? (
-                          <div className="w-2 h-2 rounded-full bg-emerald-500 ml-1" />
+                          <div className="w-2 h-2 rounded-full bg-success ml-1" />
                         ) : isInProgress ? (
-                          <div className="w-2.5 h-2.5 rounded-full bg-yale-blue-500 ml-0.5 ring-2 ring-air-force-blue-500" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-primary ml-0.5 ring-2 ring-primary/30" />
                         ) : (
-                          <div className="w-2 h-2 rounded-full border-2 border-slate-300 ml-1" />
+                          <div className="w-2 h-2 rounded-full border-2 border-border ml-1" />
                         )}
                         <span
-                          className={`text-sm ${isInProgress ? "font-bold text-slate-900" : isPending ? "font-medium text-slate-400" : "font-medium text-slate-700"}`}
+                          className={`text-sm ${isInProgress ? "font-bold text-foreground" : isPending ? "font-medium text-muted-foreground/60" : "font-medium text-foreground/80"}`}
                         >
                           {stage.recruitment_stages?.name || "Unknown Stage"}
                         </span>
@@ -389,16 +389,15 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
             </div>
           </div>
 
-          <div className="w-full h-px bg-slate-200" />
+          <div className="w-full h-px bg-border" />
 
           {/* STAGE RESULTS SECTION */}
           <div>
-            <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">
+            <h3 className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-4">
               Stage Results
             </h3>
             <div className="flex flex-col gap-4">
               {sortedStages.map((stage) => {
-                // Only show results for stages that have evaluations or are in progress
                 const stageEvalsRaw = stage.application_stage_evaluations;
                 const evalData = Array.isArray(stageEvalsRaw)
                   ? stageEvalsRaw[0]
@@ -409,16 +408,16 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                 return (
                   <div
                     key={stage.id}
-                    className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm"
+                    className="bg-surface border border-border rounded-2xl p-5 shadow-xs"
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-bold text-slate-800 text-sm">
+                      <h4 className="font-bold text-foreground text-sm">
                         {stage.recruitment_stages?.name}
                       </h4>
                       <div className="flex items-center gap-2">
                         {stage.score !== null && (
                           <span
-                            className={`px-2 py-0.5 rounded-md text-xs font-bold ${stage.score >= 80 ? "bg-emerald-50 text-emerald-700" : stage.score >= 60 ? "bg-amber-50 text-amber-700" : "bg-red-50 text-red-700"}`}
+                            className={`px-2 py-0.5 rounded-md text-xs font-bold ${stage.score >= 80 ? "bg-success/10 text-success" : stage.score >= 60 ? "bg-warning/10 text-warning" : "bg-destructive/10 text-destructive"}`}
                           >
                             {Math.round(stage.score)}
                           </span>
@@ -432,21 +431,21 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
 
                     {/* Strengths & Weaknesses Cards */}
                     {evalData &&
-                    (evalData.strengths?.length > 0 ||
-                      evalData.weaknesses?.length > 0) ? (
+                      (evalData.strengths?.length > 0 ||
+                        evalData.weaknesses?.length > 0) ? (
                       <div className="flex flex-col gap-3">
                         {evalData.strengths?.length > 0 && (
-                          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                            <h5 className="text-[10px] font-bold text-green-700 uppercase tracking-wider mb-2">
+                          <div className="bg-success/5 border border-success/20 rounded-xl p-4">
+                            <h5 className="text-[10px] font-bold text-success uppercase tracking-wider mb-2">
                               Strengths
                             </h5>
                             <ul className="space-y-1.5">
                               {evalData.strengths.map((s, i) => (
                                 <li
                                   key={`s-${i}`}
-                                  className="flex items-start gap-2 text-sm text-green-800"
+                                  className="flex items-start gap-2 text-sm text-success/90"
                                 >
-                                  <Check className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                                  <Check className="w-3.5 h-3.5 text-success mt-0.5 shrink-0" />
                                   <span>{s}</span>
                                 </li>
                               ))}
@@ -454,17 +453,17 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                           </div>
                         )}
                         {evalData.weaknesses?.length > 0 && (
-                          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                            <h5 className="text-[10px] font-bold text-red-700 uppercase tracking-wider mb-2">
+                          <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4">
+                            <h5 className="text-[10px] font-bold text-destructive uppercase tracking-wider mb-2">
                               Weaknesses
                             </h5>
                             <ul className="space-y-1.5">
                               {evalData.weaknesses.map((w, i) => (
                                 <li
                                   key={`w-${i}`}
-                                  className="flex items-start gap-2 text-sm text-red-800"
+                                  className="flex items-start gap-2 text-sm text-destructive/90"
                                 >
-                                  <X className="w-3.5 h-3.5 text-red-500 mt-0.5 shrink-0" />
+                                  <X className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" />
                                   <span>{w}</span>
                                 </li>
                               ))}
@@ -474,24 +473,23 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                       </div>
                     ) : (
                       <ul className="space-y-2.5">
-                        {/* Fallback if no specific strengths/weaknesses to match mockup look */}
                         {stage.status === "in_progress" ? (
                           <>
-                            <li className="flex items-start gap-2.5 text-sm text-yale-blue-600">
-                              <div className="w-1 h-1 rounded-full bg-yale-blue-500 mt-2 shrink-0" />
+                            <li className="flex items-start gap-2.5 text-sm text-primary">
+                              <div className="w-1 h-1 rounded-full bg-primary mt-2 shrink-0" />
                               <span className="leading-snug">
                                 Currently evaluating
                               </span>
                             </li>
-                            <li className="flex items-start gap-2.5 text-sm text-yale-blue-600">
-                              <div className="w-1 h-1 rounded-full bg-yale-blue-500 mt-2 shrink-0" />
+                            <li className="flex items-start gap-2.5 text-sm text-primary">
+                              <div className="w-1 h-1 rounded-full bg-primary mt-2 shrink-0" />
                               <span className="leading-snug">
                                 Live session scheduled
                               </span>
                             </li>
                           </>
                         ) : (
-                          <li className="flex items-start gap-2.5 text-sm text-slate-400 italic">
+                          <li className="flex items-start gap-2.5 text-sm text-muted-foreground/60 italic">
                             <span className="leading-snug">
                               No detailed feedback available.
                             </span>
@@ -508,7 +506,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
           {/* View Profile Button */}
           <button
             onClick={() => { navigate(`/companies/candidates/${candidate.id}`); onClose(); }}
-            className="w-full bg-yale-blue-600 text-white font-semibold text-sm px-4 py-3 rounded-xl hover:bg-yale-blue-700 transition-colors shadow-sm flex items-center justify-center gap-2 mt-4"
+            className="w-full bg-primary text-white font-semibold text-sm px-4 py-3 rounded-xl hover:bg-primary/90 transition-colors shadow-xs flex items-center justify-center gap-2 mt-4 cursor-pointer"
           >
             View Profile <ChevronRight className="w-4 h-4" />
           </button>

@@ -1,4 +1,3 @@
-// src\features\recruiter\pages\RecruiterDashboardPage.jsx
 import React from "react";
 import { useEffect, useState } from "react";
 import { useDashboardData } from "../hooks/useDashboardData";
@@ -9,6 +8,7 @@ import { fetchCurrentUserName } from "../services/dashboard.service";
 import { useUser } from "../../auth/context/user.context";
 
 import { useTranslation } from "react-i18next";
+
 export default function RecruiterDashboardPage() {
   const {
     jobs,
@@ -41,10 +41,10 @@ export default function RecruiterDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="bg-white border border-slate-200/80 rounded-xl px-8 py-6 shadow-sm flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-3 border-slate-100 border-t-[#0f294a] rounded-full animate-spin"></div>
-          <p className="text-xs text-slate-500 font-medium">
+      <div className="min-h-screen flex items-center justify-center bg-muted/20">
+        <div className="bg-surface border border-border rounded-xl px-8 py-6 shadow-xs flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-muted border-t-primary rounded-full animate-spin"></div>
+          <p className="text-xs text-muted-foreground font-medium">
             {t("recruiter_dashboard.loading")}
           </p>
         </div>
@@ -54,8 +54,8 @@ export default function RecruiterDashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-        <div className="bg-red-50 text-red-700 p-6 rounded-xl text-sm border border-red-100 max-w-md w-full shadow-sm">
+      <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4">
+        <div className="bg-destructive/10 text-destructive p-6 rounded-xl text-sm border border-destructive/20 max-w-md w-full shadow-xs">
           <span className="font-bold block mb-1">Error Loading Data</span>
           {error}
         </div>
@@ -64,22 +64,22 @@ export default function RecruiterDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/60 p-6">
+    <div className="min-h-screen bg-muted/20 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-foreground tracking-tight font-display">
               {t("recruiter_dashboard.title")}
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t("recruiter_dashboard.subtitle")}
             </p>
           </div>
 
-          <div className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-600 font-semibold shadow-sm">
+          <div className="px-4 py-2 rounded-xl bg-surface border border-border text-xs text-muted-foreground font-semibold shadow-xs">
             {t("sign_in.headline")},{" "}
-            <span className="text-[#0f294a]">{fullName || "Recruiter"}</span>
+            <span className="text-primary font-bold">{fullName || "Recruiter"}</span>
           </div>
         </div>
 
@@ -96,7 +96,7 @@ export default function RecruiterDashboardPage() {
         )}
 
         {/* Jobs Table */}
-        <div className="bg-white rounded-xl border border-slate-200/80 p-1 shadow-sm">
+        <div className="bg-surface rounded-xl border border-border p-1 shadow-xs">
           <DashboardJobsTable jobs={jobs} />
         </div>
       </div>

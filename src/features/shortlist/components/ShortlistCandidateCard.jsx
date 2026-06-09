@@ -66,11 +66,10 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
   return (
     <div
       onClick={onClick}
-      className={`relative px-5 py-4 cursor-pointer border-b border-zinc-100 transition-all group ${
-        isSelected
+      className={`relative px-5 py-4 cursor-pointer border-b border-zinc-100 transition-all group ${isSelected
           ? "bg-emerald-50/50 border-l-2 border-l-emerald-600"
           : "bg-white hover:bg-zinc-50 border-l-2 border-l-transparent"
-      } ${is_rejected ? "opacity-50" : ""}`}
+        } ${is_rejected ? "opacity-50" : ""}`}
     >
       {/* Rank + Avatar + Name row */}
       <div className="flex items-start gap-3 mb-2.5">
@@ -154,13 +153,12 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
           <span className="font-medium text-zinc-700">
             AI match{" "}
             <span
-              className={`font-bold px-1.5 py-0.5 rounded ${
-                composite_score >= 80
+              className={`font-bold px-1.5 py-0.5 rounded ${composite_score >= 80
                   ? "bg-emerald-50 text-emerald-700"
                   : composite_score >= 65
                     ? "bg-amber-50 text-amber-700"
                     : "bg-zinc-100 text-zinc-600"
-              }`}
+                }`}
             >
               {composite_score || "—"}
             </span>

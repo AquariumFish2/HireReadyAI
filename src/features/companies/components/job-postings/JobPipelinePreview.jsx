@@ -29,8 +29,7 @@ export default function JobPipelinePreview({
         </div>
         <button
           onClick={() => navigate(`/companies/pipelines/${selectedJobId}`)}
-          className="self-start sm:self-center flex items-center gap-1.5 bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer select-none"
-        >
+          className="self-start sm:self-center flex items-center gap-1.5 bg-surface text-foreground border border-border/80 hover:bg-muted px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer select-none"        >
           <GitBranch className="w-3.5 h-3.5" />
           {t("job_pipeline_preview.edit_pipeline")}
         </button>

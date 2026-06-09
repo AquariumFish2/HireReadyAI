@@ -135,11 +135,10 @@ export default function ShortlistReportTable({
               <tr
                 key={entry.id}
                 onClick={() => onToggleSelect(app.id)}
-                className={`cursor-pointer transition-colors duration-200 ${
-                  isSelected
+                className={`cursor-pointer transition-colors duration-200 ${isSelected
                     ? "bg-dark-amethyst-50"
                     : "hover:bg-dark-amethyst-50/30"
-                }`}
+                  }`}
               >
                 {/* Rank */}
                 <td className="px-6 py-4 text-center">

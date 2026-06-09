@@ -18,16 +18,15 @@ function parseAIFeedback(stage) {
 
 const DimensionBar = ({ label, score }) => (
   <div className="flex items-center gap-3">
-    <span className="text-sm font-medium text-slate-600 w-36 shrink-0">{label}</span>
-    <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+    <span className="text-sm font-medium text-muted-foreground w-36 shrink-0">{label}</span>
+    <div className="flex-1 h-2.5 bg-secondary rounded-full overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all duration-700 ${
-          score >= 80 ? "bg-emerald-500" : score >= 60 ? "bg-yale-blue-600" : score >= 40 ? "bg-amber-500" : "bg-red-500"
-        }`}
+        className={`h-full rounded-full transition-all duration-700 ${score >= 80 ? "bg-success" : score >= 60 ? "bg-primary" : score >= 40 ? "bg-warning" : "bg-destructive"
+          }`}
         style={{ width: `${score}%` }}
       />
     </div>
-    <span className="text-sm font-bold text-slate-700 w-8 text-right">{score}</span>
+    <span className="text-sm font-bold text-foreground w-8 text-right">{score}</span>
   </div>
 );
 
@@ -60,7 +59,7 @@ export default function CandidateProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border-yale-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -68,8 +67,8 @@ export default function CandidateProfilePage() {
   if (error || !profile) {
     return (
       <div className="p-8 text-center">
-        <p className="text-red-500 font-medium">{error || "Candidate not found"}</p>
-        <Link to="../candidates" className="text-yale-blue-600 hover:underline mt-4 inline-block">&larr; Back to pipeline</Link>
+        <p className="text-destructive font-medium">{error || "Candidate not found"}</p>
+        <Link to="../candidates" className="text-primary hover:underline mt-4 inline-block">&larr; Back to pipeline</Link>
       </div>
     );
   }
@@ -82,7 +81,6 @@ export default function CandidateProfilePage() {
   const cvStage = stages.find(s => s.recruitment_stages?.stage_type === "cv_review");
   const cvFeedback = parseAIFeedback(cvStage);
 
-  // Compute composite from stage scores when stages have been scored
   const scoredStages = stages.filter(s => s.score != null);
   const computedComposite = scoredStages.length > 0
     ? Math.round(scoredStages.reduce((sum, s) => sum + Number(s.score), 0) / scoredStages.length)
@@ -94,39 +92,43 @@ export default function CandidateProfilePage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
+    <div className="max-w-5xl mx-auto px-6 py-8 font-sans">
       {/* Back button */}
       <Link
         to="../candidates"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-rich-cerulean hover:text-yale-blue-600 transition-colors mb-6"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:text-primary transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Pipeline
       </Link>
 
       {/* Candidate Header */}
-      <div className="bg-white rounded-2xl border border-cerulean-900 p-6 shadow-sm mb-6">
+      <div className="bg-surface rounded-2xl border border-border p-6 shadow-xs mb-6">
         <div className="flex items-start gap-5">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yale-blue-600 to-deep-space-blue flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-xl">{getInitials(candidate.full_name)}</span>
+          {/* Avatar holding initials */}
+          <div className="w-16 h-16 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+            <span className="text-accent font-bold text-xl">{getInitials(candidate.full_name)}</span>
           </div>
+
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-deep-space-blue">{candidate.full_name || "Unknown Candidate"}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{candidate.full_name || "Unknown Candidate"}</h1>
               {app.is_rejected && (
-                <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-red-50 text-red-600 border border-red-200">Rejected</span>
+                <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-destructive/10 text-destructive border border-destructive/20">
+                  Rejected
+                </span>
               )}
             </div>
             {candidate.headline && (
-              <p className="text-sm text-rich-cerulean mt-1">{candidate.headline}</p>
+              <p className="text-sm text-muted-foreground mt-1">{candidate.headline}</p>
             )}
-            <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 flex-wrap">
+            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground/80 flex-wrap">
               {app.answers?.info?.email && <span>{app.answers.info.email}</span>}
               {app.answers?.info?.phone && <span>{app.answers.info.phone}</span>}
               {app.job_postings?.title && (
                 <span className="flex items-center gap-1">
-                  <FileText className="w-3.5 h-3.5" />
-                  Applied for: <strong className="text-slate-700">{app.job_postings.title}</strong>
+                  <FileText className="w-3.5 h-3.5 text-muted-foreground/60" />
+                  Applied for: <strong className="text-foreground font-semibold">{app.job_postings.title}</strong>
                 </span>
               )}
             </div>
@@ -134,12 +136,12 @@ export default function CandidateProfilePage() {
 
           {/* Composite Score + Percentile Tag */}
           <div className="flex flex-col items-center gap-2">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yale-blue-600 to-cerulean flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">{computedComposite ?? "--"}</span>
+            <div className="w-20 h-20 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
+              <span className="text-2xl font-bold text-accent">{computedComposite ?? "--"}</span>
             </div>
-            <span className="text-[10px] font-semibold text-slate-500 uppercase">Composite</span>
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Composite</span>
             {percentileTag && (
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${percentileTag.color}`}>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border bg-surface ${percentileTag.color}`}>
                 {percentileTag.label}
               </span>
             )}
@@ -153,31 +155,28 @@ export default function CandidateProfilePage() {
           {cvFeedback && (
             <>
               {/* AI CV Review Banner */}
-              <div className="rounded-2xl bg-gradient-to-br from-yale-blue-600 via-rich-cerulean to-deep-space-blue p-8 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-                <div className="relative">
+              <div className="rounded-2xl bg-accent/5 dark:bg-accent/10 p-8 border border-accent/20 shadow-xs relative overflow-hidden">
+                <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="w-6 h-6 text-sky-blue-800" />
-                    <h2 className="text-lg font-bold text-white">AI CV Review</h2>
-                    <span className={`ml-auto px-3 py-1 rounded-lg text-xs font-bold ${
-                      cvFeedback.recommendation === "proceed" ? "bg-emerald-400 text-emerald-900" :
-                      cvFeedback.recommendation === "review" ? "bg-amber-400 text-amber-900" :
-                      "bg-red-400 text-red-900"
-                    }`}>
+                    <Sparkles className="w-6 h-6 text-accent" />
+                    <h2 className="text-lg font-bold text-foreground">AI CV Review</h2>
+                    <span className={`ml-auto px-3 py-1 rounded-lg text-xs font-bold ${cvFeedback.recommendation === "proceed" ? "bg-success/20 text-success" :
+                        cvFeedback.recommendation === "review" ? "bg-warning/20 text-warning" :
+                          "bg-destructive/20 text-destructive"
+                      }`}>
                       {cvFeedback.recommendation?.toUpperCase() || "N/A"}
                     </span>
                   </div>
-                  <p className="text-sm text-sky-blue-900 leading-relaxed font-medium">{cvFeedback.feedback}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">{cvFeedback.feedback}</p>
                 </div>
               </div>
 
               {/* Dimension Scores */}
               {cvFeedback.dimension_scores && (
-                <div className="bg-white rounded-2xl border border-cerulean-900 p-6 shadow-sm">
+                <div className="bg-surface rounded-2xl border border-border p-6 shadow-xs">
                   <div className="flex items-center gap-2 mb-5">
-                    <BarChart3 className="w-5 h-5 text-yale-blue-600" />
-                    <h2 className="text-lg font-bold text-slate-900">Dimension Scores</h2>
+                    <BarChart3 className="w-5 h-5 text-primary" />
+                    <h2 className="text-lg font-bold text-foreground">Dimension Scores</h2>
                   </div>
                   <div className="space-y-3">
                     {Object.entries(cvFeedback.dimension_scores).map(([key, val]) => (
@@ -190,15 +189,15 @@ export default function CandidateProfilePage() {
               {/* Strengths, Weaknesses, Gaps */}
               <div className="flex flex-col gap-4">
                 {cvFeedback.strengths?.length > 0 && (
-                  <div className="bg-green-50 border border-green-200 rounded-2xl p-5 shadow-sm">
+                  <div className="bg-success/5 border border-success/20 rounded-2xl p-5 shadow-xs">
                     <div className="flex items-center gap-1.5 mb-3">
-                      <Check className="w-4 h-4 text-green-600" />
-                      <h3 className="text-xs font-bold text-green-700 uppercase tracking-wider">Strengths</h3>
+                      <Check className="w-4 h-4 text-success" />
+                      <h3 className="text-xs font-bold text-success uppercase tracking-wider">Strengths</h3>
                     </div>
                     <ul className="space-y-2">
                       {cvFeedback.strengths.map((s, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-green-800">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 shrink-0" />
+                        <li key={i} className="flex items-start gap-2 text-sm text-success/90">
+                          <span className="w-1.5 h-1.5 rounded-full bg-success mt-1.5 shrink-0" />
                           <span>{s}</span>
                         </li>
                       ))}
@@ -206,15 +205,15 @@ export default function CandidateProfilePage() {
                   </div>
                 )}
                 {cvFeedback.weaknesses?.length > 0 && (
-                  <div className="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm">
+                  <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5 shadow-xs">
                     <div className="flex items-center gap-1.5 mb-3">
-                      <X className="w-4 h-4 text-red-600" />
-                      <h3 className="text-xs font-bold text-red-700 uppercase tracking-wider">Weaknesses</h3>
+                      <X className="w-4 h-4 text-destructive" />
+                      <h3 className="text-xs font-bold text-destructive uppercase tracking-wider">Weaknesses</h3>
                     </div>
                     <ul className="space-y-2">
                       {cvFeedback.weaknesses.map((w, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-red-800">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+                        <li key={i} className="flex items-start gap-2 text-sm text-destructive/90">
+                          <span className="w-1.5 h-1.5 rounded-full bg-destructive mt-1.5 shrink-0" />
                           <span>{w}</span>
                         </li>
                       ))}
@@ -222,15 +221,15 @@ export default function CandidateProfilePage() {
                   </div>
                 )}
                 {cvFeedback.gaps?.length > 0 && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm">
+                  <div className="bg-warning/5 border border-warning/20 rounded-2xl p-5 shadow-xs">
                     <div className="flex items-center gap-1.5 mb-3">
-                      <AlertTriangle className="w-4 h-4 text-amber-600" />
-                      <h3 className="text-xs font-bold text-amber-700 uppercase tracking-wider">Gaps</h3>
+                      <AlertTriangle className="w-4 h-4 text-warning" />
+                      <h3 className="text-xs font-bold text-warning uppercase tracking-wider">Gaps</h3>
                     </div>
                     <ul className="space-y-2">
                       {cvFeedback.gaps.map((g, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-amber-800">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                        <li key={i} className="flex items-start gap-2 text-sm text-warning/90">
+                          <span className="w-1.5 h-1.5 rounded-full bg-warning mt-1.5 shrink-0" />
                           <span>{g}</span>
                         </li>
                       ))}
@@ -242,10 +241,10 @@ export default function CandidateProfilePage() {
           )}
 
           {!cvFeedback && (
-            <div className="bg-white rounded-2xl border border-cerulean-900 p-8 shadow-sm text-center">
-              <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500 font-medium">No CV review data available</p>
-              <p className="text-xs text-slate-400 mt-1">CV has not been reviewed yet.</p>
+            <div className="bg-surface rounded-2xl border border-border p-8 shadow-xs text-center">
+              <FileText className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-muted-foreground font-medium">No CV review data available</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">CV has not been reviewed yet.</p>
             </div>
           )}
         </div>
@@ -253,47 +252,44 @@ export default function CandidateProfilePage() {
         {/* Right Sidebar */}
         <div className="space-y-6">
           {/* Stage Scores */}
-          <div className="bg-white rounded-2xl border border-cerulean-900 p-6 shadow-sm">
+          <div className="bg-surface rounded-2xl border border-border p-6 shadow-xs">
             <div className="flex items-center gap-2 mb-4">
-              <Award className="w-4 h-4 text-yale-blue-600" />
-              <h2 className="text-sm font-bold text-slate-900">Stage Scores</h2>
+              <Award className="w-4 h-4 text-primary" />
+              <h2 className="text-sm font-bold text-foreground">Stage Scores</h2>
             </div>
             <div className="space-y-3">
               {stages.map(stage => (
                 <div key={stage.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className={`w-2 h-2 rounded-full ${
-                      stage.status === "passed" ? "bg-emerald-500" :
-                      stage.status === "failed" ? "bg-red-500" :
-                      stage.status === "in_progress" ? "bg-yale-blue-500" :
-                      "bg-slate-300"
-                    }`} />
-                    <span className="text-sm text-slate-700">{stage.recruitment_stages?.name || "Unknown"}</span>
+                    <div className={`w-2 h-2 rounded-full ${stage.status === "passed" ? "bg-success" :
+                        stage.status === "failed" ? "bg-destructive" :
+                          stage.status === "in_progress" ? "bg-primary" :
+                            "bg-muted-foreground/40"
+                      }`} />
+                    <span className="text-sm text-foreground/90">{stage.recruitment_stages?.name || "Unknown"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {stage.score != null && (
-                      <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${
-                        stage.score >= 80 ? "bg-emerald-50 text-emerald-700" :
-                        stage.score >= 60 ? "bg-blue-50 text-blue-700" :
-                        stage.score >= 40 ? "bg-amber-50 text-amber-700" :
-                        "bg-red-50 text-red-700"
-                      }`}>
+                      <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${stage.score >= 80 ? "bg-success/10 text-success" :
+                          stage.score >= 60 ? "bg-primary/10 text-primary" :
+                            stage.score >= 40 ? "bg-warning/10 text-warning" :
+                              "bg-destructive/10 text-destructive"
+                        }`}>
                         {Math.round(stage.score)}
                       </span>
                     )}
-                    <span className={`text-[10px] font-semibold ${
-                      stage.status === "passed" ? "text-emerald-600" :
-                      stage.status === "failed" ? "text-red-600" :
-                      stage.status === "in_progress" ? "text-yale-blue-600" :
-                      "text-slate-400"
-                    }`}>
+                    <span className={`text-[10px] font-semibold ${stage.status === "passed" ? "text-success" :
+                        stage.status === "failed" ? "text-destructive" :
+                          stage.status === "in_progress" ? "text-primary" :
+                            "text-muted-foreground/60"
+                      }`}>
                       {stage.status === "in_progress" ? "In Progress" : stage.status?.charAt(0).toUpperCase() + stage.status?.slice(1) || "Pending"}
                     </span>
                   </div>
                 </div>
               ))}
               {stages.length === 0 && (
-                <p className="text-sm text-slate-400 italic">No stages available.</p>
+                <p className="text-sm text-muted-foreground/60 italic">No stages available.</p>
               )}
             </div>
           </div>
@@ -302,14 +298,14 @@ export default function CandidateProfilePage() {
           {interviewStages.length > 0 && (
             <Link
               to={`/companies/candidates/${id}/assessments`}
-              className="block bg-white rounded-2xl border border-cerulean-900 p-6 shadow-sm hover:shadow-md hover:border-yale-blue-600 transition-all group"
+              className="block bg-surface rounded-2xl border border-border p-6 shadow-xs hover:shadow-md hover:border-primary transition-all group"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900">Assessments & Interviews</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">{interviewStages.length} stage(s) with results</p>
+                  <h2 className="text-sm font-bold text-foreground">Assessments & Interviews</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">{interviewStages.length} stage(s) with results</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-yale-blue-600 transition-colors" />
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
             </Link>
           )}

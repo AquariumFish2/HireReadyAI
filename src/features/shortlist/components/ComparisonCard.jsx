@@ -20,11 +20,10 @@ export default function ComparisonCard({ application, provided, isDragging }) {
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
-      className={`bg-white rounded-xl shadow-sm border p-6 min-w-[280px] w-[320px] shrink-0 font-sans transition-shadow ${
-        isDragging
+      className={`bg-white rounded-xl shadow-sm border p-6 min-w-[280px] w-[320px] shrink-0 font-sans transition-shadow ${isDragging
           ? "border-dark-amethyst-500 shadow-lg ring-1 ring-dark-amethyst-500"
           : "border-gray-100 hover:shadow-md"
-      }`}
+        }`}
     >
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-sm font-bold shrink-0">

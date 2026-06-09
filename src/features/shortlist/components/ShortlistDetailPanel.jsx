@@ -165,11 +165,10 @@ export default function ShortlistDetailPanel({
       )}
 
       <div
-        className={`bg-background flex flex-col overflow-hidden border-l border-border ${
-          isOverlay
+        className={`bg-background flex flex-col overflow-hidden border-l border-border ${isOverlay
             ? "fixed right-0 top-0 bottom-0 z-[110] w-[380px] shadow-[var(--shadow-lift)]"
             : "w-[380px] shrink-0 h-full"
-        }`}
+          }`}
       >
         {/* Header */}
         <div className="px-5 pt-5 pb-4 border-b border-border bg-background shrink-0">
@@ -187,13 +186,12 @@ export default function ShortlistDetailPanel({
                   </span>
                   {composite_score != null && (
                     <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
-                        composite_score >= 80
+                      className={`text-xs font-bold px-2 py-0.5 rounded-full border ${composite_score >= 80
                           ? "bg-success/10 text-success border-success/20"
                           : composite_score >= 65
                             ? "bg-warning/15 text-[#8a5a00] border-warning/30"
                             : "bg-secondary text-muted-foreground border-border"
-                      }`}
+                        }`}
                     >
                       {composite_score}
                     </span>
@@ -210,10 +208,9 @@ export default function ShortlistDetailPanel({
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${
-                        TAG_COLORS[tag] ||
+                      className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${TAG_COLORS[tag] ||
                         "bg-secondary text-muted-foreground border-border"
-                      }`}
+                        }`}
                     >
                       {tag}
                     </span>
@@ -239,13 +236,12 @@ export default function ShortlistDetailPanel({
             </p>
             {myVote ? (
               <div
-                className={`rounded-lg px-4 py-3 text-sm font-medium mb-3 border ${
-                  myVote === "up"
+                className={`rounded-lg px-4 py-3 text-sm font-medium mb-3 border ${myVote === "up"
                     ? "bg-success/10 text-success border-success/20"
                     : myVote === "down"
                       ? "bg-destructive/10 text-destructive border-destructive/20"
                       : "bg-secondary text-muted-foreground border-border"
-                }`}
+                  }`}
               >
                 {t("shortlist.votedMessage", { vote: myVote })}
               </div>
@@ -262,9 +258,8 @@ export default function ShortlistDetailPanel({
                     onClick={() =>
                       onCastVote(app.id, myVote === value ? null : value)
                     }
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${
-                      myVote === value ? active : inactive
-                    }`}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all ${myVote === value ? active : inactive
+                      }`}
                   >
                     <Icon className="w-3.5 h-3.5" /> {label}
                   </button>
@@ -315,13 +310,12 @@ export default function ShortlistDetailPanel({
                     </div>
                   </div>
                   <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
-                      v.vote === "up"
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full border ${v.vote === "up"
                         ? "bg-success/10 text-success border-success/20"
                         : v.vote === "down"
                           ? "bg-destructive/10 text-destructive border-destructive/20"
                           : "bg-secondary text-muted-foreground border-border"
-                    }`}
+                      }`}
                   >
                     {v.vote === "up"
                       ? t("shortlist.vote.up")
@@ -484,11 +478,10 @@ export default function ShortlistDetailPanel({
                 <button
                   onClick={() => setEmailModalAction("offer")}
                   disabled={hasOffer}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
-                    hasOffer
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${hasOffer
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
                       : "bg-linear-to-r from-dark-amethyst-600 to-mauve-magic-600 hover:from-dark-amethyst-700 hover:to-mauve-magic-700 text-white"
-                  }`}
+                    }`}
                 >
                   <ChevronUp className="w-4 h-4" />
                   {hasOffer ? "Offer already sent" : "Advance to offer"}
@@ -500,11 +493,10 @@ export default function ShortlistDetailPanel({
                       setRejectReason(ai_rationale);
                   }}
                   disabled={hasOffer}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                    hasOffer
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${hasOffer
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed border-0"
                       : "border border-gray-200 hover:bg-gray-50 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {hasOffer ? "Offer in progress" : "Move to rejected"}
                 </button>
