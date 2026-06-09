@@ -7,7 +7,7 @@ import { createApplication } from "../services/application.service";
 import { triggerCvReview } from "../services/cv-review.service";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js?url";
-
+import { CheckCircle2, XCircle } from "lucide-react";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 import { supabase } from "@/shared/services/supabase";
 import { useTranslation } from "react-i18next";
@@ -249,7 +249,7 @@ export default function ApplyJobPage() {
 
       setToast({
         type: "success",
-        message: "Application submitted successfully!",
+        message: t("apply_job.toast.success"),
       });
 
       setTimeout(() => {
@@ -259,7 +259,7 @@ export default function ApplyJobPage() {
       console.error(" Submit error:", err);
       setToast({
         type: "error",
-        message: "Something went wrong!",
+        message: t("apply_job.errors.something_wrong"),
       });
     } finally {
       setLoading(false);

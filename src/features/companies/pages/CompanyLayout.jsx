@@ -154,7 +154,10 @@ function CompanyLayout() {
               />
             }
           />
-          <Route path="shortlists" element={<ShortlistsPage jobs={jobs} company={company} />} />
+          <Route
+            path="shortlists"
+            element={<ShortlistsPage jobs={jobs} company={company} />}
+          />
           <Route
             path="shortlists/:jobId"
             element={<ShortlistsPage jobs={jobs} company={company} />}
@@ -163,10 +166,7 @@ function CompanyLayout() {
             path="candidates"
             element={<PipelineCandidatesPage company={company} jobs={jobs} />}
           />
-          <Route
-            path="candidates/:id"
-            element={<CandidateProfilePage />}
-          />
+          <Route path="candidates/:id" element={<CandidateProfilePage />} />
           <Route
             path="candidates/:id/assessments"
             element={<CandidateAssessmentsPage />}

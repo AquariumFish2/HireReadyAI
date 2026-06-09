@@ -142,7 +142,7 @@ export default function SignUpPage() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-              t("sign_up.creating")
+              {t("sign_up.creating")}
             </span>
           ) : (
             t("sign_up.create_account")

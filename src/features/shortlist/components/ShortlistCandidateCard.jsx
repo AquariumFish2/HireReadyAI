@@ -3,9 +3,9 @@ import React from "react";
 import { ThumbsUp, ThumbsDown, Sparkles, Calendar, Send } from "lucide-react";
 import { useTranslation } from "react-i18next";
 const TAG_COLORS = {
-  "Strong Fit": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Leaning hire": "bg-sky-50 text-sky-700 border-sky-200",
-  "Needs Review": "bg-amber-50 text-amber-700 border-amber-200",
+  "Strong Fit": "bg-success/10 text-success border-success/20",
+  "Leaning hire": "bg-accent/10 text-accent border-accent/20",
+  "Needs Review": "bg-warning/10 text-warning border-warning/20",
 };
 
 function getInitials(name = "") {
@@ -50,10 +50,20 @@ function timeAgo(dateString) {
 
 export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
   const { applications: app, tags = [], rank } = entry;
-  const { profiles: candidate, shortlist_votes: votes = [], composite_score, ai_rationale, applied_at, is_rejected, application_stages = [] } = app;
+  const {
+    profiles: candidate,
+    shortlist_votes: votes = [],
+    composite_score,
+    ai_rationale,
+    applied_at,
+    is_rejected,
+    application_stages = [],
+  } = app;
 
   const hasOffer = application_stages.some(
-    (s) => s.recruitment_stages?.stage_type === "offer" && s.status === "in_progress"
+    (s) =>
+      s.recruitment_stages?.stage_type === "offer" &&
+      s.status === "in_progress",
   );
   const { t } = useTranslation();
 
@@ -66,15 +76,15 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
   return (
     <div
       onClick={onClick}
-      className={`relative px-5 py-4 cursor-pointer border-b border-zinc-100 transition-all group ${
+      className={`relative px-5 py-4 cursor-pointer border-b border-border transition-all group ${
         isSelected
-          ? "bg-emerald-50/50 border-l-2 border-l-emerald-600"
-          : "bg-white hover:bg-zinc-50 border-l-2 border-l-transparent"
-      } ${is_rejected ? "opacity-50" : ""}`}
+          ? "bg-success/5 border-l-2 border-l-success"
+          : "bg-background hover:bg-muted border-l-2 border-l-transparent"
+      } ${is_rejected ? "opacity-80" : ""}`}
     >
       {/* Rank + Avatar + Name row */}
       <div className="flex items-start gap-3 mb-2.5">
-        <span className="text-[10px] font-bold text-zinc-400 pt-1 w-5 shrink-0">
+        <span className="text-[10px] font-bold text-muted-foreground/60 pt-1 w-5 shrink-0">
           #{rank}
         </span>
 
@@ -87,7 +97,7 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`text-sm font-semibold ${isSelected ? "text-emerald-900" : "text-zinc-900"}`}
+              className={`text-sm font-semibold ${isSelected ? "text-muted-foreground" : "text-foreground"}`}
             >
               {candidate?.full_name || t("company_profile.team.unknown")}
             </span>
@@ -98,7 +108,7 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
               </span>
             )}
             {is_rejected && (
-              <span className="text-[10px] px-1.5 py-0.5 bg-red-50 text-red-600 border border-red-200 rounded font-medium">
+              <span className="text-[10px] px-1.5 py-0.5 bg-destructive/10 text-red-600 border border-destructive/20 rounded font-medium">
                 {t("stages.rejected")}
               </span>
             )}
@@ -111,11 +121,13 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
               </span>
             ))}
           </div>
-          <div className="flex items-center gap-2 text-xs text-zinc-400 mt-0.5">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
             <Calendar className="w-3 h-3" />
             <span>Applied {timeAgo(applied_at)}</span>
             {app.answers?.info?.email && (
-              <span className="text-gray-400">· {app.answers.info.email}</span>
+              <span className="text-muted-foreground">
+                · {app.answers.info.email}
+              </span>
             )}
           </div>
         </div>
@@ -124,8 +136,8 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
       {/* AI Rationale snippet */}
       {ai_rationale && (
         <div className="flex items-start gap-2 ml-8 mb-3">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-          <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2">
+          <Sparkles className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
+          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
             {ai_rationale}
           </p>
         </div>
@@ -144,33 +156,33 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
             </div>
           ))}
           {remainingVoters > 0 && (
-            <div className="w-6 h-6 rounded-full border-2 border-white bg-zinc-200 text-[9px] font-bold flex items-center justify-center text-zinc-600 -ml-1.5">
+            <div className="w-6 h-6 rounded-full border-2 border-background bg-muted text-[9px] font-bold flex items-center justify-center text-muted-foreground -ml-1.5">
               +{remainingVoters}
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-zinc-500">
-          <span className="font-medium text-zinc-700">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">
             AI match{" "}
             <span
               className={`font-bold px-1.5 py-0.5 rounded ${
                 composite_score >= 80
-                  ? "bg-emerald-50 text-emerald-700"
+                  ? "bg-success/10 text-success"
                   : composite_score >= 65
-                    ? "bg-amber-50 text-amber-700"
-                    : "bg-zinc-100 text-zinc-600"
+                    ? "bg-warning/10 text-warning"
+                    : "bg-muted text-muted-foreground"
               }`}
             >
               {composite_score || "—"}
             </span>
           </span>
           <div className="flex items-center gap-1.5">
-            <span className="flex items-center gap-0.5 text-emerald-600">
+            <span className="flex items-center gap-0.5 text-success">
               <ThumbsUp className="w-3 h-3" /> {upVotes}
             </span>
-            <span className="text-zinc-300">—</span>
-            <span className="flex items-center gap-0.5 text-red-500">
+            <span className="text-border">—</span>
+            <span className="flex items-center gap-0.5 text-destructive">
               <ThumbsDown className="w-3 h-3" /> {downVotes}
             </span>
           </div>

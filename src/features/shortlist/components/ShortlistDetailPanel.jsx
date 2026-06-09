@@ -45,7 +45,7 @@ function timeAgo(dateString) {
 const TAG_COLORS = {
   "Strong Fit": "bg-success/10 text-success border-success/20",
   "Leaning hire": "bg-accent/10 text-accent border-accent/20",
-  "Needs Review": "bg-warning/15 text-[#8a5a00] border-warning/30",
+  "Needs Review": "bg-warning/10 text-warning border-warning/20",
 };
 
 // Vote Config mapped to semantic system values
@@ -109,10 +109,18 @@ export default function ShortlistDetailPanel({
   } = app;
 
   const hasOffer = application_stages.some(
-    (s) => s.recruitment_stages?.stage_type === "offer" && s.status === "in_progress"
+    (s) =>
+      s.recruitment_stages?.stage_type === "offer" &&
+      s.status === "in_progress",
   );
 
-  const handleEmailSend = async ({ fromName, fromEmail, to, subject, body }) => {
+  const handleEmailSend = async ({
+    fromName,
+    fromEmail,
+    to,
+    subject,
+    body,
+  }) => {
     const isOffer = emailModalAction === "offer";
     const { error } = await supabase.functions.invoke("send-offer-email", {
       body: {
@@ -129,8 +137,6 @@ export default function ShortlistDetailPanel({
     if (error) throw new Error(error.message || "Failed to send email");
     window.location.reload();
   };
-
-
 
   useEffect(() => {
     notesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -191,7 +197,7 @@ export default function ShortlistDetailPanel({
                         composite_score >= 80
                           ? "bg-success/10 text-success border-success/20"
                           : composite_score >= 65
-                            ? "bg-warning/15 text-[#8a5a00] border-warning/30"
+                            ? "bg-warning/10 text-warning border-warning/20"
                             : "bg-secondary text-muted-foreground border-border"
                       }`}
                     >
@@ -202,9 +208,13 @@ export default function ShortlistDetailPanel({
                 <p className="text-xs text-muted-foreground">
                   {candidate?.headline || candidate?.role}
                 </p>
-                <div className="flex items-center gap-3 text-xs text-gray-400 mt-1">
-                  {app.answers?.info?.email && <span>{app.answers.info.email}</span>}
-                  {app.answers?.info?.phone && <span>{app.answers.info.phone}</span>}
+                <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                  {app.answers?.info?.email && (
+                    <span>{app.answers.info.email}</span>
+                  )}
+                  {app.answers?.info?.phone && (
+                    <span>{app.answers.info.phone}</span>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {tags.map((tag) => (
@@ -486,8 +496,8 @@ export default function ShortlistDetailPanel({
                   disabled={hasOffer}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
                     hasOffer
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
-                      : "bg-linear-to-r from-dark-amethyst-600 to-mauve-magic-600 hover:from-dark-amethyst-700 hover:to-mauve-magic-700 text-white"
+                      ? "bg-muted text-muted-foreground cursor-not-allowed shadow-none"
+                      : "bg-primary hover:bg-primary-hover text-white"
                   }`}
                 >
                   <ChevronUp className="w-4 h-4" />
@@ -502,8 +512,8 @@ export default function ShortlistDetailPanel({
                   disabled={hasOffer}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     hasOffer
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed border-0"
-                      : "border border-gray-200 hover:bg-gray-50 text-gray-700"
+                      ? "bg-muted text-muted-foreground cursor-not-allowed border-0"
+                      : "border border-border hover:bg-muted text-foreground"
                   }`}
                 >
                   {hasOffer ? "Offer in progress" : "Move to rejected"}

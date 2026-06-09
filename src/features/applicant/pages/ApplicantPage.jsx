@@ -10,6 +10,7 @@ import ApplicationsList from "../components/ApplicationsList";
 import InterviewsList from "../components/InterviewList";
 import WelcomeOverlay from "../components/WelcomeOverlay";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner";
 
 export default function ApplicantPage() {
@@ -17,6 +18,7 @@ export default function ApplicantPage() {
   const [localProfile, setLocalProfile] = useState(profile);
   const [showWelcome, setShowWelcome] = useState(() => !sessionStorage.getItem("welcomeShown"));
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     loading,
     applications,
@@ -25,11 +27,9 @@ export default function ApplicantPage() {
     updateApplicationStage,
   } = useApplications();
 
-
   useEffect(() => {
     setLocalProfile(profile);
   }, [profile]);
-
 
   useEffect(() => {
     if (user?.id) {
@@ -81,15 +81,66 @@ export default function ApplicantPage() {
           />
         </motion.div>
 
-        {/* ── STATS ──────────────────────────────── */}
-        <motion.div
+        {/* ── EMPTY STATE (ONLY WHEN NO APPLICATIONS) ───────────────── */}
+        {applications?.length === 0 ? (
+          <div
+            style={{
+              background: "white",
+              borderRadius: "16px",
+              padding: "40px 24px",
+              textAlign: "center",
+              border: "1px solid #e6eef5",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.04)",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "18px",
+                fontWeight: "600",
+                marginBottom: "8px",
+                color: "#012a4a",
+              }}
+            >
+              {t("apply_job.empty_state.no_applications")}
+            </h2>
+
+            <p
+              style={{
+                fontSize: "13px",
+                color: "#5b7280",
+                marginBottom: "20px",
+              }}
+            >
+              {t("apply_job.empty_state.start_exploring")}
+            </p>
+
+            <button
+              onClick={() => navigate("/jobs")}
+              style={{
+                background: "#01497c",
+                color: "white",
+                padding: "10px 16px",
+                borderRadius: "10px",
+                fontSize: "13px",
+                fontWeight: "500",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Browse jobs
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* ── STATS ──────────────────────────────── */}
+            <motion.div
           className="mb-4"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
         >
-          <StatsCards applications={applications} />
-        </motion.div>
+              <StatsCards applications={applications} />
+            </motion.div>
 
         {/* ── CHARTS ──────────────────────────────── */}
         <motion.div
