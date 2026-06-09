@@ -14,7 +14,6 @@ export default function ShortlistInsightsBar({ insightsSummary }) {
         <div className="flex items-center gap-1.5 text-success font-medium">
           <ThumbsUp className="w-3.5 h-3.5" />
           <span>
-            Up votes <span className="font-bold">{up}</span>
             {t("shortlistInsights.upVotes")}{" "}
             <span className="font-bold">{up}</span>
           </span>
@@ -26,7 +25,6 @@ export default function ShortlistInsightsBar({ insightsSummary }) {
         <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
           <Minus className="w-3.5 h-3.5" />
           <span>
-            Neutral <span className="font-bold">{neutral}</span>
             {t("shortlistInsights.neutral")}{" "}
             <span className="font-bold">{neutral}</span>
           </span>
@@ -38,7 +36,8 @@ export default function ShortlistInsightsBar({ insightsSummary }) {
         <div className="flex items-center gap-1.5 text-destructive font-medium">
           <ThumbsDown className="w-3.5 h-3.5" />
           <span>
-            Down votes <span className="font-bold">{down}</span>
+            {t("shortlistInsights.down")}{" "}
+            <span className="font-bold">{down}</span>
           </span>
         </div>
         <span className="text-border hidden sm:block">|</span>
@@ -47,15 +46,8 @@ export default function ShortlistInsightsBar({ insightsSummary }) {
           shortlisted
           {awaitingVote > 0 && (
             <>
-              {" "}
-              ·{" "}
-              <span className="font-semibold text-warning">
-                {awaitingVote}
-              </span>{" "}
-              awaiting first vote
-              <span className="font-semibold text-warning">
-                {awaitingVote}
-              </span>{" "}
+              ·
+              <span className="font-semibold text-warning">{awaitingVote}</span>
               {t("shortlistInsights.awaitingVote")}
             </>
           )}

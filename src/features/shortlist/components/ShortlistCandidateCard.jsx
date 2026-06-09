@@ -80,7 +80,7 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
         isSelected
           ? "bg-success/5 border-l-2 border-l-success"
           : "bg-background hover:bg-muted border-l-2 border-l-transparent"
-      } ${is_rejected ? "opacity-50" : ""}`}
+      } ${is_rejected ? "opacity-80" : ""}`}
     >
       {/* Rank + Avatar + Name row */}
       <div className="flex items-start gap-3 mb-2.5">
@@ -97,7 +97,7 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`text-sm font-semibold ${isSelected ? "text-emerald-900" : "text-zinc-900"}`}
+              className={`text-sm font-semibold ${isSelected ? "text-muted-foreground" : "text-foreground"}`}
             >
               {candidate?.full_name || t("company_profile.team.unknown")}
             </span>
@@ -108,7 +108,7 @@ export default function ShortlistCandidateCard({ entry, isSelected, onClick }) {
               </span>
             )}
             {is_rejected && (
-              <span className="text-[10px] px-1.5 py-0.5 bg-destructive/10 text-destructive border border-destructive/20 rounded font-medium">
+              <span className="text-[10px] px-1.5 py-0.5 bg-destructive/10 text-red-600 border border-destructive/20 rounded font-medium">
                 {t("stages.rejected")}
               </span>
             )}
