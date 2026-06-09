@@ -35,7 +35,7 @@ export default function AuthLayout({ children, headline, subheading }) {
   ];
   const { darkMode, toggle: toggleTheme } = useTheme();
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex justify-center items-center bg-background">
       {/* LEFT SIDE */}
       <div className="hidden lg:flex lg:flex-col fixed top-0 left-0 h-screen w-[45%] xl:w-[40%] bg-sidebar p-12   overflow-hidden  border-r border-white/5">
         <div
@@ -61,7 +61,7 @@ export default function AuthLayout({ children, headline, subheading }) {
           >
             HireReadyAI
           </span>
-          <div className="ml-auto">
+          <div className="ml-auto flex flex-row items-center gap-4">
             <LanguageSwitcher />
             <button
               onClick={toggleTheme}
