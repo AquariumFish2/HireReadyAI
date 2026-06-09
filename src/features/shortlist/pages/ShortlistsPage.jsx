@@ -118,11 +118,10 @@ export default function ShortlistsPage({ jobs, company }) {
               <button
                 key={key}
                 onClick={() => setSortMode(key)}
-                className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
-                  sortMode === key
+                className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${sortMode === key
                     ? "bg-primary text-white border-primary"
                     : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-primary"
-                }`}
+                  }`}
               >
                 {label}
               </button>
@@ -173,7 +172,7 @@ export default function ShortlistsPage({ jobs, company }) {
                 myVote={myVote}
                 notes={notes}
                 notesLoading={notesLoading}
-                onClose={() => {}}
+                onClose={() => { }}
                 onCastVote={castVote}
                 onReject={rejectApplication}
                 onAdvanceToOffer={advanceToOffer}

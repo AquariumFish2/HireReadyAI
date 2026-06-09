@@ -1,4 +1,4 @@
-//src\features\recruiter\components\DashboardCharts.jsx
+// src/features/recruiter/components/DashboardCharts.jsx
 import React from "react";
 import {
   BarChart,
@@ -11,23 +11,15 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const COLORS = {
-  primary: "#4f46e5",
-  primaryLight: "#4f46e51a",
-  bg: "#ffffff",
-  border: "#e2e8f0",
-  muted: "#f8fafc",
-  text: "#334155",
-  mutedText: "#94a3b8",
-};
 import { useTranslation } from "react-i18next";
+
 export default function DashboardCharts({
   pipelineSummaryData,
   trendData,
   topJobsData,
 }) {
   const { t } = useTranslation();
+
   const calcPct = (val) => {
     if (!pipelineSummaryData || pipelineSummaryData.applied === 0) return 0;
     return Math.round((val / pipelineSummaryData.applied) * 100);
@@ -36,17 +28,17 @@ export default function DashboardCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6 font-sans">
       {/* ── Pipeline Summary Component ────────────────────────────────────────── */}
-      <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm p-5 col-span-1 lg:col-span-2 xl:col-span-1">
+      <div className="bg-surface border border-border rounded-xl shadow-xs p-5 col-span-1 lg:col-span-2 xl:col-span-1">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900 tracking-tight">
+            <h3 className="text-base font-bold text-foreground tracking-tight font-display">
               {t("dashboard_charts.pipeline_summary.title")}
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               {t("dashboard_charts.pipeline_summary.subtitle")}
             </p>
           </div>
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-[#4f46e5] bg-[#4f46e5]/10 border border-[#4f46e5]/20">
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20">
             {t("dashboard_charts.pipeline_summary.live")}
           </span>
         </div>
@@ -70,37 +62,33 @@ export default function DashboardCharts({
                 pct: calcPct(pipelineSummaryData.testing),
               },
               {
-                label: t(
-                  "dashboard_charts.pipeline_summary.stages.interviewed",
-                ),
+                label: t("dashboard_charts.pipeline_summary.stages.interviewed"),
                 value: pipelineSummaryData.interviewed,
                 pct: calcPct(pipelineSummaryData.interviewed),
               },
               {
-                label: t(
-                  "dashboard_charts.pipeline_summary.stages.shortlisted",
-                ),
+                label: t("dashboard_charts.pipeline_summary.stages.shortlisted"),
                 value: pipelineSummaryData.shortlisted,
                 pct: calcPct(pipelineSummaryData.shortlisted),
               },
             ].map((stage, idx) => (
               <div key={idx} className="flex flex-col flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1 mb-0.5">
-                  <span className="text-[10px] font-medium text-slate-400 truncate">
+                  <span className="text-[10px] font-medium text-muted-foreground truncate">
                     {stage.label}
                   </span>
                   {idx > 0 && (
-                    <span className="text-[10px] font-bold text-slate-900">
+                    <span className="text-[10px] font-bold text-foreground">
                       {stage.pct}%
                     </span>
                   )}
                 </div>
-                <span className="text-lg font-bold text-slate-900 mb-1.5 tracking-tight">
+                <span className="text-lg font-bold text-foreground mb-1.5 tracking-tight">
                   {stage.value}
                 </span>
-                <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#4f46e5] rounded-full transition-all duration-500"
+                    className="h-full bg-primary rounded-full transition-all duration-500"
                     style={{ width: `${stage.pct}%` }}
                   />
                 </div>
@@ -120,12 +108,12 @@ export default function DashboardCharts({
                 <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor={COLORS.primary}
-                    stopOpacity={0.15}
+                    stopColor="var(--color-primary)"
+                    stopOpacity={0.2}
                   />
                   <stop
                     offset="95%"
-                    stopColor={COLORS.primary}
+                    stopColor="var(--color-primary)"
                     stopOpacity={0}
                   />
                 </linearGradient>
@@ -133,36 +121,36 @@ export default function DashboardCharts({
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke={COLORS.border}
-                opacity={0.4}
+                stroke="var(--color-border)"
+                opacity={0.5}
               />
               <XAxis
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: COLORS.mutedText, fontSize: 10, fontWeight: 500 }}
+                tick={{ fill: "var(--color-muted-foreground)", fontSize: 10, fontWeight: 500 }}
                 dy={8}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: COLORS.mutedText, fontSize: 10, fontWeight: 500 }}
+                tick={{ fill: "var(--color-muted-foreground)", fontSize: 10, fontWeight: 500 }}
                 tickCount={4}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: COLORS.bg,
-                  borderRadius: "8px",
-                  border: `1px solid ${COLORS.border}`,
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  backgroundColor: "var(--color-surface)",
+                  borderRadius: "12px",
+                  border: "1px solid var(--color-border)",
+                  boxShadow: "var(--shadow-xs)",
                   fontSize: "11px",
-                  color: COLORS.text,
+                  color: "var(--color-foreground)",
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="applications"
-                stroke={COLORS.primary}
+                stroke="var(--color-primary)"
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorApps)"
@@ -172,13 +160,12 @@ export default function DashboardCharts({
         </div>
       </div>
 
-      {/* ── Top Jobs Chart ────────────────────────────────────────────────────── */}
-      <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm p-5">
+      <div className="bg-surface border border-border rounded-xl shadow-xs p-5">
         <div className="mb-4">
-          <h3 className="text-base font-bold text-slate-900 tracking-tight">
+          <h3 className="text-base font-bold text-foreground tracking-tight font-display">
             {t("dashboard_charts.top_jobs.title")}
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground">
             {t("dashboard_charts.top_jobs.subtitle")}
           </p>
         </div>
@@ -191,36 +178,36 @@ export default function DashboardCharts({
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke={COLORS.border}
-                opacity={0.4}
+                stroke="var(--color-border)"
+                opacity={0.5}
               />
               <XAxis
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: COLORS.mutedText, fontSize: 10, fontWeight: 500 }}
+                tick={{ fill: "var(--color-muted-foreground)", fontSize: 10, fontWeight: 500 }}
                 dy={8}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: COLORS.mutedText, fontSize: 10, fontWeight: 500 }}
+                tick={{ fill: "var(--color-muted-foreground)", fontSize: 10, fontWeight: 500 }}
                 tickCount={4}
               />
               <Tooltip
-                cursor={{ fill: "#f1f5f9", opacity: 0.6 }}
+                cursor={{ fill: "var(--color-muted)", opacity: 0.15 }}
                 contentStyle={{
-                  backgroundColor: COLORS.bg,
-                  borderRadius: "8px",
-                  border: `1px solid ${COLORS.border}`,
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  backgroundColor: "var(--color-surface)",
+                  borderRadius: "12px",
+                  border: "1px solid var(--color-border)",
+                  boxShadow: "var(--shadow-xs)",
                   fontSize: "11px",
-                  color: COLORS.text,
+                  color: "var(--color-foreground)",
                 }}
               />
               <Bar
                 dataKey="applicants"
-                fill={COLORS.primary}
+                fill="var(--color-primary)"
                 opacity={0.85}
                 radius={[4, 4, 0, 0]}
                 barSize={24}

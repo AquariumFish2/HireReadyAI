@@ -1,4 +1,4 @@
-//src\features\recruiter\pages\PipelineCandidatesPage.jsx
+// src/features/pipeline/pages/PipelineCandidatesPage.jsx
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -44,12 +44,10 @@ function timeAgo(date) {
 }
 
 const scoreColor = (s) => {
-  if (s >= 85)
-    return "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
-  if (s >= 70) return "bg-primary/10 text-primary border border-primary/20";
-  if (s >= 55)
-    return "bg-amber-500/10 text-amber-600 border border-amber-500/20";
-  return "bg-destructive/10 text-destructive border border-destructive/20";
+  if (s >= 85) return "bg-success/10 text-success border-success/20";
+  if (s >= 70) return "bg-primary/10 text-primary border-primary/20";
+  if (s >= 55) return "bg-warning/10 text-warning border-warning/20";
+  return "bg-destructive/10 text-destructive border-destructive/20";
 };
 
 function getFit(score, isRejected, t) {
@@ -59,25 +57,21 @@ function getFit(score, isRejected, t) {
       cls: "bg-destructive/10 text-destructive border-destructive/20",
     };
   }
-
   if (score >= 85)
     return {
       label: t("candidate_pipeline.fit.strong_fit"),
-      cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+      cls: "bg-success/10 text-success border-success/20",
     };
-
   if (score >= 70)
     return {
       label: t("candidate_pipeline.fit.good_fit"),
       cls: "bg-primary/10 text-primary border-primary/20",
     };
-
   if (score >= 55)
     return {
       label: t("candidate_pipeline.fit.needs_review"),
-      cls: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+      cls: "bg-warning/10 text-warning border-warning/20",
     };
-
   return {
     label: t("candidate_pipeline.fit.low_fit"),
     cls: "bg-destructive/10 text-destructive border-destructive/20",
@@ -96,13 +90,13 @@ const stageScore = (as) => {
 const statusStyle = (status) => {
   switch (status) {
     case "passed":
-      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+      return "bg-success/10 text-success border-success/20";
     case "in_progress":
-      return "bg-amber-100 text-amber-700 border-amber-200";
+      return "bg-warning/10 text-warning border-warning/20";
     case "failed":
-      return "bg-red-100 text-red-700 border-red-200";
+      return "bg-destructive/10 text-destructive border-destructive/20";
     default:
-      return "bg-gray-100 text-gray-500 border-gray-200";
+      return "bg-muted text-muted-foreground border-border";
   }
 };
 
@@ -149,109 +143,96 @@ const CandidateCard = ({
     <div
       draggable
       onDragStart={() => onDragStart(candidate)}
-      className={`bg-background rounded-2xl border border-border p-4 cursor-grab active:cursor-grabbing select-none transition-all duration-200 hover:shadow-[var(--shadow-lift)] hover:-translate-y-0.5 group ${isDragging ? "opacity-40 scale-95" : ""}`}
+      className={`bg-surface rounded-2xl border border-border/80 p-4 cursor-grab active:cursor-grabbing select-none flex flex-col justify-between min-h-[165px] transition-all duration-200 hover:shadow-md dark:hover:shadow-neutral-950/50 hover:-translate-y-0.5 group ${isDragging ? "opacity-40 scale-95" : ""}`}
       onClick={onClick}
-      style={{ boxShadow: "0 1px 4px rgba(1,73,124,0.1)" }}
     >
-      <div className="p-4 cursor-grab active:cursor-grabbing select-none">
-        
-        <div className="flex items-start gap-3 mb-3">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-bold text-white text-sm shrink-0 font-display">
-            {getInitials(candidate.name)}
+      <div className="flex flex-col flex-1 justify-between">
+
+        <div className="flex items-start gap-3 mb-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0 font-display shadow-xs">            {getInitials(candidate.name)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground truncate font-display">
+            <p className="text-xs font-bold text-foreground truncate font-display leading-snug group-hover:text-primary transition-colors">
               {candidate.name}
-              {candidate.is_rejected && (
-                <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded bg-destructive/10 text-destructive border border-destructive/20 font-sans font-medium">
-                  {t("candidate_pipeline.fit.rejected")}
-                </span>
-              )}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">
               {timeAgo(candidate.applied_at)}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between gap-2 mb-3">
           {candidate.hasEvaluation ? (
-            <span
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${fit.cls}`}
-            >
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border tracking-wide uppercase ${fit.cls}`}>
               {fit.label}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border bg-amber-100 text-amber-700 border-amber-200">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border bg-warning/10 text-warning border-warning/20 tracking-wide uppercase">
               In Progress
             </span>
           )}
-          {candidate.hasEvaluation ? (
-            <span
-              className={`px-2 py-0.5 rounded-lg text-xs font-bold font-display ${scoreColor(candidate.score)}`}
-            >
-              {candidate.score}
-            </span>
-          ) : (
-            <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-500">
-              -/100
+
+          {candidate.is_rejected && !candidate.hasEvaluation && (
+            <span className="text-[10px] px-2 py-0.5 rounded bg-destructive/10 text-destructive border border-destructive/20 font-medium uppercase tracking-wide">
+              {t("candidate_pipeline.fit.rejected")}
             </span>
           )}
+
+          <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold font-display tracking-tight shrink-0 ${candidate.hasEvaluation ? scoreColor(candidate.score) : "bg-muted text-muted-foreground border border-border"}`}>
+            {candidate.hasEvaluation ? candidate.score : "-/100"}
+          </span>
         </div>
 
-        {/* Score bar */}
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-cerulean">Stage score</span>
-            <span className="text-xs font-semibold text-rich-cerulean-600">
+        <div className="mb-1 w-full">
+          <div className="flex items-center justify-between mb-1 text-[11px] font-medium text-muted-foreground">
+            <span>Stage score</span>
+            <span className="font-bold text-foreground">
               {candidate.hasEvaluation ? `${candidate.score}/100` : "-/100"}
             </span>
           </div>
-          <div className="w-full h-1.5 rounded-full bg-cerulean-900 overflow-hidden">
+          <div className="w-full h-1.5 rounded-full bg-muted border border-border/30 overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-700 ${
-                candidate.score >= 85
-                  ? "bg-emerald-500"
-                  : candidate.score >= 70
-                    ? "bg-yale-blue-600"
-                    : candidate.score >= 55
-                      ? "bg-air-force-blue-600"
-                      : "bg-destructive"
-              }`}
+              className={`h-full rounded-full transition-all duration-500 ${candidate.score >= 85
+                ? "bg-success"
+                : candidate.score >= 70
+                  ? "bg-primary"
+                  : candidate.score >= 55
+                    ? "bg-warning"
+                    : "bg-destructive"
+                }`}
               style={{ width: `${candidate.score || 0}%` }}
             />
           </div>
         </div>
       </div>
 
-      {/* Expand button — only show if there are previous stages */}
-      {previousStages.length > 0 && (
+      {previousStages.length > 0 ? (
         <button
           onClick={(e) => {
             e.stopPropagation();
             setExpanded((s) => !s);
           }}
-          className="w-full flex items-center justify-center gap-1 py-2 text-xs font-semibold text-cerulean hover:text-rich-cerulean border-t border-cerulean-900 transition"
+          className="w-full flex items-center justify-center gap-1 pt-2.5 mt-2 text-[10px] font-bold text-muted-foreground hover:text-primary border-t border-border/40 transition-colors cursor-pointer shrink-0"
         >
           {expanded ? (
             <>
-              <ChevronUp className="w-3.5 h-3.5" />
+              <ChevronUp className="w-3 h-3" />
               Hide previous stages
             </>
           ) : (
             <>
-              <ChevronDown className="w-3.5 h-3.5" />
-              {previousStages.length} previous stage
-              {previousStages.length > 1 ? "s" : ""}
+              <ChevronDown className="w-3 h-3" />
+              {previousStages.length} previous stage{previousStages.length > 1 ? "s" : ""}
             </>
           )}
         </button>
+      ) : (
+        <div className="h-6 w-full invisible border-t border-transparent mt-2" aria-hidden="true" />
       )}
 
-      {/* Expanded previous stages */}
       {expanded && previousStages.length > 0 && (
-        <div className="px-4 pb-4 space-y-2 border-t border-cerulean-900 pt-3">
-          <p className="text-[10px] font-semibold text-cerulean uppercase tracking-wide mb-2">
+        <div className="mt-2 pt-2 border-t border-border/50 space-y-1.5 w-full animate-fade-in">
+          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
             Previous stages
           </p>
           {previousStages.map((as) => {
@@ -260,24 +241,18 @@ const CandidateCard = ({
             return (
               <div
                 key={as.id}
-                className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-sky-blue-900/60"
+                className="flex items-center justify-between py-1 px-2 rounded-lg bg-muted/40 border border-border/40"
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-xs font-medium text-deep-space-blue truncate">
-                    {name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  {ss != null ? (
-                    <span
-                      className={`text-xs font-bold px-1.5 py-0.5 rounded ${scoreColor(ss)}`}
-                    >
-                      {ss}/100
+                <span className="text-[11px] font-medium text-foreground truncate max-w-[110px]">
+                  {name}
+                </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {ss != null && (
+                    <span className={`text-[10px] font-bold px-1 py-0.2 rounded ${scoreColor(ss)}`}>
+                      {ss}
                     </span>
-                  ) : null}
-                  <span
-                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${statusStyle(as.status)}`}
-                  >
+                  )}
+                  <span className={`text-[9px] font-bold px-1 py-0.2 rounded border uppercase tracking-tight ${statusStyle(as.status)}`}>
                     {statusLabel(as.status)}
                   </span>
                 </div>
@@ -314,9 +289,8 @@ const PipelineColumn = ({
 
   return (
     <div
-      className={`flex flex-col min-w-[270px] w-[270px] shrink-0 rounded-2xl transition-all duration-200 ${
-        isOver && !isLocked ? "ring-2 ring-air-force-blue ring-offset-2" : ""
-      }`}
+      className={`flex flex-col min-w-[280px] w-[280px] shrink-0 rounded-2xl transition-all duration-200 ${isOver && !isLocked ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-black" : ""
+        }`}
       onDragOver={(e) => {
         e.preventDefault();
         if (!isLocked) onDragOver(stage.id);
@@ -325,60 +299,60 @@ const PipelineColumn = ({
         if (!isLocked) onDrop(stage.id);
       }}
     >
-      <div className="flex items-center justify-between px-4 py-3 mb-3">
-        <div className="flex items-center gap-2 min-w-0 min-w-0 flex-1">
+      <div className="flex items-center justify-between px-2 py-2.5 mb-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <span
             className="w-2.5 h-2.5 rounded-full shrink-0"
             style={{
-              background: `hsl(${210 - stage.order_index * 10}, 70%, ${55 - stage.order_index * 3}%)`,
+              background: `hsl(${210 - stage.order_index * 12}, 80%, 45%)`,
             }}
           />
-          <span className="text-sm font-bold text-foreground font-display truncate">
+          <span className="text-xs font-bold text-foreground font-display truncate">
             {stage.name}
           </span>
-          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-secondary text-muted-foreground border border-border ml-1 shrink-0">
+          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-muted text-muted-foreground border border-border/80 ml-1 shrink-0">
             {candidates.length}
           </span>
           {isLocked && (
             <Lock
-              className="w-3 h-3 text-muted-foreground/60 ml-0.5 shrink-0"
+              className="w-3 h-3 text-muted-foreground/60 ml-1 shrink-0"
               title={t("candidate_pipeline.locked_stage")}
             />
           )}
 
           {!isLocked && (
-            <div className="relative ml-2 shrink-0">
+            <div className="relative ml-auto shrink-0">
               <button
                 onClick={() => setOpenMenu((s) => !s)}
-                className="text-muted-foreground hover:text-foreground font-bold transition-colors"
+                className="text-muted-foreground hover:text-foreground font-bold transition-colors px-1 cursor-pointer"
               >
                 ⋯
               </button>
 
               {openMenu && (
-                <div className="absolute left-0 mt-2 w-44 bg-background border border-border rounded-xl shadow-[var(--shadow-lift)] p-2 z-50">
-                  <div className="p-2">
-                    <p className="text-xs mb-1 text-muted-foreground font-medium">
+                <div className="absolute right-0 mt-2 w-44 bg-surface border border-border rounded-xl shadow-lg p-2 z-50 animate-fade-in">
+                  <div className="p-2 border-b border-border/60">
+                    <p className="text-[11px] mb-1 text-muted-foreground font-medium">
                       {t("candidate_pipeline.min_score")}
                     </p>
                     <input
                       type="number"
                       value={localMinScore}
                       onChange={(e) => setLocalMinScore(Number(e.target.value))}
-                      className="w-full px-2 py-1 text-xs border border-border rounded bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      className="w-full px-2 py-1 text-xs border border-border rounded bg-muted text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                     <button
                       onClick={async () => {
                         await updateStageMinScore(stage.id, localMinScore);
                         setOpenMenu(false);
                       }}
-                      className="w-full text-center text-xs mt-2 bg-primary text-white px-2 py-1 rounded font-medium hover:opacity-90 transition-opacity"
+                      className="w-full text-center text-xs mt-2 bg-primary text-primary-foreground px-2 py-1 rounded font-medium hover:opacity-95 transition-opacity cursor-pointer"
                     >
                       {t("candidate_pipeline.save")}
                     </button>
                   </div>
                   <button
-                    className="w-full text-left text-xs p-2 hover:bg-sky-blue-900 rounded"
+                    className="w-full text-left text-xs p-2 mt-1 hover:bg-muted text-foreground font-medium rounded-lg transition-colors cursor-pointer"
                     onClick={() => handleStageAutoAdvance(stage.id)}
                   >
                     {t("candidate_pipeline.auto_advance")}
@@ -391,22 +365,20 @@ const PipelineColumn = ({
       </div>
 
       <div
-        className={`flex-1 overflow-y-auto space-y-3 px-1 pb-4 pr-2 transition-all duration-200 ${
-          isOver && !isLocked ? "bg-secondary/40 rounded-xl" : ""
-        }`}
-        style={{ maxHeight: "calc(100vh - 230px)", minHeight: 120 }}
+        className={`flex-1 overflow-y-auto space-y-3 px-1.5 pb-4 transition-all duration-200 scrollbar-thin ${isOver && !isLocked ? "bg-muted/40 rounded-xl" : ""
+          }`}
+        style={{ maxHeight: "calc(100vh - 240px)", minHeight: 150 }}
       >
         {candidates.length === 0 ? (
           <div
-            className={`rounded-xl border-2 border-dashed h-24 flex items-center justify-center transition-all ${
-              isLocked
-                ? "border-border bg-secondary/30 text-muted-foreground/50"
-                : isOver
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-border text-muted-foreground/40"
-            }`}
+            className={`rounded-xl border-2 border-dashed h-28 flex items-center justify-center transition-all ${isLocked
+              ? "border-border/60 bg-muted/10 text-muted-foreground/30"
+              : isOver
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border text-muted-foreground/20"
+              }`}
           >
-            <p className="text-xs font-medium">
+            <p className="text-[11px] font-medium tracking-wide">
               {isLocked
                 ? t("candidate_pipeline.auto_managed")
                 : t("candidate_pipeline.drop_here")}
@@ -446,7 +418,6 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
   const [stageSettings, setStageSettings] = useState({});
   const [selectedCandidate, setSelectedCandidate] = useState(null);
 
-  // Shortlist modal
   const [showShortlistModal, setShowShortlistModal] = useState(false);
   const [criteria, setCriteria] = useState("");
   const [minScore, setMinScore] = useState(70);
@@ -460,12 +431,9 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
     try {
       const { data, error } = await supabase.functions.invoke(
         "auto-generate-criteria",
-        {
-          body: { jobId: selectedJobId },
-        },
+        { body: { jobId: selectedJobId } },
       );
-      if (error)
-        throw new Error(error.message || "Failed to generate criteria");
+      if (error) throw new Error(error.message || "Failed to generate criteria");
       if (data.criteria) setCriteria(data.criteria);
       if (data.suggestedMinScore) setMinScore(data.suggestedMinScore);
       if (data.scoreReasoning) setScoreReasoning(data.scoreReasoning);
@@ -513,9 +481,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
 
       const results = data?.results || [];
       const passed = results.filter((r) => r.passed).length;
-      alert(
-        `Evaluation complete: ${passed}/${candidateIds.length} candidates advanced to shortlist`,
-      );
+      alert(`Evaluation complete: ${passed}/${candidateIds.length} candidates advanced to shortlist`);
 
       setShowShortlistModal(false);
       setCriteria("");
@@ -529,7 +495,6 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
     }
   }
 
-  // Initialize selected job from URL param or first job
   const [searchParams] = useSearchParams();
   useEffect(() => {
     if (jobs.length === 0) return;
@@ -559,15 +524,11 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
         }
 
         const stagesToFix = [];
-
         const mapped = (data || []).map((app) => {
           const allStages = app.application_stages || [];
-
           let currentStageId = app.current_stage_id;
 
           if (!currentStageId && allStages.length > 0) {
-            // current_stage_id cascade-nulled (stage deleted) or never set
-            // Find the last stage with an evaluation score
             const scored = allStages
               .filter(
                 (s) =>
@@ -585,7 +546,6 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
             if (lastScored) {
               currentStageId = lastScored.recruitment_stages.id;
             } else {
-              // No evaluated stage — put them at the first available stage
               const sorted = [...allStages]
                 .filter((s) => s.recruitment_stages)
                 .sort(
@@ -609,9 +569,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
           let score = 0;
 
           if (currentStage) {
-            evaluation =
-              currentStage.application_stage_evaluations?.[0] ?? null;
-
+            evaluation = currentStage.application_stage_evaluations?.[0] ?? null;
             if (evaluation?.ai_score != null) {
               score = Math.round(Number(evaluation.ai_score));
             } else if (currentStage.score != null) {
@@ -619,18 +577,13 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
             }
           }
 
-          const hasEvaluation =
-            evaluation !== null || currentStage?.score != null;
-
-          const isRejected =
-            app.is_rejected || evaluation?.recommendation === "reject";
+          const hasEvaluation = evaluation !== null || currentStage?.score != null;
+          const isRejected = app.is_rejected || evaluation?.recommendation === "reject";
 
           return {
             id: app.id,
             jobId: app.job_postings?.id,
-            name:
-              app.profiles?.full_name ||
-              t("candidate_pipeline.unknown_candidate"),
+            name: app.profiles?.full_name || t("candidate_pipeline.unknown_candidate"),
             applied_at: app.applied_at,
             score,
             hasEvaluation,
@@ -646,7 +599,6 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
 
         setCandidates(mapped);
 
-        // Persist fixed current_stage_id back to DB
         for (const fix of stagesToFix) {
           await supabase
             .from("applications")
@@ -655,22 +607,16 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
         }
       })
       .finally(() => setLoading(false));
-  }, [company?.id]);
+  }, [company?.id, t]);
 
   const filtered = candidates.filter((c) => {
     if (selectedJobId && c.jobId !== selectedJobId) return false;
-    if (search && !c.name.toLowerCase().includes(search.toLowerCase()))
-      return false;
-
-    if (filterFit === t("candidate_pipeline.fit.rejected"))
-      return c.is_rejected;
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filterFit === t("candidate_pipeline.fit.rejected")) return c.is_rejected;
     if (filterFit !== t("candidate_pipeline.filters.all")) {
-      const fitLabel = c.hasEvaluation
-        ? getFit(c.score, c.is_rejected, t).label
-        : "In Progress";
+      const fitLabel = c.hasEvaluation ? getFit(c.score, c.is_rejected, t).label : "In Progress";
       if (fitLabel !== filterFit) return false;
     }
-
     return true;
   });
 
@@ -680,45 +626,34 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       if (c.currentStageId === null && stageId === stages[0]?.id) return true;
       return false;
     });
-  const totalInFlight = filtered.length;
 
+  const totalInFlight = filtered.length;
   const handleDragStart = (candidate) => setDraggingCandidate(candidate);
 
   const handleDrop = async (targetStageId) => {
-    console.log("DROP FIRED", { targetStageId, draggingCandidate });
     if (!draggingCandidate || loadingDrop) return;
 
     const candidateId = draggingCandidate.id;
-
     const candidate = candidates.find((c) => c.id === candidateId);
-    console.log("CANDIDATE FOUND", candidate);
     if (!candidate) return;
 
     const targetStage = stages.find((s) => s.id === targetStageId);
-    console.log("TARGET STAGE", targetStage);
     if (!targetStage || targetStage.is_locked) return;
 
     const currentStage = stages.find((s) => s.id === candidate.currentStageId);
-    console.log("CURRENT STAGE", currentStage);
     if (!currentStage) return;
 
     const sorted = [...stages].sort((a, b) => a.order_index - b.order_index);
     const currentIndex = sorted.findIndex((s) => s.id === currentStage.id);
     const targetIndex = sorted.findIndex((s) => s.id === targetStage.id);
-    console.log("INDICES", { currentIndex, targetIndex });
 
-    if (targetIndex !== currentIndex + 1) {
-      console.log("BLOCKED: not forward +1");
-      return;
-    }
+    if (targetIndex !== currentIndex + 1) return;
 
     setLoadingDrop(true);
     const prevState = [...candidates];
 
     setCandidates((prev) =>
-      prev.map((c) =>
-        c.id === candidateId ? { ...c, currentStageId: targetStageId } : c,
-      ),
+      prev.map((c) => (c.id === candidateId ? { ...c, currentStageId: targetStageId } : c)),
     );
 
     try {
@@ -738,21 +673,10 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
     if (!selectedJobId) return;
     try {
       const minScore =
-        stageSettings[stageId]?.min_score ??
-        stages.find((s) => s.id === stageId)?.min_score ??
-        70;
-
-      const { advancedCount } = await autoAdvanceToShortlist(
-        selectedJobId,
-        minScore,
-      );
-
+        stageSettings[stageId]?.min_score ?? stages.find((s) => s.id === stageId)?.min_score ?? 70;
+      const { advancedCount } = await autoAdvanceToShortlist(selectedJobId, minScore);
       if (advancedCount > 0) {
-        alert(
-          t("candidate_pipeline.alerts.advanced_success", {
-            count: advancedCount,
-          }),
-        );
+        alert(t("candidate_pipeline.alerts.advanced_success", { count: advancedCount }));
       } else {
         alert(t("candidate_pipeline.alerts.no_match"));
       }
@@ -761,32 +685,10 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       alert(t("candidate_pipeline.alerts.auto_advance_failed"));
     }
   };
-  const handleAutoAdvance = async () => {
-    if (!selectedJobId) return;
-    setIsAdvancing(true);
-    try {
-      const { advancedCount } = await autoAdvanceToShortlist(selectedJobId, 70);
-      if (advancedCount > 0) {
-        alert(
-          t("candidate_pipeline.alerts.shortlist_success", {
-            count: advancedCount,
-          }),
-        );
-        loadCandidates(selectedJobId);
-      } else {
-        alert(t("candidate_pipeline.alerts.no_candidates"));
-      }
-    } catch (err) {
-      console.error("Auto advance error:", err);
-      alert(t("candidate_pipeline.alerts.failed"));
-    } finally {
-      setIsAdvancing(false);
-    }
-  };
-  console.log(stages);
+
   return (
     <div
-      className="flex flex-col h-[calc(100vh-64px)] bg-secondary/20 overflow-hidden"
+      className="flex flex-col h-[calc(100vh-64px)] bg-muted/20 text-foreground overflow-hidden"
       onDragEnd={() => {
         if (!loadingDrop) {
           setDraggingCandidate(null);
@@ -794,7 +696,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
         }
       }}
     >
-      <div className="bg-background border-b border-border px-6 py-4 sticky top-0 z-30">
+      <div className="bg-surface border-b border-border px-6 py-4 sticky top-0 z-30">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-foreground font-display">
@@ -804,11 +706,9 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
               <select
                 value={selectedJobId || ""}
                 onChange={(e) => setSelectedJobId(e.target.value)}
-                className="text-xs font-bold text-primary bg-secondary border border-border rounded-lg px-2 py-1 outline-none cursor-pointer focus:ring-2 focus:ring-primary/20"
+                className="text-xs font-bold text-primary bg-muted border border-border rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:ring-2 focus:ring-primary/20"
               >
-                {jobs.length === 0 && (
-                  <option value="">{t("candidate_pipeline.no_jobs")}</option>
-                )}
+                {jobs.length === 0 && <option value="">{t("candidate_pipeline.no_jobs")}</option>}
                 {jobs.map((j) => (
                   <option key={j.id} value={j.id}>
                     {j.title}
@@ -816,10 +716,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
                 ))}
               </select>
               <span className="text-xs text-muted-foreground">
-                ·{" "}
-                <span className="font-bold text-primary font-display">
-                  {totalInFlight}
-                </span>{" "}
+                · <span className="font-bold text-primary font-display">{totalInFlight}</span>{" "}
                 {t("candidate_pipeline.candidates_in_flight")}
               </span>
             </div>
@@ -832,7 +729,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("candidate_pipeline.search_placeholder")}
-              className="w-full h-10 rounded-xl pl-9 pr-4 text-sm text-foreground bg-secondary border border-border outline-none placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/30 focus:border-transparent transition-all"
+              className="w-full h-10 rounded-xl pl-9 pr-4 text-sm text-foreground bg-muted border border-border outline-none placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-primary/30 focus:border-transparent transition-all"
             />
           </div>
 
@@ -842,18 +739,17 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
                 setShowShortlistModal(true);
                 setScoreReasoning("");
               }}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition bg-deep-space-blue text-white border-deep-space-blue hover:bg-yale-blue-600"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition bg-primary text-white hover:opacity-95 shadow-xs cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Advance to Shortlist
             </button>
             <button
               onClick={() => setShowFilters((s) => !s)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all ${
-                showFilters
-                  ? "bg-primary text-white border-primary shadow-sm"
-                  : "border-border text-foreground bg-background hover:bg-secondary"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${showFilters
+                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                : "border-border text-foreground bg-surface hover:bg-muted"
+                }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
               {t("candidate_pipeline.filters.title")}
@@ -878,11 +774,10 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
               <button
                 key={f}
                 onClick={() => setFilterFit(f)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                  filterFit === f
-                    ? "bg-primary text-white border-primary shadow-sm"
-                    : "bg-background text-foreground border-border hover:bg-secondary"
-                }`}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${filterFit === f
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-surface text-foreground border-border hover:bg-muted"
+                  }`}
               >
                 {f}
               </button>
@@ -899,7 +794,7 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
 
       {!loading && candidates.length === 0 && (
         <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-16 h-16 rounded-full bg-secondary border border-border flex items-center justify-center mb-4">
+          <div className="w-16 h-16 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
             <Search className="w-7 h-7 text-muted-foreground/60" />
           </div>
           <h2 className="text-foreground text-lg font-bold mb-1 font-display">
@@ -912,178 +807,133 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       )}
 
       {!loading && candidates.length > 0 && (
-        <>
-          <div className="px-6 py-4 flex items-center gap-3 overflow-x-auto shrink-0">
-            {stages.map((s) => (
-              <div
-                key={s.id}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border shrink-0 shadow-sm"
-              >
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{
-                    background: `hsl(${220 - s.order_index * 15}, 70%, 50%)`,
-                  }}
-                />
-                <span className="text-xs font-bold text-foreground font-display">
-                  {s.name}
-                </span>
-                {s.is_locked && (
-                  <Lock className="w-2.5 h-2.5 text-muted-foreground/60" />
-                )}
-                <span className="px-1.5 py-0.5 rounded-full text-xs font-bold bg-secondary text-muted-foreground border border-border/60">
-                  {byStage(s.id).length}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex-1 overflow-x-auto overflow-y-hidden px-6 pb-6 mt-2">
-            <div className="flex gap-4 w-max h-full">
-              {stages.map((stage) => (
-                <PipelineColumn
-                  key={stage.id}
-                  stage={stage}
-                  candidates={byStage(stage.id)}
-                  onDragStart={handleDragStart}
-                  draggingCandidate={draggingCandidate}
-                  dragOverStage={dragOverStage}
-                  onDragOver={setDragOverStage}
-                  onDrop={handleDrop}
-                  stageSettings={stageSettings}
-                  setStageSettings={setStageSettings}
-                  handleStageAutoAdvance={handleStageAutoAdvance}
-                  onCardClick={setSelectedCandidate}
-                  allStages={stages}
-                />
-              ))}
-            </div>
-          </div>
-        </>
+        <div className="px-6 py-6 flex items-start gap-5 overflow-x-auto flex-1 h-full scrollbar-thin">
+          {stages.map((s) => (
+            <PipelineColumn
+              key={s.id}
+              stage={s}
+              candidates={byStage(s.id)}
+              onDragStart={handleDragStart}
+              dragOverStage={dragOverStage}
+              onDragOver={setDragOverStage}
+              onDrop={handleDrop}
+              draggingCandidate={draggingCandidate}
+              handleStageAutoAdvance={handleStageAutoAdvance}
+              allStages={stages}
+              onCardClick={(c) => setSelectedCandidate(c)}
+            />
+          ))}
+        </div>
       )}
 
       {selectedCandidate && (
         <CandidateSidebar
           candidate={selectedCandidate}
           onClose={() => setSelectedCandidate(null)}
-          onUpdate={(id, updates) => {
-            setCandidates((prev) =>
-              prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
-            );
-            setSelectedCandidate((prev) =>
-              prev?.id === id ? { ...prev, ...updates } : prev,
-            );
-          }}
+          allStages={stages}
         />
       )}
 
-      {/* ── Advance to Shortlist Modal ── */}
       {showShortlistModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4">
+        <div className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-surface border border-border rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-cerulean-900">
-              <div>
-                <h2 className="text-lg font-bold text-deep-space-blue">
-                  Advance to Shortlist
-                </h2>
-                <p className="text-xs text-cerulean mt-0.5">
-                  Set criteria and minimum score for AI evaluation
-                </p>
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/40">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <h3 className="font-bold text-foreground text-lg">
+                  AI Shortlist Advancement
+                </h3>
               </div>
               <button
                 onClick={() => setShowShortlistModal(false)}
-                className="p-1.5 rounded-lg text-cerulean hover:text-rich-cerulean hover:bg-sky-blue-900 transition"
+                className="text-muted-foreground hover:text-foreground rounded-lg p-1 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="px-6 py-5 space-y-5">
-              {/* Evaluation Criteria */}
+            <div className="p-6 overflow-y-auto space-y-5 flex-1">
+
+              {/* Evaluation Criteria Section */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold text-cerulean uppercase tracking-wide">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
                     Evaluation Criteria
                   </label>
                   <button
                     onClick={handleAutoGenerateCriteria}
-                    disabled={generatingCriteria}
-                    className="flex items-center gap-1 text-xs font-semibold text-rich-cerulean hover:text-yale-blue-600 transition disabled:opacity-50"
+                    disabled={generatingCriteria || !selectedJobId}
+                    className="flex items-center gap-1.5 text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/15 px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-50 cursor-pointer"
                   >
                     {generatingCriteria ? (
                       <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
                       <Sparkles className="w-3 h-3" />
                     )}
-                    Auto-generate
+                    Auto-generate from JD
                   </button>
                 </div>
+
                 <textarea
                   value={criteria}
                   onChange={(e) => setCriteria(e.target.value)}
-                  placeholder="Describe what makes a strong candidate for this role..."
-                  rows={5}
-                  className="w-full rounded-xl px-4 py-3 text-sm text-deep-space-blue bg-sky-blue-900 border border-cerulean-900 outline-none focus:border-rich-cerulean transition placeholder:text-steel-blue resize-none"
+                  placeholder="Describe the skills, experience levels, or qualifications required for shortlisting..."
+                  className="w-full h-32 px-3 py-2 text-sm text-foreground bg-muted border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/40 resize-none"
                 />
               </div>
 
-              {/* Min Score */}
-              <div>
-                <label className="block text-xs font-semibold text-cerulean uppercase tracking-wide mb-2">
-                  Minimum Score
-                </label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={minScore}
-                    onChange={(e) => {
-                      setMinScore(Number(e.target.value));
-                      setScoreReasoning("");
-                    }}
-                    className="flex-1 accent-rich-cerulean"
-                  />
-                  <span className="text-lg font-bold text-deep-space-blue w-10 text-right">
+              {/* Min Score Range Slider */}
+              <div className="space-y-3 pt-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
+                    Min Score
+                  </label>
+                  <span className="text-xs font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-lg">
                     {minScore}
                   </span>
                 </div>
-                <p className="text-xs text-cerulean mt-1">
-                  Candidates below this score will be rejected
-                </p>
-                {scoreReasoning && (
-                  <p className="text-xs text-rich-cerulean mt-1.5 italic">
-                    {scoreReasoning}
-                  </p>
-                )}
+
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={minScore}
+                  onChange={(e) => setMinScore(Number(e.target.value))}
+                  className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary border border-border focus:outline-none [&::-webkit-slider-runnable-track]:bg-muted [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                />
               </div>
+
+
+              {scoreReasoning && (
+                <div className="p-3 bg-primary/5 border border-primary/10 rounded-xl text-xs text-muted-foreground animate-fade-in">
+                  <span className="font-bold text-primary block mb-0.5">AI Suggestion Note:</span>
+                  {scoreReasoning}
+                </div>
+              )}
+
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-cerulean-900 bg-sky-blue-900 rounded-b-2xl">
+            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3 bg-muted/20">
               <button
                 onClick={() => setShowShortlistModal(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-cerulean bg-white border border-cerulean-900 hover:bg-sky-blue-900 transition"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-border rounded-xl transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAdvanceToShortlist}
-                disabled={advancingToShortlist || !criteria.trim()}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-deep-space-blue hover:bg-yale-blue-600 transition disabled:opacity-50"
+                disabled={!criteria.trim() || advancingToShortlist}
+                className="px-5 py-2 text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-xl shadow-xs transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
               >
-                {advancingToShortlist ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Evaluating...
-                  </>
-                ) : (
-                  "Confirm & Advance"
-                )}
+                {advancingToShortlist && <Loader2 className="w-4 h-4 animate-spin" />}
+                Run Evaluation
               </button>
             </div>
+
           </div>
         </div>
       )}

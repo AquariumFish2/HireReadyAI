@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+// src\features\pipeline\components\StageDetailsPanel.jsx
+import React, { useState, useEffect } from "react";
 import { STAGE_TYPE_OPTIONS } from "../constants/stageLibrary";
 import { useTranslation } from "react-i18next";
-import { Save } from "lucide-react";
+import { Save, Settings } from "lucide-react";
 
 export default function StageDetailsPanel({ stage, stages, onUpdate }) {
   const { t } = useTranslation();
@@ -15,10 +16,8 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Sync local form state when selected stage changes
   useEffect(() => {
     if (stage) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         name: stage.name || "",
         stage_type: stage.stage_type || "",
@@ -32,15 +31,14 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
 
   if (!stage) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mb-3">
-          <span className="text-gray-400 text-lg">⚙</span>
+      <div className="flex flex-col items-center justify-center h-full text-center px-6 bg-surface">
+        <div className="w-12 h-12 bg-secondary dark:bg-slate-800 rounded-xl flex items-center justify-center mb-4 border border-border dark:border-slate-700">
+          <Settings className="text-muted-foreground w-5 h-5 animate-spin-slow" />
         </div>
-        <p className="text-sm font-medium text-gray-600 mb-1">
-          {" "}
+        <p className="text-sm font-bold text-foreground mb-1">
           {t("stage_details.title")}
         </p>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted-foreground max-w-[220px] leading-relaxed">
           {t("stage_details.empty_description")}
         </p>
       </div>
@@ -61,7 +59,6 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Explicitly exclude order_index to prevent unique constraint violations
       const { ...updateData } = form;
       await onUpdate(stage.id, updateData);
       setHasChanges(false);
@@ -74,41 +71,47 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
 
   const weightPct = Math.round((form.weight ?? 0) * 100);
 
-  // Calculate maximum allowed weight for this stage based on other stages
   const totalOtherWeights = (stages || [])
     .filter((s) => s.id !== stage.id)
     .reduce((sum, s) => sum + (parseFloat(s.weight) || 0), 0);
 
-  // Use a tiny epsilon offset because of floating point math (e.g. 0.8 + 0.2000000000000001)
   const maxAllowedWeight = Math.max(
     0,
     Math.round((1 - totalOtherWeights) * 100) / 100,
   );
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      {/* Header */}
-      <div className="px-5 pt-5 pb-4 border-b border-gray-100">
-        <p className="text-[10px] font-semibold text-dark-amethyst-600 tracking-widest uppercase mb-0.5">
+    <div
+      className="flex flex-col h-full overflow-y-auto bg-surface border-l border-border
+        [&::-webkit-scrollbar]:w-1.5
+        [&::-webkit-scrollbar-track]:bg-transparent
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-thumb]:bg-gray-200
+        dark:[&::-webkit-scrollbar-thumb]:bg-slate-800
+        dark:[&::-webkit-scrollbar-thumb]:hover:bg-slate-700"
+    >
+      {/* Header Panel Layer */}
+      <div className="px-5 pt-5 pb-4 border-b border-border bg-surface sticky top-0 z-10">
+        <p className="text-[10px] font-bold text-primary tracking-widest uppercase mb-1">
           {t("stage_details.title")}
         </p>
-        <p className="text-sm font-semibold text-gray-900 leading-tight truncate flex items-center gap-1.5">
+        <p className="text-sm font-bold text-foreground leading-tight truncate flex items-center gap-1.5">
           {form.name || t("stage_details.untitled_stage")}
           {stage.is_locked && (
-            <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">
+            <span className="text-[10px] bg-secondary dark:bg-slate-800 border border-border dark:border-slate-700 text-muted-foreground px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
               {t("stage_details.locked")}
             </span>
           )}
         </p>
-        <p className="text-xs text-gray-400 truncate">
+        <p className="text-xs text-muted-foreground font-medium mt-0.5 truncate capitalize">
           {form.stage_type?.replace(/_/g, " ")}
         </p>
       </div>
 
       <div className="flex-1 px-5 py-5 space-y-5">
-        {/* Stage Name */}
+        {/* Stage Name Section */}
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+          <label className="block text-xs font-bold text-muted-foreground mb-1.5">
             {t("stage_details.fields.stage_name")}
           </label>
           <input
@@ -116,52 +119,45 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
             value={form.name}
             disabled={stage.is_locked}
             onChange={(e) => handleChange("name", e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
+            className="w-full px-3 py-2 text-sm bg-surface dark:bg-slate-800/50 border border-border dark:border-slate-700/60 rounded-lg text-foreground placeholder-muted-foreground/50 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all disabled:bg-secondary/60 dark:disabled:bg-slate-800/30 disabled:text-muted-foreground/60 disabled:cursor-not-allowed font-medium"
           />
         </div>
 
-        {/* Stage Type */}
+        {/* Stage Type Config */}
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+          <label className="block text-xs font-bold text-muted-foreground mb-1.5">
             {t("stage_details.fields.stage_type")}
           </label>
           <select
             value={form.stage_type}
             disabled={stage.is_locked}
             onChange={(e) => handleChange("stage_type", e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full px-3 py-2 text-sm bg-surface dark:bg-slate-800/50 border border-border dark:border-slate-700/60 rounded-lg text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all disabled:bg-secondary/60 dark:disabled:bg-slate-800/30 disabled:text-muted-foreground/60 cursor-pointer disabled:cursor-not-allowed font-medium"
           >
             <option value="">
-              {" "}
               {t("stage_details.placeholders.select_type")}
             </option>
             {STAGE_TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+              <option key={opt.value} value={opt.value} className="dark:bg-slate-800">
                 {opt.label}
               </option>
             ))}
             {stage.is_locked &&
               !STAGE_TYPE_OPTIONS.some((o) => o.value === form.stage_type) && (
-                <option value={form.stage_type}>
-                  {form.stage_type.replace(/_/g, " ")}
-                </option>
-              )}
-            {stage.is_locked &&
-              !STAGE_TYPE_OPTIONS.some((o) => o.value === form.stage_type) && (
-                <option value={form.stage_type}>
+                <option value={form.stage_type} className="dark:bg-slate-800">
                   {form.stage_type.replace(/_/g, " ")}
                 </option>
               )}
           </select>
         </div>
 
-        {/* Weight */}
+        {/* Dynamic Weight Range Slider */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs font-semibold text-gray-600">
+            <label className="text-xs font-bold text-muted-foreground">
               {t("stage_details.fields.weight")}
             </label>
-            <span className="text-xs font-bold text-dark-amethyst-600">
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">
               {weightPct}%
             </span>
           </div>
@@ -171,14 +167,15 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
             max={maxAllowedWeight}
             step="0.01"
             value={form.weight ?? 0}
+            disabled={stage.is_locked}
             onChange={(e) => handleWeightChange(e.target.value)}
-            className="w-full h-1.5 accent-dark-amethyst-600 cursor-pointer"
+            className="w-full h-1.5 accent-primary bg-secondary dark:bg-slate-800 border border-border dark:border-slate-700 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
 
-        {/* Description */}
+        {/* Text Description Box */}
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+          <label className="block text-xs font-bold text-muted-foreground mb-1.5">
             {t("stage_details.fields.description")}
           </label>
           <textarea
@@ -186,15 +183,15 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
             value={form.description}
             disabled={stage.is_locked}
             onChange={(e) => handleChange("description", e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow resize-none disabled:bg-gray-50 disabled:text-gray-500"
+            className="w-full px-3 py-2 text-sm bg-surface dark:bg-slate-800/50 border border-border dark:border-slate-700/60 rounded-lg text-foreground placeholder-muted-foreground/50 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all resize-none disabled:bg-secondary/60 dark:disabled:bg-slate-800/30 disabled:text-muted-foreground/60 disabled:cursor-not-allowed font-medium"
             placeholder={t("stage_details.placeholders.description")}
           />
         </div>
 
-        {/* Number of Questions */}
+        {/* Dynamic Number of Questions Input */}
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Number of Questions
+          <label className="block text-xs font-bold text-muted-foreground mb-1.5">
+            {t("stage_details.fields.num_questions", { defaultValue: "Number of Questions" })}
           </label>
           <input
             type="number"
@@ -205,33 +202,14 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
             onChange={(e) =>
               handleChange("num_questions", parseInt(e.target.value) || 0)
             }
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
-            placeholder="Enter number of questions…"
+            className="w-full px-3 py-2 text-sm bg-surface dark:bg-slate-800/50 border border-border dark:border-slate-700/60 rounded-lg text-foreground placeholder-muted-foreground/50 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all disabled:bg-secondary/60 dark:disabled:bg-slate-800/30 disabled:text-muted-foreground/60 disabled:cursor-not-allowed font-medium"
+            placeholder={t("stage_details.placeholders.num_questions", { defaultValue: "Enter number of questions…" })}
           />
         </div>
 
-        {/* Number of Questions */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Number of Questions
-          </label>
-          <input
-            type="number"
-            min="0"
-            max="100"
-            value={form.num_questions || 0}
-            disabled={stage.is_locked}
-            onChange={(e) =>
-              handleChange("num_questions", parseInt(e.target.value) || 0)
-            }
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-amethyst-400 focus:border-transparent transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
-            placeholder="Enter number of questions…"
-          />
-        </div>
-
-        {/* Out-of-scope fields — rendered disabled as placeholders */}
-        <div className="space-y-3 pt-2 border-t border-gray-100">
-          <p className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">
+        {/* Out-of-scope Advanced Toggles */}
+        <div className="space-y-3 pt-4 border-t border-border">
+          <p className="text-[10px] font-bold text-muted-foreground/60 tracking-widest uppercase">
             {t("stage_details.advanced.title")}
           </p>
           {[
@@ -242,24 +220,24 @@ export default function StageDetailsPanel({ stage, stages, onUpdate }) {
           ].map((label) => (
             <div
               key={label}
-              className="flex items-center justify-between opacity-40 cursor-not-allowed"
+              className="flex items-center justify-between opacity-40 cursor-not-allowed select-none"
             >
-              <span className="text-xs text-gray-500">{label}</span>
-              <div className="w-8 h-4 bg-gray-200 rounded-full" />
+              <span className="text-xs text-muted-foreground font-medium">{label}</span>
+              <div className="w-8 h-4 bg-secondary-foreground/20 dark:bg-slate-700 rounded-full border border-border dark:border-slate-600" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Save Button Footer */}
-      <div className="px-5 py-4 border-t border-gray-100 bg-white flex gap-2">
+      {/* Save Button Interactive Footer */}
+      <div className="px-5 py-4 border-t border-border bg-surface flex gap-2 sticky bottom-0">
         <button
           onClick={handleSave}
           disabled={!hasChanges || stage.is_locked || isSaving}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-dark-amethyst-600 text-white text-sm font-semibold rounded-lg hover:bg-dark-amethyst-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg hover:bg-primary/90 focus:outline-hidden focus:ring-2 focus:ring-primary/40 disabled:bg-secondary dark:disabled:bg-slate-800 disabled:text-muted-foreground/40 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
-          <Save className="w-4 h-4" />
-          {isSaving ? "Saving..." : "Save Changes"}
+          <Save className="w-4 h-4 stroke-[2.2]" />
+          {isSaving ? t("stage_details.actions.saving", { defaultValue: "Saving..." }) : t("stage_details.actions.save", { defaultValue: "Save Changes" })}
         </button>
       </div>
     </div>

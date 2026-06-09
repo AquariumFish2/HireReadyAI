@@ -142,10 +142,10 @@ export default function CompanyProfile({ company, members, onInvite }) {
                   <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 select-none">
                     {member.profiles?.full_name
                       ? member.profiles.full_name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
                       : "?"}
                   </div>
                   <div className="min-w-0">

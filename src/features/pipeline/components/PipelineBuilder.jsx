@@ -1,3 +1,4 @@
+// src\features\pipeline\components\PipelineBuilder.jsx
 import { useState, useEffect, useCallback } from "react";
 import {
   DragDropContext,
@@ -109,28 +110,45 @@ export default function PipelineBuilder({
   if (isDesktop) {
     return (
       <div className="flex h-full font-sans overflow-hidden">
-        <div className="w-56 shrink-0 border-r border-gray-100 bg-white overflow-y-auto">
+        <div
+          className="w-56 shrink-0 border-r border-gray-100 dark:border-slate-800 bg-white dark:bg-background overflow-y-auto
+            [&::-webkit-scrollbar]:w-1.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:bg-gray-200
+            dark:[&::-webkit-scrollbar-thumb]:bg-slate-800
+            dark:[&::-webkit-scrollbar-thumb]:hover:bg-slate-700"
+        >
           <StageLibrary onAddStage={handleAddFromLibrary} />
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-gray-50/50 px-8 py-6">
+
+        <div
+          className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-background px-8 py-6
+            [&::-webkit-scrollbar]:w-1.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:bg-gray-200
+            dark:[&::-webkit-scrollbar-thumb]:bg-slate-800
+            dark:[&::-webkit-scrollbar-thumb]:hover:bg-slate-700"
+        >
           <div className="max-w-xl mx-auto">
-            <h2 className="text-xl font-bold text-dark-amethyst-950 mb-1">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-1">
               {job?.title || t("pipeline_builder.title")}
             </h2>
-            <p className="text-xs text-gray-400 mb-6">
+            <p className="text-xs text-gray-400 dark:text-slate-400 mb-6">
               {t("pipeline_builder.desktop.subtitle")}
             </p>
 
             {stages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl py-16 text-center">
-                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-                  <Plus className="w-5 h-5 text-gray-400" />
+              <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-2xl py-16 text-center bg-white/50 dark:bg-[#111c2a]/30">
+                <div className="w-10 h-10 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
+                  <Plus className="w-5 h-5 text-gray-400 dark:text-slate-500" />
                 </div>
-                <p className="text-sm font-medium text-gray-500 mb-1">
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-1">
                   {t("pipeline_builder.empty.title")}
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-400 dark:text-slate-500">
                   {t("pipeline_builder.desktop.empty_desc")}
                 </p>
               </div>
@@ -171,7 +189,16 @@ export default function PipelineBuilder({
           </div>
         </div>
 
-        <div className="w-64 shrink-0 border-l border-gray-100 bg-white overflow-y-auto">
+        {/* Right Column: Stage Details */}
+        <div
+          className="w-64 shrink-0 border-l border-gray-100 dark:border-slate-800 bg-white dark:bg-background overflow-y-auto
+            [&::-webkit-scrollbar]:w-1.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:bg-gray-200
+            dark:[&::-webkit-scrollbar-thumb]:bg-slate-800
+            dark:[&::-webkit-scrollbar-thumb]:hover:bg-slate-700"
+        >
           <StageDetailsPanel
             stage={selectedStage}
             stages={stages}
@@ -188,31 +215,39 @@ export default function PipelineBuilder({
       {/* Library toggle */}
       <button
         onClick={() => setLibraryOpen(true)}
-        className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-xl shadow-sm text-sm text-gray-600 hover:text-dark-amethyst-700 hover:border-dark-amethyst-300 transition-all cursor-pointer"
+        className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[#111c2a] border border-gray-200 dark:border-slate-800 rounded-xl shadow-sm text-sm text-gray-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary-hover transition-all cursor-pointer"
       >
         <Library className="w-4 h-4" />
         <span className="text-xs font-medium hidden sm:inline">Library</span>
       </button>
 
       {/* Pipeline canvas */}
-      <div className="flex-1 overflow-y-auto bg-gray-50/50 px-4 py-6 pt-16">
+      <div
+        className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-[#0b131f] px-4 py-6 pt-16
+          [&::-webkit-scrollbar]:w-1.5
+          [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-thumb]:bg-gray-200
+          dark:[&::-webkit-scrollbar-thumb]:bg-slate-800
+          dark:[&::-webkit-scrollbar-thumb]:hover:bg-slate-700"
+      >
         <div className="max-w-xl mx-auto">
-          <h2 className="text-lg font-bold text-dark-amethyst-950 mb-1">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-1">
             {job?.title || "Pipeline"}
           </h2>
-          <p className="text-xs text-gray-400 mb-6">
+          <p className="text-xs text-gray-400 dark:text-slate-400 mb-6">
             {t("pipeline_builder.mobile.subtitle")}
           </p>
 
           {stages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl py-16 text-center">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-                <Plus className="w-5 h-5 text-gray-400" />
+            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-2xl py-16 text-center bg-white dark:bg-[#111c2a]/30">
+              <div className="w-10 h-10 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
+                <Plus className="w-5 h-5 text-gray-400 dark:text-slate-500" />
               </div>
-              <p className="text-sm font-medium text-gray-500 mb-1">
+              <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-1">
                 {t("pipeline_builder.empty.title")}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-slate-500">
                 {t("pipeline_builder.mobile.empty_desc")}
               </p>
             </div>
@@ -257,7 +292,7 @@ export default function PipelineBuilder({
       {selectedStage && (
         <button
           onClick={() => setDetailsOpen(true)}
-          className="absolute right-3 bottom-3 z-10 inline-flex items-center gap-1.5 px-3 py-2 bg-dark-amethyst-600 text-white border border-dark-amethyst-500 rounded-xl shadow-lg text-sm hover:bg-dark-amethyst-700 transition-all cursor-pointer"
+          className="absolute right-3 bottom-3 z-10 inline-flex items-center gap-1.5 px-3 py-2 bg-primary text-white border border-primary/80 rounded-xl shadow-lg text-sm hover:bg-primary-hover transition-all cursor-pointer"
         >
           <span className="text-xs font-medium hidden sm:inline">
             {t("pipeline_builder.settings")}
@@ -269,25 +304,25 @@ export default function PipelineBuilder({
       {/* Library drawer overlay */}
       <div
         className={`fixed inset-0 z-50 transition-all duration-300 ease-out ${libraryOpen
-            ? "visible opacity-100"
-            : "invisible opacity-0 pointer-events-none"
+          ? "visible opacity-100"
+          : "invisible opacity-0 pointer-events-none"
           }`}
       >
         <div
-          className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={() => setLibraryOpen(false)}
         />
         <div
-          className={`absolute left-0 top-0 bottom-0 w-72 max-w-[80vw] bg-white shadow-2xl transition-transform duration-300 ease-out ${libraryOpen ? "translate-x-0" : "-translate-x-full"
+          className={`absolute left-0 top-0 bottom-0 w-72 max-w-[80vw] bg-white dark:bg-[#0b131f] shadow-2xl transition-transform duration-300 ease-out ${libraryOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <span className="text-[10px] font-semibold text-gray-400 tracking-widest uppercase">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-slate-800">
+            <span className="text-[10px] font-semibold text-gray-400 dark:text-slate-400 tracking-widest uppercase">
               {t("pipeline_builder.library.title")}
             </span>
             <button
               onClick={() => setLibraryOpen(false)}
-              className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               aria-label={t("pipeline_builder.library.close")}
             >
               <X className="w-4 h-4" />
@@ -300,25 +335,31 @@ export default function PipelineBuilder({
       {/* Details drawer overlay */}
       <div
         className={`fixed inset-0 z-50 transition-all duration-300 ease-out ${detailsOpen
-            ? "visible opacity-100"
-            : "invisible opacity-0 pointer-events-none"
+          ? "visible opacity-100"
+          : "invisible opacity-0 pointer-events-none"
           }`}
       >
         <div
-          className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={() => setDetailsOpen(false)}
         />
         <div
-          className={`absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto transition-transform duration-300 ease-out ${detailsOpen ? "translate-x-0" : "translate-x-full"
-            }`}
+          className={`absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-[#0b131f] shadow-2xl overflow-y-auto transition-transform duration-300 ease-out 
+            ${detailsOpen ? "translate-x-0" : "translate-x-full"}
+            [&::-webkit-scrollbar]:w-1.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:bg-gray-200
+            dark:[&::-webkit-scrollbar-thumb]:bg-slate-800
+            dark:[&::-webkit-scrollbar-thumb]:hover:bg-slate-700`}
         >
-          <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-            <span className="text-sm font-semibold text-gray-900 truncate">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-slate-800">
+            <span className="text-sm font-semibold text-gray-900 dark:text-slate-100 truncate">
               {selectedStage?.name || t("pipeline_builder.details.title")}
             </span>
             <button
               onClick={() => setDetailsOpen(false)}
-              className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               aria-label={t("pipeline_builder.close_settings")}
             >
               <X className="w-4 h-4" />
