@@ -4,6 +4,10 @@ import TrustedBySection from "../Components/TrustedBySection";
 import FeaturesSection from "../Components/FeaturesSection";
 import AnimatedSection from "../Components/AnimatedSection";
 import LandingLayout from "../LandingLayout";
+import HowItWorks from "../Components/HowItWorks";
+import Customers from "../Components/Customers";
+import ContactUs from "../Components/ContactUs";
+import Footer from "../Components/Footer";
 
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
@@ -25,6 +29,10 @@ export default function LandingPage() {
         <TrustedBySection />
       </AnimatedSection>
       <FeaturesSection />
+      <HowItWorks />
+      <Customers />
+      <ContactUs />
+      <Footer />
     </LandingLayout>
   );
 }
