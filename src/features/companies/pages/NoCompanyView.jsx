@@ -1,7 +1,6 @@
-//src\features\companies\pages\NoCompanyView.jsx
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Building2, Plus, LogOut, ArrowLeft } from "lucide-react";
+import { Building2, Plus, LogOut, ArrowLeft, Check, Crown } from "lucide-react";
 import {
   fetchAllCompanies,
   createCompany,
@@ -9,9 +8,9 @@ import {
 import { addMembership } from "../services/memberships.service";
 import { logOut } from "@/features/auth/services/auth.service";
 import { useUser } from "@/features/auth/context/user.context";
-import { useTranslation } from "react-i18next";
-import LoadingSpinner from "@/shared/ui/LoadingSpinner";
 import { t } from "i18next";
+import LoadingSpinner from "@/shared/ui/LoadingSpinner";
+import { MEMBERSHIP_PERMISSION } from "@/shared/constants/enums";
 
 export default function NoCompanyView({ onCompanyJoined }) {
   const { profile } = useUser();
@@ -20,6 +19,8 @@ export default function NoCompanyView({ onCompanyJoined }) {
   const [error, setError] = useState(null);
   const [joining, setJoining] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [showingPricing, setShowingPricing] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   // form state
   const [newCompany, setNewCompany] = useState({
@@ -27,6 +28,13 @@ export default function NoCompanyView({ onCompanyJoined }) {
     industry: "",
     size: "",
     location: "",
+    description: "",
+    culture: "",
+    benefits: "",
+    founding_date: "",
+    website_url: "",
+    linkedin_url: "",
+    twitter_url: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,11 +61,10 @@ export default function NoCompanyView({ onCompanyJoined }) {
 
       setJoining(companyId);
 
-      // Add user as recruiter to existing company
       const membershipData = {
         company_id: companyId,
         profile_id: profile.id,
-        permissions: { role: "recruiter" },
+        recruiter_permissions: MEMBERSHIP_PERMISSION.pending,
       };
 
       await addMembership(membershipData);
@@ -83,13 +90,19 @@ export default function NoCompanyView({ onCompanyJoined }) {
         industry: newCompany.industry,
         size: newCompany.size ? parseInt(newCompany.size, 10) : null,
         location: newCompany.location,
+        description: newCompany.description,
+        culture: newCompany.culture,
+        benefits: newCompany.benefits,
+        founding_date: newCompany.founding_date || null,
+        website_url: newCompany.website_url,
+        linkedin_url: newCompany.linkedin_url,
+        twitter_url: newCompany.twitter_url,
       });
 
-      // Add user as admin (creator) to the new company
       await addMembership({
         company_id: created.id,
         profile_id: profile.id,
-        permissions: { role: "admin" },
+        recruiter_permissions: MEMBERSHIP_PERMISSION.hrManager,
       });
 
       onCompanyJoined(created.id);
@@ -106,7 +119,8 @@ export default function NoCompanyView({ onCompanyJoined }) {
   }
 
   return (
-    <div className="min-h-screen bg-background font-sans flex flex-col">      {/* Topbar */}
+    <div className="fixed inset-0 z-50 bg-background font-sans flex flex-col">
+      {/* Topbar */}
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -144,7 +158,135 @@ export default function NoCompanyView({ onCompanyJoined }) {
             </motion.div>
           )}
 
-          {isCreating ? (
+          {/* Pricing Step */}
+          {showingPricing && !selectedPlan && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              className="max-w-2xl mx-auto"
+            >
+              <button
+                onClick={() => setShowingPricing(false)}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-4 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back
+              </button>
+              <div className="text-center mb-6">
+                <h1 className="text-xl font-bold text-foreground mb-1">
+                  Choose your plan
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Start with a free plan and upgrade anytime
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Free Plan */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-background rounded-xl border border-border/60 p-6 shadow-xs flex flex-col"
+                >
+                  <div className="mb-4">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
+                      <Check className="w-5 h-5 text-primary" />
+                    </div>
+                    <h3 className="text-base font-bold text-foreground">
+                      Free
+                    </h3>
+                    <p className="text-2xl font-bold text-foreground mt-1">
+                      $0
+                      <span className="text-xs font-normal text-muted-foreground">
+                        /forever
+                      </span>
+                    </p>
+                  </div>
+                  <ul className="space-y-2 text-xs text-muted-foreground mb-6 flex-1">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Up to 10 active job postings
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Basic candidate management
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Team collaboration (up to 5 members)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Email support
+                    </li>
+                  </ul>
+                  <button
+                    onClick={() => {
+                      setSelectedPlan("free");
+                      setIsCreating(true);
+                    }}
+                    className="w-full py-2 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors cursor-pointer"
+                  >
+                    Get Started Free
+                  </button>
+                </motion.div>
+
+                {/* Premium Plan */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-gradient-to-b from-primary/5 to-background rounded-xl border border-primary/30 p-6 shadow-xs flex flex-col relative overflow-hidden"
+                >
+                  <div className="absolute top-3 right-3 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    Coming Soon
+                  </div>
+                  <div className="mb-4">
+                    <div className="w-10 h-10 bg-warning/20 rounded-lg flex items-center justify-center mb-3">
+                      <Crown className="w-5 h-5 text-warning" />
+                    </div>
+                    <h3 className="text-base font-bold text-foreground">
+                      Premium
+                    </h3>
+                    <p className="text-2xl font-bold text-foreground mt-1">
+                      $29
+                      <span className="text-xs font-normal text-muted-foreground">
+                        /month
+                      </span>
+                    </p>
+                  </div>
+                  <ul className="space-y-2 text-xs text-muted-foreground mb-6 flex-1">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Unlimited job postings
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      AI-powered candidate screening
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Advanced analytics & reports
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Priority support
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      Custom branding
+                    </li>
+                  </ul>
+                  <button
+                    disabled
+                    className="w-full py-2 bg-muted text-muted-foreground rounded-md text-xs font-medium cursor-not-allowed"
+                  >
+                    Coming Soon
+                  </button>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Create Company Form */}
+          {isCreating && selectedPlan === "free" && (
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -153,7 +295,11 @@ export default function NoCompanyView({ onCompanyJoined }) {
             >
               <div className="p-4 border-b border-border/60 flex items-center gap-3">
                 <button
-                  onClick={() => setIsCreating(false)}
+                  onClick={() => {
+                    setIsCreating(false);
+                    setSelectedPlan(null);
+                    setShowingPricing(true);
+                  }}
                   className="p-1.5 hover:bg-muted rounded-md transition-colors cursor-pointer text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="w-4 h-4" />
@@ -225,10 +371,117 @@ export default function NoCompanyView({ onCompanyJoined }) {
                     />
                   </div>
                 </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Founded
+                    </label>
+                    <input
+                      type="date"
+                      value={newCompany.founding_date}
+                      onChange={(e) =>
+                        setNewCompany({ ...newCompany, founding_date: e.target.value })
+                      }
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Website
+                    </label>
+                    <input
+                      type="url"
+                      value={newCompany.website_url}
+                      onChange={(e) =>
+                        setNewCompany({ ...newCompany, website_url: e.target.value })
+                      }
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    About
+                  </label>
+                  <textarea
+                    value={newCompany.description}
+                    onChange={(e) =>
+                      setNewCompany({ ...newCompany, description: e.target.value })
+                    }
+                    rows={3}
+                    className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring resize-none"
+                    placeholder="Tell applicants about your company..."
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Culture
+                    </label>
+                    <textarea
+                      value={newCompany.culture}
+                      onChange={(e) =>
+                        setNewCompany({ ...newCompany, culture: e.target.value })
+                      }
+                      rows={2}
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring resize-none"
+                      placeholder="Company values, culture..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Benefits
+                    </label>
+                    <textarea
+                      value={newCompany.benefits}
+                      onChange={(e) =>
+                        setNewCompany({ ...newCompany, benefits: e.target.value })
+                      }
+                      rows={2}
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring resize-none"
+                      placeholder="Perks, benefits..."
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      LinkedIn
+                    </label>
+                    <input
+                      type="url"
+                      value={newCompany.linkedin_url}
+                      onChange={(e) =>
+                        setNewCompany({ ...newCompany, linkedin_url: e.target.value })
+                      }
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                      placeholder="https://linkedin.com/company/..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Twitter
+                    </label>
+                    <input
+                      type="url"
+                      value={newCompany.twitter_url}
+                      onChange={(e) =>
+                        setNewCompany({ ...newCompany, twitter_url: e.target.value })
+                      }
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                      placeholder="https://twitter.com/..."
+                    />
+                  </div>
+                </div>
                 <div className="pt-3 flex justify-end gap-2 border-t border-border/60 mt-4">
                   <button
                     type="button"
-                    onClick={() => setIsCreating(false)}
+                    onClick={() => {
+                      setIsCreating(false);
+                      setSelectedPlan(null);
+                      setShowingPricing(true);
+                    }}
                     className="px-3 py-1.5 text-xs font-medium text-muted-foreground bg-background border border-border rounded-md hover:bg-muted transition-colors cursor-pointer"
                   >
                     {t("no_company_view.create.buttons.cancel")}
@@ -245,7 +498,10 @@ export default function NoCompanyView({ onCompanyJoined }) {
                 </div>
               </form>
             </motion.div>
-          ) : (
+          )}
+
+          {/* Main View */}
+          {!showingPricing && !isCreating && (
             <>
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
@@ -260,11 +516,12 @@ export default function NoCompanyView({ onCompanyJoined }) {
                   {t("no_company_view.join.title")}
                 </h1>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Select a company to get started with HireReadyAI or create your own
+                  Select a company to get started with HireReadyAI or create
+                  your own
                 </p>
                 {companies.length > 0 && (
                   <button
-                    onClick={() => setIsCreating(true)}
+                    onClick={() => setShowingPricing(true)}
                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors cursor-pointer shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -284,7 +541,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
                     {t("no_company_view.join.no_companies")}
                   </p>
                   <button
-                    onClick={() => setIsCreating(true)}
+                    onClick={() => setShowingPricing(true)}
                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors cursor-pointer shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />

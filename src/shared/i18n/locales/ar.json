@@ -7,6 +7,7 @@
     "explore_jobs": "استكشف الوظائف",
     "my_applications": "طلباتي",
     "my_feedback": "النتائج",
+    "my_profile": "ملفي الشخصي",
     "company_profile": "ملف الشركة",
     "job_postings": "الوظائف",
     "shortlists": "القوائم المختصرة",
@@ -575,6 +576,13 @@
       "join": "انضم",
       "joining": "جاري الانضمام..."
     }
+  },
+
+  "pending_approval": {
+    "title": "قيد الانتظار",
+    "subtitle": "طلب انضمامك إلى {{company}} قيد المراجعة.",
+    "contact_hr": "يرجى التواصل مع مدير الموارد البشرية للحصول على الوصول.",
+    "back_to_home": "العودة إلى الصفحة الرئيسية"
   },
 
   "job_content_cards": {

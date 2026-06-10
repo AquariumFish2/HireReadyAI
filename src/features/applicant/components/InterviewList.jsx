@@ -213,7 +213,7 @@
 // }
 // src/features/applicant/components/InterviewList.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { APPLICATION_STAGE } from "@/shared/constants/enums";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
@@ -602,8 +602,13 @@ export default function InterviewList({ applications }) {
                     </div>
 
                     <p className="text-xs text-accent font-medium m-0 mb-1.5">
-                      {company?.name ||
-                        t("interview_list.fields.unknown_company")}
+                      {company ? (
+                        <Link to={`/company/${company.id}`} className="hover:underline">
+                          {company.name}
+                        </Link>
+                      ) : (
+                        t("interview_list.fields.unknown_company")
+                      )}
                     </p>
 
                     <div className="flex items-center gap-2 flex-wrap">

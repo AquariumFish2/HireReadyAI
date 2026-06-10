@@ -19,6 +19,7 @@ import {
   CheckCircle,
   Wand2,
   KanbanSquare,
+  User,
   Sun,
   Moon,
 } from "lucide-react";
@@ -34,6 +35,7 @@ export default function MainLayout() {
     ? [
         { to: "/applicant", label: "nav.my_applications", icon: FileCheck },
         { to: "/applicant/feedback", label: "nav.my_feedback", icon: FileText },
+        { to: "/applicant/profile", label: "nav.my_profile", icon: User },
         { to: "/jobs", label: "nav.explore_jobs", icon: Briefcase },
       ]
     : [

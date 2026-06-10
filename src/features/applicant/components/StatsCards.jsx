@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { APPLICATION_STAGE } from "@/shared/constants/enums";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
@@ -119,7 +119,9 @@ export default function StatsCards({ applications }) {
                       {job?.title || "Unknown Position"}
                     </p>
                     <p className="m-0 mt-0.5 text-[11px] text-accent">
-                      {company?.name}{app.applied_at ? ` · Applied ${formatDate(app.applied_at)}` : ""}
+                      <Link to={`/company/${company?.id}`} className="hover:underline">
+                        {company?.name}
+                      </Link>{app.applied_at ? ` · Applied ${formatDate(app.applied_at)}` : ""}
                     </p>
                   </div>
                   <button

@@ -26,6 +26,10 @@ export const UserProvider = ({ children }) => {
       phone: data.phone,
       isActive: data.is_active,
       profile_pic: data.profile_pic,
+      headline: data.headline,
+      bio: data.bio,
+      location: data.location,
+      linkedin_url: data.linkedin_url,
       created_at: new Date().toISOString(),
     };
   };

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useUser } from "@/features/auth/context/user.context";
 import { useApplications } from "@/features/applications/context/application.context";
-import ApplicantHeader from "../components/ApplicantHeader";
 import StatsCards from "../components/StatsCards";
 import ChartsSection from "../components/ChartsSection";
 import ApplicationsList from "../components/ApplicationsList";
@@ -15,7 +14,6 @@ import LoadingSpinner from "@/shared/ui/LoadingSpinner";
 
 export default function ApplicantPage() {
   const { profile, user } = useUser();
-  const [localProfile, setLocalProfile] = useState(profile);
   const [showWelcome, setShowWelcome] = useState(
     () => !sessionStorage.getItem("welcomeShown"),
   );
@@ -28,11 +26,6 @@ export default function ApplicantPage() {
     getAllApplications,
     updateApplicationStage,
   } = useApplications();
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocalProfile(profile);
-  }, [profile]);
 
   useEffect(() => {
     if (user?.id) {
@@ -56,7 +49,7 @@ export default function ApplicantPage() {
     <div className="relative min-h-screen bg-surface-muted font-sans text-foreground">
       {showWelcome && (
         <WelcomeOverlay
-          profile={localProfile}
+          profile={profile}
           applications={applications}
           onContinue={() => {
             sessionStorage.setItem("welcomeShown", "1");
@@ -67,26 +60,6 @@ export default function ApplicantPage() {
       <div className="p-4">
         {/* Inner max-width container */}
         <div className="max-w-7xl mx-auto">
-          {/* ── HEADER ─────────────────────────────── */}
-          <motion.div
-            className="mb-4"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <ApplicantHeader
-              fullName={localProfile?.fullName}
-              profile_pic={localProfile?.profile_pic}
-              email={localProfile?.email}
-              phone={localProfile?.phone}
-              joinedDate={localProfile?.created_at}
-              userId={user?.id}
-              onAvatarChange={(url) =>
-                setLocalProfile((prev) => ({ ...prev, profile_pic: url }))
-              }
-            />
-          </motion.div>
-
           {/* ── EMPTY STATE (ONLY WHEN NO APPLICATIONS) ───────────────── */}
           {applications?.length === 0 ? (
             <div

@@ -1,4 +1,3 @@
-import { USER_ROLE } from "@/shared/constants/enums";
 import { supabase } from "@/shared/services/supabase";
 
 // Add a membership
@@ -22,4 +21,19 @@ export const removeMembership = async (membershipId) => {
     .delete()
     .eq("id", membershipId);
   if (error) throw error;
+};
+
+// Update a membership's recruiter_permissions
+export const updateMembershipPermission = async (membershipId, permission) => {
+  const { data, error } = await supabase
+    .from("company_memberships")
+    .update({ recruiter_permissions: permission })
+    .eq("id", membershipId)
+    .select(`
+      *,
+      profiles(*)
+    `)
+    .single();
+  if (error) throw error;
+  return data;
 };

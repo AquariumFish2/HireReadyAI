@@ -8,6 +8,7 @@
     "explore_jobs": "Explore Jobs",
     "my_feedback": "My Feedback",
     "my_applications": "My Applications",
+    "my_profile": "My Profile",
     "company_profile": "Company Profile",
     "job_postings": "Job Postings",
     "shortlists": "Shortlists",
@@ -577,6 +578,13 @@
       "join": "Join",
       "joining": "Joining..."
     }
+  },
+
+  "pending_approval": {
+    "title": "Pending Approval",
+    "subtitle": "Your request to join {{company}} is awaiting approval.",
+    "contact_hr": "Please contact your HR manager for access.",
+    "back_to_home": "Back to Home"
   },
 
   "job_content_cards": {

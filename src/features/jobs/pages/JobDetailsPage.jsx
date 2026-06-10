@@ -1,6 +1,6 @@
 //src\features\jobs\pages\JobDetailsPage.jsx
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { fetchJobById, fetchSimilarJobs } from "../services/jobs.service";
 import { useUser } from "@/features/auth/context/user.context";
 import { supabase } from "@/shared/services/supabase";
@@ -129,20 +129,22 @@ export default function JobDetailsPage() {
             </div>
 
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              {company?.logo_url ? (
-                <img
-                  src={company.logo_url}
-                  alt={company.name}
-                  className="size-7 object-contain rounded-md border border-border p-0.5 bg-card"
-                />
-              ) : (
-                <div className="size-7 rounded-md bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                  {company?.name?.[0]}
-                </div>
-              )}
-              <span className="text-foreground/80 text-xs font-semibold flex items-center gap-1">
-                {company?.name}
-              </span>
+              <Link to={`/company/${company?.id}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                {company?.logo_url ? (
+                  <img
+                    src={company.logo_url}
+                    alt={company.name}
+                    className="size-7 object-contain rounded-md border border-border p-0.5 bg-card"
+                  />
+                ) : (
+                  <div className="size-7 rounded-md bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    {company?.name?.[0]}
+                  </div>
+                )}
+                <span className="text-foreground/80 text-xs font-semibold flex items-center gap-1">
+                  {company?.name}
+                </span>
+              </Link>
               {company?.location && (
                 <>
                   <span className="text-muted-foreground/30 text-[10px]">

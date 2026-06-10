@@ -13,7 +13,7 @@ export async function getPipelineCandidates(companyId) {
       cv_score,
     current_stage_id,
     answers,
-    profiles ( full_name, headline, phone ),
+    profiles ( id, full_name, headline, phone ),
       job_postings!inner ( id, title, company_id ),
       application_stages (
         id,

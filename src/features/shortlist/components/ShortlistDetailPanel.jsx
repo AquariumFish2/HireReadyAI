@@ -1,5 +1,6 @@
 //src\features\shortlist\components\ShortlistDetailPanel.jsx
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ThumbsUp,
@@ -11,6 +12,7 @@ import {
   Send,
   Clock,
   UserCheck,
+  ExternalLink,
 } from "lucide-react";
 import { supabase } from "@/shared/services/supabase";
 import OfferEmailModal from "./OfferEmailModal";
@@ -88,6 +90,7 @@ export default function ShortlistDetailPanel({
   companyName = "",
 }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [noteBody, setNoteBody] = useState("");
   const [visibleToTeam, setVisibleToTeam] = useState(true);
   const [showRejectInput, setShowRejectInput] = useState(false);
@@ -197,6 +200,12 @@ export default function ShortlistDetailPanel({
                   <span className="font-bold text-foreground font-display text-[17px]">
                     {candidate?.full_name}
                   </span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigate(`/companies/applicants/${candidate?.id}/profile`); }}
+                    className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium text-primary bg-primary/5 border border-primary/15 rounded-md hover:bg-primary/10 transition-colors shrink-0"
+                  >
+                    Show Profile <ExternalLink className="w-3 h-3" />
+                  </button>
                   {composite_score != null && (
                     <span
                       className={`text-xs font-bold px-2 py-0.5 rounded-full border ${composite_score >= 80

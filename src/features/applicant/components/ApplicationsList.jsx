@@ -1,5 +1,5 @@
 // src/features/applicant/components/ApplicationsList.jsx
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { APPLICATION_STAGE } from "@/shared/constants/enums";
 import {
   Briefcase,
@@ -272,8 +272,14 @@ export default function ApplicationsList({ applications }) {
                     <div className="flex items-center gap-1.5 mb-2.5">
                       <Briefcase size={12} className="text-accent shrink-0" />
                       <span className="text-xs text-accent font-medium">
-                        {company?.name || t("applications.unknown_company")}
-                      </span>
+                      {company ? (
+                        <Link to={`/company/${company.id}`} className="hover:underline">
+                          {company.name}
+                        </Link>
+                      ) : (
+                        t("applications.unknown_company")
+                      )}
+                    </span>
                     </div>
 
                     {/* Meta row */}

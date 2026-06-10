@@ -1,4 +1,3 @@
-//src\features\companies\pages\CompanyLayout.jsx
 import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
@@ -7,11 +6,13 @@ import JobPostings from "./JobPostings";
 import CompanyProfile from "./CompanyProfile";
 import JDGeneratorPage from "./JDGeneratorPage";
 import NoCompanyView from "./NoCompanyView";
+import PendingApprovalPage from "./PendingApprovalPage";
 import RecruiterDashboardPage from "../../recruiter/pages/RecruiterDashboardPage";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner";
 import PipelineCandidatesPage from "../../recruiter/pages/PipelineCandidatesPage";
 import CandidateProfilePage from "../../recruiter/pages/CandidateProfilePage";
 import CandidateAssessmentsPage from "../../recruiter/pages/CandidateAssessmentsPage";
+import ApplicantProfilePage from "../../applicant/pages/ApplicantProfilePage";
 import ShortlistsPage from "../../shortlist/pages/ShortlistsPage";
 import PipelineBuilderPage from "../../pipeline/pages/PipelineBuilderPage";
 import {
@@ -20,6 +21,7 @@ import {
   fetchCompanyMembers,
 } from "../services/companies.service";
 import { addMembership } from "../services/memberships.service";
+import { MEMBERSHIP_PERMISSION } from "@/shared/constants/enums";
 import { useTranslation } from "react-i18next";
 
 function CompanyLayout() {
@@ -32,6 +34,7 @@ function CompanyLayout() {
   const [jobs, setJobs] = useState([]);
   const [members, setMembers] = useState([]);
   const [company, setCompany] = useState(null);
+  const [permission, setPermission] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [frameworkFile, setFrameworkFile] = useState(
     "engineering-framework-v3.pdf",
@@ -48,14 +51,16 @@ function CompanyLayout() {
         setDataLoading(true);
         setError(null);
 
-        const companyData = await fetchCompanyByProfileId(profile.id);
+        const { company: companyData, permission: perm } = await fetchCompanyByProfileId(profile.id);
         if (!companyData) {
           setCompany(null);
+          setPermission(null);
           setDataLoading(false);
           return;
         }
 
         setCompany(companyData);
+        setPermission(perm);
 
         const [jobsData, membersData] = await Promise.all([
           fetchJobsByCompanyId(companyData.id),
@@ -82,7 +87,7 @@ function CompanyLayout() {
       const membershipData = {
         company_id: company.id,
         profile_id: profile?.id,
-        permissions: { role: "recruiter" },
+        recruiter_permissions: MEMBERSHIP_PERMISSION.pending,
       };
 
       const newMembership = await addMembership(membershipData);
@@ -124,6 +129,10 @@ function CompanyLayout() {
     );
   }
 
+  if (permission === MEMBERSHIP_PERMISSION.pending) {
+    return <PendingApprovalPage companyName={company?.name} />;
+  }
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden w-full h-full bg-background font-sans">
       {!isFullscreenRoute && (
@@ -144,7 +153,11 @@ function CompanyLayout() {
               <CompanyProfile
                 company={company}
                 members={members}
+                currentUserPermission={permission}
+                currentUserId={profile?.id}
                 onInvite={handleInviteMember}
+                onMembersChange={setMembers}
+                onCompanyUpdate={setCompany}
                 frameworkFile={frameworkFile}
                 setFrameworkFile={setFrameworkFile}
               />
@@ -176,6 +189,10 @@ function CompanyLayout() {
           <Route
             path="candidates/:id/assessments"
             element={<CandidateAssessmentsPage />}
+          />
+          <Route
+            path="applicants/:id/profile"
+            element={<ApplicantProfilePage />}
           />
           <Route path="pipelines/:jobId" element={<PipelineBuilderPage />} />
           <Route

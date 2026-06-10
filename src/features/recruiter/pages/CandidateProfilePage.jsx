@@ -14,6 +14,7 @@ import {
   Award,
   Download,
   MessageSquare,
+  ExternalLink,
 } from "lucide-react";
 import {
   getCandidateProfile,
@@ -234,6 +235,12 @@ export default function CandidateProfilePage() {
                   Rejected
                 </span>
               )}
+              <Link
+                to={`/companies/applicants/${candidate.id}/profile`}
+                className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium text-primary bg-primary/5 border border-primary/15 rounded-md hover:bg-primary/10 transition-colors"
+              >
+                Show Profile <ExternalLink className="w-3 h-3" />
+              </Link>
             </div>
             {candidate.headline && (
               <p className="text-sm text-muted-foreground mt-1">

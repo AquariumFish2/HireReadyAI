@@ -9,6 +9,7 @@ import {
   Check,
   ChevronRight,
   Loader2,
+  ExternalLink,
 } from "lucide-react";
 import { rejectApplication, unrejectApplication } from "../../shortlist/services/shortlist.service";
 import { moveToStage } from "../services/candidatesPipline.service";
@@ -232,6 +233,12 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
                 <h2 className="text-lg font-bold text-foreground">
                   {candidate.name}
                 </h2>
+                <button
+                  onClick={(e) => { e.stopPropagation(); navigate(`/companies/applicants/${profile?.id}/profile`); }}
+                  className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium text-primary bg-primary/5 border border-primary/15 rounded-md hover:bg-primary/10 transition-colors shrink-0"
+                >
+                  Show Profile <ExternalLink className="w-3 h-3" />
+                </button>
                 {candidate.is_rejected && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-destructive/10 text-destructive border border-destructive/20">
                     Rejected

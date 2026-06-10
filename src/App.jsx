@@ -12,6 +12,7 @@ import GoogleRoleSelect from "@/features/auth/pages/GoogleRoleSelect";
 import { USER_ROLE } from "@/shared/constants/enums";
 import ApplicantPage from "@/features/applicant/pages/ApplicantPage";
 import ApplicantFeedbackPage from "@/features/applicant/pages/ApplicantFeedbackPage";
+import ApplicantProfilePage from "@/features/applicant/pages/ApplicantProfilePage";
 import JobsPage from "@/features/jobs/pages/JobsPage";
 import CompanyLayout from "./features/companies/pages/CompanyLayout";
 import MainLayout from "@/shared/ui/MainLayout";
@@ -20,6 +21,7 @@ import InterviewPage from "./features/interview/pages/interviewPage";
 import JobDetailsPage from "@/features/jobs/pages/JobDetailsPage";
 import ApplyJobPage from "@/features/applications/pages/ApplyJobPage";
 import PipelineCandidatesPage from "./features/recruiter/pages/PipelineCandidatesPage";
+import PublicCompanyProfile from "./features/companies/pages/PublicCompanyProfile";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner";
 
 // eslint-disable-next-line no-unused-vars
@@ -83,6 +85,15 @@ function App() {
         />
 
         <Route
+          path="/applicant/profile"
+          element={
+            <ProtectedRoute allowedRoles={[USER_ROLE.applicant]}>
+              <ApplicantProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/applicant/feedback"
           element={
             <ProtectedRoute allowedRoles={[USER_ROLE.applicant]}>
@@ -126,6 +137,8 @@ function App() {
           }
         />
       </Route>
+
+      <Route path="/company/:id" element={<PublicCompanyProfile />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

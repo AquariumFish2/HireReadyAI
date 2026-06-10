@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { fetchSimilarJobs } from "@/features/jobs/services/jobs.service";
 import { Briefcase, MapPin, Building2 } from "lucide-react";
 
@@ -34,27 +34,32 @@ export default function SimilarOpportunities({ jobId, seniorityLevel, jobType })
               onClick={() => navigate(`/jobs/${job.id}`)}
               className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-surface-hover transition-colors cursor-pointer group"
             >
-              {company?.logo_url ? (
-                <img
-                  src={company.logo_url}
-                  alt={company.name}
-                  className="w-9 h-9 rounded-lg border border-border object-contain p-0.5 shrink-0 bg-card"
-                />
-              ) : (
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-bold text-xs shrink-0">
-                  {company?.name?.[0] || "?"}
-                </div>
-              )}
+              <Link to={`/company/${company?.id}`} className="shrink-0 hover:opacity-80 transition-opacity">
+                {company?.logo_url ? (
+                  <img
+                    src={company.logo_url}
+                    alt={company.name}
+                    className="w-9 h-9 rounded-lg border border-border object-contain p-0.5 shrink-0 bg-card"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    {company?.name?.[0] || "?"}
+                  </div>
+                )}
+              </Link>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-foreground group-hover:text-accent transition-colors truncate">
                   {job.title}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5 text-[11px] text-muted-foreground">
                   {company?.name && (
-                    <span className="flex items-center gap-1">
+                    <Link
+                      to={`/company/${company.id}`}
+                      className="flex items-center gap-1 hover:text-primary transition-colors"
+                    >
                       <Building2 size={10} className="text-muted-foreground/60" />
                       {company.name}
-                    </span>
+                    </Link>
                   )}
                   {company?.location && (
                     <span className="flex items-center gap-1">
