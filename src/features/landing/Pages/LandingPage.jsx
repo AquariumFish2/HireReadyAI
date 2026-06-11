@@ -16,7 +16,7 @@ import FAQ from "../Components/Faq";
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Testimonials", href: "#testimonials" },
+  { label: "Testimonials", href: "#customers" },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
@@ -35,9 +35,9 @@ export default function LandingPage() {
       <FeaturesSection />
       <HowItWorks />
       <Customers />
-      <ContactUs />
       <BuiltForJobs />
       <TopFeaturedJobs />
+      <ContactUs />
       <FAQ />
       <Footer />
     </LandingLayout>
