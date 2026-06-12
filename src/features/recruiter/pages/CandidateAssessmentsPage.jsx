@@ -119,9 +119,9 @@ function ExpandableQuestion({ question }) {
 
             {question.question_type === "video" && (
               <div className="space-y-3">
-                {answerData?.recording_url ? (
+                {(context?.video_url || context?.recording_url) ? (
                   <video
-                    src={answerData.recording_url}
+                    src={context.video_url || context.recording_url}
                     controls
                     className="w-full rounded-xl border border-border max-h-[320px] bg-black"
                   />
@@ -131,13 +131,13 @@ function ExpandableQuestion({ question }) {
                     No video recording available
                   </div>
                 )}
-                {answerData?.transcript && (
+                {answerData?.answer_text && (
                   <div className="bg-surface border border-border rounded-xl p-4">
                     <div className="flex items-center gap-1.5 mb-2">
                       <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/60" />
                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Transcript</span>
                     </div>
-                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{answerData.transcript}</p>
+                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{answerData.answer_text}</p>
                   </div>
                 )}
               </div>
