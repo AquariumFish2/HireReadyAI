@@ -1,5 +1,6 @@
 // src\features\applications\services\application.service.js
 import { supabase } from "@/shared/services/supabase";
+import { notifyNewApplication } from "@/shared/services/notifications";
 //fetch all applications by applicant id
 export const fetchApplicationsByApplicantId = async (applicantId) => {
   const { data, error } = await supabase
@@ -119,6 +120,9 @@ export const createApplication = async (applicationData) => {
       { onConflict: "application_id,stage_id" }
     );
   }
+
+  // Notify recruiters of the new application in background
+  notifyNewApplication(application);
 
   return application;
 };

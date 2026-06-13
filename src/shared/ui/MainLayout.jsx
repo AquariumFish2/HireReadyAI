@@ -25,11 +25,47 @@ import {
 } from "lucide-react";
 
 
+import { supabase } from "@/shared/services/supabase";
+import ToastNotification from "@/features/applications/components/apply/ToastNotification";
+import { useRealtimeApplicant, useRealtimeRecruiter } from "@/shared/hooks/useRealtime";
+
 export default function MainLayout() {
   const { profile, signOutUser } = useUser();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const isApplicant = profile?.role === USER_ROLE.applicant;
+
+  // Realtime notification state
+  const [toast, setToast] = useState(null);
+  const [companyId, setCompanyId] = useState(null);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  // Fetch company ID for recruiters
+  useEffect(() => {
+    if (profile && !isApplicant) {
+      supabase
+        .from("company_memberships")
+        .select("company_id")
+        .eq("profile_id", profile.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.company_id) {
+            setCompanyId(data.company_id);
+          }
+        });
+    }
+  }, [profile, isApplicant]);
+
+  // Realtime subscriptions
+  useRealtimeApplicant(isApplicant ? profile?.id : null, setToast);
+  useRealtimeRecruiter(isApplicant ? null : companyId, setToast);
 
   const links = isApplicant
     ? [
@@ -96,6 +132,7 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-screen bg-secondary/50 font-sans relative overflow-hidden">
+      <ToastNotification toast={toast} onDismiss={() => setToast(null)} />
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 md:hidden transition-opacity duration-200"

@@ -4,36 +4,35 @@ import { Plus, Minus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
-const faqs = [
-  {
-    q: "How can I find jobs on HireReadyAI?",
-    a: "Use the Jobs page to search by title, skill, or company. You can filter by job type, location, and salary range.",
-  },
-  {
-    q: "Is my resume and profile data kept private?",
-    a: "Yes. Your profile is only shared with employers when you explicitly apply. We never sell your data or surface your profile to recruiters without your consent.",
-  },
-  {
-    q: "How do I track my applications?",
-    a: "The My Applications dashboard gives you a real-time pipeline view — from Applied through Screening, Interview, Assessment, and Final Stage. Each card updates automatically when a recruiter takes action.",
-  },
-  {
-    q: "Can I prepare for interviews inside the platform?",
-    a: "Yes. HireReadyAI includes an AI Interview Coach that simulates common and role-specific questions, scores your responses, and gives actionable feedback on clarity, structure, and confidence.",
-  },
-  {
-    q: "What types of roles and industries does HireReadyAI cover?",
-    a: "We cover tech, design, product, marketing, finance, and operations roles across startups, scale-ups, and enterprise companies. New listings are added daily, and you can set alerts for any keyword or company.",
-  },
-  {
-    q: "How do I upload or update my profile picture?",
-    a: "Go to your Profile page, click on your avatar, and select a new image from your device. Supported formats are JPG and PNG. Your picture is visible to employers when they review your application.",
-  },
-];
-
 export default function FAQ() {
   const [open, setOpen] = useState(1); // open second item by default (mirrors screenshot)
   const { t } = useTranslation();
+  const faqs = [
+    {
+      q: t("faq.items.0.q"),
+      a: t("faq.items.0.a"),
+    },
+    {
+      q: t("faq.items.1.q"),
+      a: t("faq.items.1.a"),
+    },
+    {
+      q: t("faq.items.2.q"),
+      a: t("faq.items.2.a"),
+    },
+    {
+      q: t("faq.items.3.q"),
+      a: t("faq.items.3.a"),
+    },
+    {
+      q: t("faq.items.4.q"),
+      a: t("faq.items.4.a"),
+    },
+    {
+      q: t("faq.items.5.q"),
+      a: t("faq.items.5.a"),
+    },
+  ];
 
   return (
     <motion.section
@@ -44,7 +43,6 @@ export default function FAQ() {
       className="py-20 px-4 bg-background"
     >
       <div className="max-w-6xl mx-auto space-y-12">
-
         <div className="text-center space-y-3 max-w-2xl mx-auto">
           <span className="inline-block text-[10px] font-extrabold tracking-[0.2em] text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/10 uppercase">
             {t("faq.eyebrow")}
@@ -155,9 +153,10 @@ export default function FAQ() {
                   <div
                     key={i}
                     className={`rounded-xl border transition-colors cursor-pointer
-                      ${isOpen
-                        ? "border-primary/30 dark:border-accent/30 bg-secondary dark:bg-surface-muted"
-                        : "border-border bg-card hover:bg-surface-hover"
+                      ${
+                        isOpen
+                          ? "border-primary/30 dark:border-accent/30 bg-secondary dark:bg-surface-muted"
+                          : "border-border bg-card hover:bg-surface-hover"
                       }`}
                     onClick={() => setOpen(isOpen ? null : i)}
                   >
@@ -169,10 +168,11 @@ export default function FAQ() {
                       </span>
                       <div
                         className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center border transition-colors
-                        ${isOpen
+                        ${
+                          isOpen
                             ? "border-primary/30 dark:border-accent/30 bg-primary/10 dark:bg-accent/10"
                             : "border-border bg-surface-muted"
-                          }`}
+                        }`}
                       >
                         {isOpen ? (
                           <Minus
