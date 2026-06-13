@@ -85,3 +85,32 @@ export const deleteJob = async (jobId) => {
     .eq("id", jobId);
   if (error) throw error;
 };
+
+// Fetch featured jobs (last 6 posts with dynamic applicants count)
+export const getFeaturedJobs = async () => {
+  const { data, error } = await supabase
+    .from("job_postings")
+    .select(`
+      id,
+      title,
+      work_location,
+      job_type,
+      salary_min,
+      salary_max,
+      created_at,
+      companies (
+        name,
+        logo_url
+      ),
+      applications(count)
+    `)
+    .order("created_at", { ascending: false })
+    .limit(6);
+
+  if (error) throw error;
+
+  return data.map(job => ({
+    ...job,
+    applicants_count: job.applications?.[0]?.count || 0
+  }));
+};
