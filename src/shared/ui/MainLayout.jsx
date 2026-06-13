@@ -132,7 +132,7 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-screen bg-secondary/50 font-sans relative overflow-hidden">
-      <ToastNotification toast={toast} />
+      <ToastNotification toast={toast} onDismiss={() => setToast(null)} />
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 md:hidden transition-opacity duration-200"

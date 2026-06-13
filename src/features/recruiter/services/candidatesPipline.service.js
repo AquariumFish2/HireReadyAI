@@ -1,4 +1,5 @@
 import { supabase } from "@/shared/services/supabase";
+import { notifyStageChange } from "@/shared/services/notifications";
 
 /**
  * Fetch all applications for a specific company, with their current stage data.
@@ -187,6 +188,9 @@ export async function moveToStage(applicationId, targetStageId) {
 
   if (updateErr) return { error: updateErr };
 
+  // Trigger push notification in background
+  notifyStageChange(applicationId, targetStageId);
+
   return { error: null };
 }
 
@@ -202,6 +206,10 @@ export const openStage = async (applicationId, stageId) => {
     .from("applications")
     .update({ current_stage_id: stageId })
     .eq("id", applicationId);
+
+  if (!error) {
+    notifyStageChange(applicationId, stageId);
+  }
 
   return { error };
 };

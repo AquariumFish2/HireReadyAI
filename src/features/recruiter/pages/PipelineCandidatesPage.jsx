@@ -657,6 +657,100 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
       })
       .finally(() => setLoading(false));
   }, [company?.id, t]);
+  // ------- Realtime: auto-refresh pipeline when applications change -------
+  useEffect(() => {
+    if (!company?.id) return;
+
+    const channel = supabase
+      .channel(`pipeline-page-${company.id}-${Date.now()}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "applications" },
+        () => {
+          // Refetch full data so new applicant appears instantly
+          getPipelineCandidates(company.id).then(async ({ data, error }) => {
+            if (error || !data) return;
+            const mapped = (data || []).map((app) => {
+              const allStages = app.application_stages || [];
+              let currentStageId = app.current_stage_id;
+              const currentStage = currentStageId
+                ? allStages.find((s) => s.recruitment_stages?.id === currentStageId)
+                : null;
+              let score = 0;
+              let evaluation = null;
+              if (currentStage) {
+                evaluation = currentStage.application_stage_evaluations?.[0] ?? null;
+                if (evaluation?.ai_score != null) score = Math.round(Number(evaluation.ai_score));
+                else if (currentStage.score != null) score = Math.round(Number(currentStage.score));
+              }
+              const hasEvaluation = evaluation !== null || currentStage?.score != null;
+              const isRejected = app.is_rejected || evaluation?.recommendation === "reject";
+              return {
+                id: app.id,
+                jobId: app.job_postings?.id,
+                name: app.profiles?.full_name || t("candidate_pipeline.unknown_candidate"),
+                applied_at: app.applied_at,
+                score,
+                hasEvaluation,
+                is_rejected: isRejected,
+                currentStageId,
+                cvScore: app.cv_score,
+                compositeScore: app.composite_score,
+                profile: app.profiles,
+                answers: app.answers,
+                stagesData: allStages,
+              };
+            });
+            setCandidates(mapped);
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "applications" },
+        () => {
+          getPipelineCandidates(company.id).then(({ data }) => {
+            if (!data) return;
+            const mapped = (data || []).map((app) => {
+              const allStages = app.application_stages || [];
+              let currentStageId = app.current_stage_id;
+              const currentStage = currentStageId
+                ? allStages.find((s) => s.recruitment_stages?.id === currentStageId)
+                : null;
+              let score = 0;
+              let evaluation = null;
+              if (currentStage) {
+                evaluation = currentStage.application_stage_evaluations?.[0] ?? null;
+                if (evaluation?.ai_score != null) score = Math.round(Number(evaluation.ai_score));
+                else if (currentStage.score != null) score = Math.round(Number(currentStage.score));
+              }
+              const hasEvaluation = evaluation !== null || currentStage?.score != null;
+              const isRejected = app.is_rejected || evaluation?.recommendation === "reject";
+              return {
+                id: app.id,
+                jobId: app.job_postings?.id,
+                name: app.profiles?.full_name || t("candidate_pipeline.unknown_candidate"),
+                applied_at: app.applied_at,
+                score,
+                hasEvaluation,
+                is_rejected: isRejected,
+                currentStageId,
+                cvScore: app.cv_score,
+                compositeScore: app.composite_score,
+                profile: app.profiles,
+                answers: app.answers,
+                stagesData: allStages,
+              };
+            });
+            setCandidates(mapped);
+          });
+        }
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, [company?.id, t]);
+  // -------------------------------------------------------------------------
 
   const filtered = candidates.filter((c) => {
     if (selectedJobId && c.jobId !== selectedJobId) return false;
