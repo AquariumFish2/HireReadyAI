@@ -996,6 +996,17 @@
   },
 
   "landing": {
+    "contact_us": {
+      "contactus": "Contact Us",
+      "get_in_touch": "Get in touch",
+      "title": "Contact information",
+      "description": "Reach the team directly through any of the channels below."
+    },
+    "customers": {
+      "testimonials": "Testimonials",
+      "loved_by": "Loved by hiring teams"
+    },
+
     "nav": {
       "get_started": "Get Started"
     },
@@ -1129,6 +1140,57 @@
       "scoreLabel": "Screening Score",
       "scoreRole": "Senior Frontend Engineer",
       "scoreValue": "94%"
+    }
+  },
+  "builtFj": {
+    "labels": {
+      "applicants": "For Applicants",
+      "employers": "For Employers"
+    },
+
+    "applicant": {
+      "resumeScore": {
+        "title": "AI Resume Match Score",
+        "description": "Get an instant AI-powered score showing how well your resume matches the job you applied for, along with insights to improve your chances.",
+        "cardTitle": "Resume Match Score",
+        "position": "Frontend Developer Position",
+        "insight1": "+ Strong React Experience",
+        "insight2": "+ Relevant Project Portfolio",
+        "insight3": "− Add More TypeScript Keywords"
+      },
+
+      "interviews": {
+        "title": "AI Interviews & Assessments",
+        "description": "Complete AI-generated interviews and skill tests tailored to the job you're applying for, then receive automatic scoring and feedback.",
+        "cardTitle": "Assessment Result",
+        "position": "Frontend Developer Interview",
+        "strengths": "Strengths",
+        "improve": "Improve",
+        "problemSolving": "Problem Solving",
+        "reactKnowledge": "React Knowledge",
+        "systemDesign": "System Design"
+      }
+    },
+
+    "recruiter": {
+      "jdGenerator": {
+        "title": "AI Job Description Generator",
+        "description": "Create professional and accurate job descriptions in seconds using AI, helping recruiters publish roles faster and more consistently.",
+        "generated": "Job Description Generated",
+        "ready": "Ready",
+        "positionLabel": "Position",
+        "position": "Senior Frontend Developer",
+        "requirements": "Requirements",
+        "responsibilities": "Responsibilities",
+        "footer": "AI-generated job description tailored to the role and industry standards"
+      },
+
+      "shortlist": {
+        "title": "Auto-Screen & Shortlist",
+        "description": "Automatically evaluate applicants and advance the most qualified candidates to the shortlist based on AI-driven screening.",
+        "cardTitle": "Candidates Shortlisted",
+        "position": "Frontend Developer Position"
+      }
     }
   },
 
@@ -1268,7 +1330,7 @@
     "items": {
       "0": {
         "q": "How can I find jobs on HireReadyAI?",
-        "a": "Use the Jobs page to search by title, skill, or company. You can filter by job type, location, and salary range. Your dashboard also surfaces recommended roles based on your profile — the more complete your profile, the better the suggestions."
+        "a": "Use the Jobs page to search by title, skill, or company. You can filter by job type, location, and salary range. Your dashboard also surfaces recommended roles based on your profile , the more complete your profile, the better the suggestions."
       },
       "1": {
         "q": "Is my resume and profile data kept private?",
@@ -1276,7 +1338,7 @@
       },
       "2": {
         "q": "How do I track my applications?",
-        "a": "The My Applications dashboard gives you a real-time pipeline view — from Applied through Screening, Interview, Assessment, and Final Stage. Each card updates automatically when a recruiter takes action."
+        "a": "The My Applications dashboard gives you a real-time pipeline view , from Applied through Screening, Interview, Assessment, and Final Stage. Each card updates automatically when a recruiter takes action."
       },
       "3": {
         "q": "Can I prepare for interviews inside the platform?",
@@ -1289,6 +1351,53 @@
       "5": {
         "q": "How do I upload or update my profile picture?",
         "a": "Go to your Profile page, click on your avatar, and select a new image from your device. Supported formats are JPG and PNG. Your picture is visible to employers when they review your application."
+      }
+    }
+  },
+
+  "howItWorks": {
+    "eyebrow": "How it works",
+    "title": "How it works",
+    "applicantSubtitle": "Your journey to your dream job designed to be seamless and transparent.",
+    "recruiterSubtitle": "End-to-end talent acquisition platform powered by advanced AI.",
+    "tabs": {
+      "jobSeeker": "Job Seeker",
+      "employer": "Employer"
+    },
+    "applicantSteps": {
+      "step1": {
+        "title": "Browse Jobs",
+        "description": "Explore and search for open positions easily."
+      },
+      "step2": {
+        "title": "Apply & Submit",
+        "description": "Attach your resume and fill out the application form."
+      },
+      "step3": {
+        "title": "AI Interviews & Tests",
+        "description": "Complete AI-driven interviews and skill assessments."
+      },
+      "step4": {
+        "title": "Track Results",
+        "description": "Monitor your application status and performance feedback."
+      }
+    },
+    "recruiterSteps": {
+      "step1": {
+        "title": "Generate JD",
+        "description": "Create accurate job descriptions using AI."
+      },
+      "step2": {
+        "title": "Auto-Screen & Shortlist",
+        "description": "Auto advance candidate to shortlist automatically."
+      },
+      "step3": {
+        "title": "Team Voting",
+        "description": "Vote into recruitment team for offer & reject."
+      },
+      "step4": {
+        "title": "Final Decisions",
+        "description": "Evaluate and shortlist for top candidate."
       }
     }
   }
