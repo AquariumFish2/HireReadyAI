@@ -36,14 +36,35 @@ export const uploadRecording = async (blob, applicationStageId, questionId) => {
     data: { publicUrl },
   } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
 
-  // Store recording metadata in generation_context (JSONB column)
+  // Merge recording metadata into generation_context without overwriting other keys
+  const { data: current } = await supabase
+    .from("application_questions")
+    .select("generation_context")
+    .eq("id", questionId)
+    .single();
+
   await updateApplicationQuestion(questionId, {
     generation_context: {
+      ...(current?.generation_context || {}),
       recording_url: publicUrl,
       storage_path: fileName,
       transcription_status: "pending",
     },
   });
+
+  // Also pre-create/upsert the application_answers row with the video URL
+  // so the applicant view (ExpandableQuestion) can find it.
+  await supabase
+    .from("application_answers")
+    .upsert(
+      { 
+        question_id: questionId, 
+        recording_url: publicUrl,
+        storage_path: fileName,
+        transcription_status: "pending"
+      },
+      { onConflict: "question_id" }
+    );
 
   return { publicUrl, fileName };
 };

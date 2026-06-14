@@ -10,6 +10,7 @@ export default function VideoQuestion({
   question,
   applicationStageId,
   onAnswer,
+  onStatusChange,
 }) {
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -101,6 +102,7 @@ export default function VideoQuestion({
   const handleSubmit = async () => {
     if (!blobRef.current || !question?.id) return;
     setStatus("uploading");
+    onStatusChange?.("uploading");
 
     try {
       const { fileName } = await uploadRecording(
