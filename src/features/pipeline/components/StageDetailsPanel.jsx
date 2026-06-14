@@ -2,7 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { STAGE_TYPE_OPTIONS, STAGE_LIBRARY } from "../constants/stageLibrary";
 import { useTranslation } from "react-i18next";
-import { Save, Settings, Crown } from "lucide-react";
+import { Save, Settings, Crown, Plus, X, Loader2, RefreshCw, AlertTriangle } from "lucide-react";
+import { generateEvaluationCriteria } from "../services/pipeline.service";
+
+// Stage types with AI evaluation criteria
+const AI_STAGE_TYPES = new Set([
+  "hr_interview", "technical_interview",
+  "assessment", "assessment_test", "coding_test",
+]);
 
 export default function StageDetailsPanel({ stage, stages, onUpdate, isCompanyPremium }) {
   const { t } = useTranslation();
@@ -23,6 +30,12 @@ export default function StageDetailsPanel({ stage, stages, onUpdate, isCompanyPr
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Evaluation criteria local state
+  const [localCriteria, setLocalCriteria] = useState([]);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [criteriaHasChanges, setCriteriaHasChanges] = useState(false);
+  const [newConceptInputs, setNewConceptInputs] = useState({});
+
   useEffect(() => {
     if (stage) {
       setForm({
@@ -33,6 +46,10 @@ export default function StageDetailsPanel({ stage, stages, onUpdate, isCompanyPr
         num_questions: stage.num_questions || 0,
       });
       setHasChanges(false);
+      // Load evaluation criteria
+      setLocalCriteria(Array.isArray(stage.evaluation_criteria) ? stage.evaluation_criteria : []);
+      setCriteriaHasChanges(false);
+      setNewConceptInputs({});
     }
   }, [stage]);
 
@@ -67,13 +84,77 @@ export default function StageDetailsPanel({ stage, stages, onUpdate, isCompanyPr
     setIsSaving(true);
     try {
       const { ...updateData } = form;
-      await onUpdate(stage.id, updateData);
+      // Include criteria if there are criteria changes too
+      const payload = criteriaHasChanges
+        ? { ...updateData, evaluation_criteria: localCriteria }
+        : updateData;
+      await onUpdate(stage.id, payload);
       setHasChanges(false);
+      setCriteriaHasChanges(false);
     } catch (err) {
       console.error("Failed to save stage:", err);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // ── Criteria helpers ────────────────────────────────────────────────────────
+  const weightTotal = localCriteria.reduce((s, c) => s + (Number(c.weight) || 0), 0);
+  const weightValid = weightTotal === 100;
+  const hasZeroWeight = localCriteria.some(c => Number(c.weight) === 0);
+
+  const updateCriterion = (idx, field, value) => {
+    setLocalCriteria(prev => prev.map((c, i) => i === idx ? { ...c, [field]: value } : c));
+    setCriteriaHasChanges(true);
+  };
+
+  const deleteCriterion = (idx) => {
+    setLocalCriteria(prev => prev.filter((_, i) => i !== idx));
+    setCriteriaHasChanges(true);
+  };
+
+  const addCriterion = () => {
+    setLocalCriteria(prev => [
+      ...prev,
+      { competency: "", weight: 0, required: true, min_questions: 1, concepts: [] },
+    ]);
+    setCriteriaHasChanges(true);
+  };
+
+  const addConcept = (idx) => {
+    const val = (newConceptInputs[idx] || "").trim();
+    if (!val) return;
+    setLocalCriteria(prev => prev.map((c, i) =>
+      i === idx ? { ...c, concepts: [...(c.concepts || []), val] } : c
+    ));
+    setNewConceptInputs(prev => ({ ...prev, [idx]: "" }));
+    setCriteriaHasChanges(true);
+  };
+
+  const removeConcept = (cIdx, conceptIdx) => {
+    setLocalCriteria(prev => prev.map((c, i) =>
+      i === cIdx ? { ...c, concepts: c.concepts.filter((_, ci) => ci !== conceptIdx) } : c
+    ));
+    setCriteriaHasChanges(true);
+  };
+
+  const handleRegenerate = async () => {
+    if (!window.confirm(t("stage_details.evaluation_criteria.regenerate_confirm"))) return;
+    setIsRegenerating(true);
+    try {
+      const newCriteria = await generateEvaluationCriteria(stage.id);
+      setLocalCriteria(newCriteria || []);
+      setCriteriaHasChanges(false);
+    } catch (err) {
+      console.error("Regenerate criteria failed:", err);
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  const maxWeightForIndex = (idx) => {
+    const othersTotal = localCriteria.reduce((s, c, i) => i === idx ? s : s + (Number(c.weight) || 0), 0);
+    return Math.max(0, 100 - othersTotal);
   };
 
   const weightPct = Math.round((form.weight ?? 0) * 100);
@@ -215,6 +296,203 @@ export default function StageDetailsPanel({ stage, stages, onUpdate, isCompanyPr
           />
         </div>
 
+        {/* Evaluation Criteria Editor — only for AI stage types */}
+        {AI_STAGE_TYPES.has(form.stage_type) && (
+          <div className="space-y-3 pt-4 border-t border-border">
+            {/* Header row */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  {t("stage_details.evaluation_criteria.title")}
+                </p>
+                <p className="text-[11px] text-muted-foreground/70 mt-0.5">
+                  {t("stage_details.evaluation_criteria.subtitle")}
+                </p>
+              </div>
+              <button
+                onClick={handleRegenerate}
+                disabled={isRegenerating || stage.is_locked}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                title={t("stage_details.evaluation_criteria.regenerate")}
+              >
+                {isRegenerating
+                  ? <Loader2 className="w-3 h-3 animate-spin" />
+                  : <RefreshCw className="w-3 h-3" />}
+                {isRegenerating
+                  ? t("stage_details.evaluation_criteria.regenerating")
+                  : t("stage_details.evaluation_criteria.regenerate")}
+              </button>
+            </div>
+
+            {/* Weight total badge */}
+            {localCriteria.length > 0 && (
+              <div className={`flex items-center justify-between px-3 py-1.5 rounded-lg border text-xs font-bold ${
+                weightValid
+                  ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400"
+                  : "bg-destructive/10 border-destructive/20 text-destructive"
+              }`}>
+                <span>{t("stage_details.evaluation_criteria.weight_total")}</span>
+                <span>{weightTotal} / 100</span>
+              </div>
+            )}
+
+            {/* Competency list */}
+            {localCriteria.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic text-center py-4">
+                {t("stage_details.evaluation_criteria.empty")}
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {localCriteria.map((criterion, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 bg-secondary/40 dark:bg-slate-800/30 border border-border/60 rounded-xl space-y-2.5"
+                  >
+                    {/* Name + delete */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={criterion.competency}
+                        disabled={stage.is_locked}
+                        onChange={(e) => updateCriterion(idx, "competency", e.target.value)}
+                        className="flex-1 px-2.5 py-1.5 text-xs bg-surface dark:bg-slate-800/60 border border-border rounded-lg text-foreground font-semibold focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all disabled:opacity-60"
+                        placeholder="Competency name"
+                      />
+                      {Number(criterion.weight) === 0 && (
+                        <span className="flex items-center gap-1 px-2 py-1 bg-warning/10 border border-warning/20 text-warning rounded-md text-[10px] font-bold shrink-0">
+                          <AlertTriangle className="w-3 h-3" />
+                          {t("stage_details.evaluation_criteria.weight_zero_warning")}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => deleteCriterion(idx)}
+                        disabled={stage.is_locked}
+                        className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                        title={t("stage_details.evaluation_criteria.delete_competency")}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Weight slider */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+                          Weight
+                        </label>
+                        <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                          {criterion.weight}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max={maxWeightForIndex(idx) + Number(criterion.weight)}
+                        step="1"
+                        value={Number(criterion.weight)}
+                        disabled={stage.is_locked}
+                        onChange={(e) => updateCriterion(idx, "weight", parseInt(e.target.value))}
+                        className="w-full h-1.5 accent-primary bg-secondary dark:bg-slate-800 border border-border rounded cursor-pointer disabled:opacity-50"
+                      />
+                    </div>
+
+                    {/* Required + min_questions row */}
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={criterion.required}
+                          disabled={stage.is_locked}
+                          onChange={(e) => updateCriterion(idx, "required", e.target.checked)}
+                          className="w-3.5 h-3.5 accent-primary"
+                        />
+                        <span className="text-[11px] font-semibold text-muted-foreground">
+                          {t("stage_details.evaluation_criteria.required_label")}
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-1.5 ml-auto">
+                        <label className="text-[11px] font-semibold text-muted-foreground">
+                          {t("stage_details.evaluation_criteria.min_questions_label")}
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={10}
+                          value={criterion.min_questions}
+                          disabled={stage.is_locked}
+                          onChange={(e) => updateCriterion(idx, "min_questions", parseInt(e.target.value) || 1)}
+                          className="w-12 px-1.5 py-0.5 text-xs text-center bg-surface dark:bg-slate-800/60 border border-border rounded-md font-bold focus:outline-none focus:ring-1 focus:ring-primary/40 disabled:opacity-60"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Concepts tags */}
+                    <div>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1.5">
+                        {t("stage_details.evaluation_criteria.concepts_label")}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {(criterion.concepts || []).map((concept, ci) => (
+                          <span
+                            key={ci}
+                            className="flex items-center gap-1 px-2 py-0.5 bg-primary/10 border border-primary/20 text-primary rounded-full text-[11px] font-semibold"
+                          >
+                            {concept}
+                            {!stage.is_locked && (
+                              <button
+                                onClick={() => removeConcept(idx, ci)}
+                                className="text-primary/60 hover:text-destructive transition-colors cursor-pointer"
+                              >
+                                <X className="w-2.5 h-2.5" />
+                              </button>
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                      {!stage.is_locked && (
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            value={newConceptInputs[idx] || ""}
+                            onChange={(e) => setNewConceptInputs(prev => ({ ...prev, [idx]: e.target.value }))}
+                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addConcept(idx); } }}
+                            className="flex-1 px-2.5 py-1 text-xs bg-surface dark:bg-slate-800/60 border border-border rounded-lg text-foreground placeholder-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/40 font-medium"
+                            placeholder={t("stage_details.evaluation_criteria.add_concept_placeholder")}
+                          />
+                          <button
+                            onClick={() => addConcept(idx)}
+                            className="px-2 py-1 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add competency button */}
+            {!stage.is_locked && localCriteria.length < 4 && (
+              <button
+                onClick={addCriterion}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 border-dashed rounded-xl transition-colors cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {t("stage_details.evaluation_criteria.add_competency")}
+              </button>
+            )}
+
+            {/* Weight error */}
+            {criteriaHasChanges && !weightValid && (
+              <p className="text-xs text-destructive font-semibold">
+                {t("stage_details.evaluation_criteria.weight_error")}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Out-of-scope Advanced Toggles */}
         <div className="space-y-3 pt-4 border-t border-border">
           <p className="text-[10px] font-bold text-muted-foreground/60 tracking-widest uppercase">
@@ -241,7 +519,12 @@ export default function StageDetailsPanel({ stage, stages, onUpdate, isCompanyPr
       <div className="px-5 py-4 border-t border-border bg-surface flex gap-2 sticky bottom-0">
         <button
           onClick={handleSave}
-          disabled={!hasChanges || stage.is_locked || isSaving}
+          disabled={
+            (!hasChanges && !criteriaHasChanges) ||
+            stage.is_locked ||
+            isSaving ||
+            (criteriaHasChanges && (!weightValid || hasZeroWeight))
+          }
           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg hover:bg-primary/90 focus:outline-hidden focus:ring-2 focus:ring-primary/40 disabled:bg-secondary dark:disabled:bg-slate-800 disabled:text-muted-foreground/40 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
           <Save className="w-4 h-4 stroke-[2.2]" />

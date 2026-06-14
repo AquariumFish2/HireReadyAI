@@ -109,7 +109,7 @@ export const generateNextQuestion = async (applicationStageId, previousAnswer = 
   const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL;
   const supabaseKey  = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-  const res = await fetch(`${supabaseUrl}/functions/v1/generate-question`, {
+  const res = await fetch(`${supabaseUrl}/functions/v1/generate-question-v2`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
