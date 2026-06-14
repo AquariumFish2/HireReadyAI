@@ -29,7 +29,7 @@ const ICON_MAP = {
   Award,
 };
 
-export default function StageLibrary({ onAddStage, isCompanyPremium }) {
+export default function StageLibrary({ onRequestAddStage, isCompanyPremium }) {
   const { t } = useTranslation();
 
   return (
@@ -60,7 +60,7 @@ export default function StageLibrary({ onAddStage, isCompanyPremium }) {
             <button
               key={item.key}
               disabled={locked}
-              onClick={() => onAddStage(item)}
+              onClick={() => onRequestAddStage(item)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all group text-start ${
                 locked
                   ? "border-transparent opacity-50 cursor-not-allowed"
@@ -90,3 +90,4 @@ export default function StageLibrary({ onAddStage, isCompanyPremium }) {
     </div>
   );
 }
+

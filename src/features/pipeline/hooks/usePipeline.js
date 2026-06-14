@@ -47,7 +47,7 @@ export const usePipeline = (jobId) => {
     fetchPipeline();
   }, [fetchPipeline]);
 
-  const handleAddStage = async (libraryItem) => {
+  const handleAddStage = async (libraryItem, extraFields = {}) => {
     const unlockedStages = stages.filter((s) => !s.is_locked);
 
     const maxUnlockedIndex =
@@ -72,13 +72,13 @@ export const usePipeline = (jobId) => {
     }
 
     const stageData = {
-      name: libraryItem.label,
+      name: extraFields.name ?? libraryItem.label,
       stage_type: libraryItem.key,
-      description: libraryItem.subtitle || null,
+      description: extraFields.description ?? libraryItem.subtitle ?? null,
       order_index: nextIndex,
       weight: newWeight,
-      pass_score: null,
-      num_questions: 0,
+      pass_score: extraFields.pass_score ?? null,
+      num_questions: extraFields.num_questions ?? 0,
     };
 
     try {
@@ -86,9 +86,11 @@ export const usePipeline = (jobId) => {
       setStages((prev) =>
         [...prev, created].sort((a, b) => a.order_index - b.order_index),
       );
+      return created;
     } catch (err) {
       console.error("Failed to add stage:", err);
       setError(err.message);
+      return null;
     }
   };
 

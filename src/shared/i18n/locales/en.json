@@ -745,6 +745,35 @@
     }
   },
 
+  "stage_config_dialog": {
+    "title": "Configure Stage",
+    "subtitle": "Set up the stage details before adding it to the pipeline.",
+    "fields": {
+      "name": "Stage Name",
+      "description": "Stage Purpose",
+      "num_questions": "Number of Questions",
+      "pass_score": "Pass Score (%)"
+    },
+    "placeholders": {
+      "description": "Describe what this stage evaluates\u2026",
+      "num_questions": "e.g. 5",
+      "pass_score": "70"
+    },
+    "errors": {
+      "name_required": "Stage name is required",
+      "description_required": "Description is required for AI to generate criteria",
+      "num_questions_min": "Must have at least 1 question",
+      "pass_score_range": "Score must be between 0 and 100"
+    },
+    "generating_criteria": "Generating AI evaluation criteria\u2026",
+    "criteria_warning": "Criteria generation failed. You can regenerate later from the stage settings.",
+    "buttons": {
+      "confirm": "Add Stage",
+      "adding": "Adding\u2026",
+      "cancel": "Cancel"
+    }
+  },
+
   "stage_details": {
     "title": "Stage Settings",
     "empty_description": "Select a stage from the canvas to configure it.",
@@ -771,6 +800,24 @@
       "manual_review": "Manual Review Required",
       "auto_advance": "Auto Advance",
       "auto_reject": "Auto Reject"
+    },
+
+    "evaluation_criteria": {
+      "title": "Evaluation Criteria",
+      "subtitle": "AI-generated competency framework for this stage.",
+      "empty": "No criteria defined. Click 'Regenerate' to generate from job context.",
+      "regenerate": "Regenerate with AI",
+      "regenerating": "Regenerating…",
+      "regenerate_confirm": "This will overwrite the current criteria. Continue?",
+      "add_competency": "Add Competency",
+      "weight_total": "Total Weight",
+      "weight_error": "Weights must sum to exactly 100% before saving.",
+      "weight_zero_warning": "Set weight > 0",
+      "required_label": "Required",
+      "min_questions_label": "Min Questions",
+      "concepts_label": "Concepts",
+      "add_concept_placeholder": "Add concept…",
+      "delete_competency": "Remove competency"
     }
   },
 

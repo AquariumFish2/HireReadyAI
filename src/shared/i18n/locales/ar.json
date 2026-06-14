@@ -738,6 +738,35 @@
     }
   },
 
+  "stage_config_dialog": {
+    "title": "إعداد المرحلة",
+    "subtitle": "قم بإعداد تفاصيل المرحلة قبل إضافتها إلى مسار التوظيف.",
+    "fields": {
+      "name": "اسم المرحلة",
+      "description": "الغرض من المرحلة",
+      "num_questions": "عدد الأسئلة",
+      "pass_score": "درجة النجاح (%)"
+    },
+    "placeholders": {
+      "description": "صف ما تقيمه هذه المرحلة…",
+      "num_questions": "مثال: 5",
+      "pass_score": "70"
+    },
+    "errors": {
+      "name_required": "اسم المرحلة مطلوب",
+      "description_required": "الوصف مطلوب للذكاء الاصطناعي لإنشاء معايير التقييم",
+      "num_questions_min": "يجب أن تحتوي على سؤال واحد على الأقل",
+      "pass_score_range": "يجب أن تكون الدرجة بين 0 و 100"
+    },
+    "generating_criteria": "جاري إنشاء معايير التقييم بالذكاء الاصطناعي…",
+    "criteria_warning": "فشل إنشاء المعايير. يمكنك إعادة إنشائها لاحقًا من إعدادات المرحلة.",
+    "buttons": {
+      "confirm": "إضافة المرحلة",
+      "adding": "جاري الإضافة…",
+      "cancel": "إلغاء"
+    }
+  },
+
   "stage_details": {
     "title": "إعدادات المرحلة",
     "empty_description": "اختر مرحلة من المخطط لتعديل إعداداتها.",
@@ -764,6 +793,24 @@
       "manual_review": "مراجعة يدوية مطلوبة",
       "auto_advance": "الانتقال التلقائي",
       "auto_reject": "الرفض التلقائي"
+    },
+
+    "evaluation_criteria": {
+      "title": "معايير التقييم",
+      "subtitle": "إطار الكفاءات المنشأ بالذكاء الاصطناعي لهذه المرحلة.",
+      "empty": "لم يتم تحديد معايير. انقر على 'إعادة إنشاء' لتوليدها من سياق الوظيفة.",
+      "regenerate": "إعادة إنشاء بالذكاء الاصطناعي",
+      "regenerating": "جاري الإعادة…",
+      "regenerate_confirm": "سيؤدي هذا إلى استبدال المعايير الحالية. هل ترغب في المتابعة؟",
+      "add_competency": "إضافة كفاءة",
+      "weight_total": "إجمالي الوزن",
+      "weight_error": "يجب أن يكون مجموع الأوزان 100% بالضبط قبل الحفظ.",
+      "weight_zero_warning": "ضع وزن > 0",
+      "required_label": "مطلوب",
+      "min_questions_label": "الحد الأدنى للأسئلة",
+      "concepts_label": "المفاهيم",
+      "add_concept_placeholder": "أضف مفهوم…",
+      "delete_competency": "إزالة الكفاءة"
     }
   },
 

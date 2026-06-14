@@ -9,7 +9,15 @@ import { Plus, X, Library, Settings } from "lucide-react";
 import StageLibrary from "./StageLibrary";
 import StageCard from "./StageCard";
 import StageDetailsPanel from "./StageDetailsPanel";
+import StageConfigDialog from "./StageConfigDialog";
+import { generateEvaluationCriteria } from "../services/pipeline.service";
 import { useTranslation } from "react-i18next";
+
+// Stage types that require the config dialog + criteria generation
+const AI_STAGE_TYPES = new Set([
+  "hr_interview", "technical_interview",
+  "assessment", "assessment_test", "coding_test",
+]);
 
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(
@@ -38,6 +46,7 @@ export default function PipelineBuilder({
   const [selectedStageId, setSelectedStageId] = useState(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [pendingLibraryItem, setPendingLibraryItem] = useState(null);
   const { t } = useTranslation();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
@@ -53,12 +62,45 @@ export default function PipelineBuilder({
     onReorderStages(reordered);
   };
 
-  const handleAddFromLibrary = useCallback(
-    async (libraryItem) => {
-      await onAddStage(libraryItem);
-      if (!isDesktop) setLibraryOpen(false);
+  // Intercept library clicks: AI stages open config dialog; others add directly
+  const handleRequestAddStage = useCallback(
+    (libraryItem) => {
+      if (AI_STAGE_TYPES.has(libraryItem.key)) {
+        setPendingLibraryItem(libraryItem);
+        if (!isDesktop) setLibraryOpen(false);
+      } else {
+        onAddStage(libraryItem);
+        if (!isDesktop) setLibraryOpen(false);
+      }
     },
     [onAddStage, isDesktop],
+  );
+
+  // Called when the config dialog confirms
+  const handleDialogConfirm = useCallback(
+    async (libraryItem, extraFields, setCriteriaState) => {
+      // 1. Create the stage
+      const created = await onAddStage(libraryItem, extraFields);
+      if (!created) {
+        setPendingLibraryItem(null);
+        return;
+      }
+      // 2. Generate criteria if AI stage
+      if (AI_STAGE_TYPES.has(libraryItem.key)) {
+        setCriteriaState("generating");
+        try {
+          await generateEvaluationCriteria(created.id);
+          setCriteriaState("idle");
+        } catch (err) {
+          console.error("Criteria generation failed:", err);
+          setCriteriaState("warning");
+          // Wait a moment so the user sees the warning before dialog closes
+          await new Promise(r => setTimeout(r, 2500));
+        }
+      }
+      setPendingLibraryItem(null);
+    },
+    [onAddStage],
   );
 
   const handleStageSelect = useCallback(
@@ -120,7 +162,7 @@ export default function PipelineBuilder({
             dark:[&::-webkit-scrollbar-thumb]:bg-slate-800
             dark:[&::-webkit-scrollbar-thumb]:hover:bg-slate-700"
         >
-          <StageLibrary onAddStage={handleAddFromLibrary} isCompanyPremium={isCompanyPremium} />
+          <StageLibrary onRequestAddStage={handleRequestAddStage} isCompanyPremium={isCompanyPremium} />
         </div>
 
 
@@ -206,9 +248,18 @@ export default function PipelineBuilder({
             onUpdate={onUpdateStage}
           />
         </div>
-      </div>
-    );
-  }
+
+      {/* Stage config dialog — desktop */}
+      {pendingLibraryItem && (
+        <StageConfigDialog
+          libraryItem={pendingLibraryItem}
+          onConfirm={handleDialogConfirm}
+          onCancel={() => setPendingLibraryItem(null)}
+        />
+      )}
+    </div>
+  );
+}
 
   // Mobile / Tablet: single column + slide-over drawers
   return (
@@ -329,7 +380,7 @@ export default function PipelineBuilder({
               <X className="w-4 h-4" />
             </button>
           </div>
-          <StageLibrary onAddStage={handleAddFromLibrary} isCompanyPremium={isCompanyPremium} />
+          <StageLibrary onRequestAddStage={handleRequestAddStage} isCompanyPremium={isCompanyPremium} />
         </div>
       </div>
 
@@ -374,6 +425,15 @@ export default function PipelineBuilder({
           />
         </div>
       </div>
+      {/* Stage config dialog — mobile */}
+      {pendingLibraryItem && (
+        <StageConfigDialog
+          libraryItem={pendingLibraryItem}
+          onConfirm={handleDialogConfirm}
+          onCancel={() => setPendingLibraryItem(null)}
+        />
+      )}
     </div>
+
   );
 }
