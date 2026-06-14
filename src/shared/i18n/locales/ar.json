@@ -1601,5 +1601,149 @@
     "description": "اختر شركة للبدء مع HireReadyAI أو أنشئ شركتك الخاصة",
     "createButton": "إنشاء شركة جديدة",
     "noCompanies": "لا توجد شركات متاحة للانضمام."
+  },
+  "landing_navbar": {
+    "nav": {
+      "get_started": "ابدأ الآن",
+      "features": "المميزات",
+      "how_it_works": "كيف يعمل",
+      "testimonials": "آراء المستخدمين",
+      "pricing": "الأسعار",
+      "faq": "الأسئلة الشائعة",
+      "contact": "تواصل معنا"
+    }
+  },
+  "candidate_sidebar": {
+    "show_profile": "عرض الملف الشخصي",
+    "view_profile": "عرض الملف الشخصي",
+    "rejected": "مرفوض",
+    "reject": "رفض",
+    "unreject": "إلغاء الرفض",
+    "ai_recommendation": "توصية الذكاء الاصطناعي",
+    "confidence": "مستوى الثقة",
+    "politely_reject": "رفض المرشح",
+    "advance_next_stage": "الانتقال إلى المرحلة التالية",
+    "no_reasoning": "تم إنهاء التقييم، ولكن لم يتم توفير تفاصيل إضافية.",
+    "pipeline_progress": "تقدم مسار التوظيف",
+    "stage_results": "نتائج المراحل",
+    "strengths": "نقاط القوة",
+    "weaknesses": "نقاط الضعف",
+    "currently_evaluating": "جارٍ التقييم",
+    "live_session_scheduled": "تم جدولة جلسة مباشرة",
+    "no_feedback": "لا توجد ملاحظات تفصيلية متاحة.",
+    "unknown_stage": "مرحلة غير معروفة",
+    "metrics": {
+      "resume": "السيرة الذاتية",
+      "ai_match": "التوافق بالذكاء الاصطناعي",
+      "stage": "المرحلة"
+    },
+    "status": {
+      "rejected": "مرفوض",
+      "passed": "ناجح",
+      "in_progress": "قيد التنفيذ",
+      "failed": "راسب",
+      "pending": "معلق"
+    }
+  },
+  "candidate_assessments": {
+    "title": "التقييمات والمقابلات",
+    "candidate": "المرشح",
+    "back_to_profile": "العودة إلى الملف الشخصي",
+    "total_questions": "إجمالي الأسئلة",
+    "unknown": "غير معروف",
+
+    "answer": "الإجابة",
+    "transcript": "النص المستخرج",
+    "options": "الخيارات",
+
+    "no_video": "لا يوجد تسجيل فيديو متاح",
+    "no_answer": "لم يتم تقديم إجابة.",
+    "no_code": "لم يتم إرسال أي كود.",
+    "no_selection": "لم يتم اختيار إجابة.",
+    "no_ai_feedback": "لا توجد ملاحظات من الذكاء الاصطناعي لهذه الإجابة.",
+
+    "ai_feedback": "ملاحظات الذكاء الاصطناعي",
+    "strengths": "نقاط القوة",
+    "weaknesses": "نقاط الضعف",
+
+    "ui_visual": "واجهة / تصميم",
+    "problem_solving": "حل المشكلات",
+
+    "no_assessment_data": "لا توجد بيانات تقييم",
+    "no_assessment_subtitle": "لم يكمل هذا المرشح أي مقابلات أو تقييمات بعد.",
+
+    "recommendation": "التوصية",
+    "confidence": "مستوى الثقة",
+    "questions": "الأسئلة",
+    "na": "غير متوفر",
+
+    "question_types": {
+      "video": "إجابة فيديو",
+      "text": "إجابة كتابية",
+      "code": "تحدي برمجي",
+      "multiple_choice": "اختيار من متعدد"
+    },
+
+    "recommendations": {
+      "proceed": "متابعة",
+      "review": "مراجعة",
+      "reject": "رفض"
+    },
+
+    "status": {
+      "passed": "ناجح",
+      "failed": "راسب",
+      "in_progress": "قيد التنفيذ",
+      "pending": "معلق"
+    }
+  },
+  "candidate_profile": {
+    "candidate_not_found": "لم يتم العثور على المرشح",
+    "back_to_pipeline": "العودة إلى مسار التوظيف",
+    "cv": "السيرة الذاتية",
+    "unknown_candidate": "مرشح غير معروف",
+    "unknown": "غير معروف",
+
+    "rejected": "مرفوض",
+    "show_profile": "عرض الملف الشخصي",
+
+    "applied_for": "تقدم إلى:",
+    "composite": "النتيجة الإجمالية",
+
+    "ai_cv_review": "مراجعة السيرة الذاتية بالذكاء الاصطناعي",
+
+    "application_questions": "أسئلة وإجابات التقديم",
+    "question": "س",
+    "no_answer": "لم يتم تقديم إجابة",
+
+    "dimension_scores": "درجات الأبعاد",
+
+    "strengths": "نقاط القوة",
+    "weaknesses": "نقاط الضعف",
+    "gaps": "الفجوات",
+
+    "no_cv_review": "لا توجد بيانات لمراجعة السيرة الذاتية",
+    "cv_not_reviewed": "لم تتم مراجعة السيرة الذاتية بعد.",
+
+    "stage_scores": "درجات المراحل",
+    "no_stages": "لا توجد مراحل متاحة.",
+
+    "assessments": "التقييمات والمقابلات",
+    "stages_with_results": "مرحلة تحتوي على نتائج",
+
+    "na": "غير متوفر",
+
+    "recommendations": {
+      "proceed": "متابعة",
+      "review": "مراجعة",
+      "reject": "رفض"
+    },
+
+    "status": {
+      "passed": "ناجح",
+      "failed": "راسب",
+      "in_progress": "قيد التنفيذ",
+      "pending": "معلق"
+    }
   }
 }
