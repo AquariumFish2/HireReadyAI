@@ -17,6 +17,7 @@ import {
 } from "../../shortlist/services/shortlist.service";
 import { moveToStage } from "../services/candidatesPipline.service";
 import { useTranslation } from "react-i18next";
+import { supabase } from "@/shared/services/supabase";
 
 function getInitials(name = "") {
   return (
@@ -28,21 +29,6 @@ function getInitials(name = "") {
       .toUpperCase() || "?"
   );
 }
-
-const MetricCard = ({ title, score, colorClass }) => (
-  <div className="flex-1 bg-surface border border-border rounded-2xl p-4 flex flex-col gap-3">
-    <span className="text-xs font-semibold text-muted-foreground">{title}</span>
-    <span className="text-3xl font-bold text-foreground leading-none">
-      {score ?? "--"}
-    </span>
-    <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
-      <div
-        className={`h-full rounded-full transition-all duration-700 ${colorClass || "bg-primary"}`}
-        style={{ width: `${score ?? 0}%` }}
-      />
-    </div>
-  </div>
-);
 
 const StatusBadge = ({ status, isRejected }) => {
   if (isRejected)
@@ -76,7 +62,7 @@ const StatusBadge = ({ status, isRejected }) => {
   );
 };
 
-export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
+export default function CandidateSidebar({ candidate, onClose, onUpdate, recruiterName = "", recruiterEmail = "", companyName = "" }) {
   const navigate = useNavigate();
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -106,43 +92,8 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
   const evalsRaw = lastEvalStage?.application_stage_evaluations;
   const currentEval = Array.isArray(evalsRaw) ? evalsRaw[0] : evalsRaw;
 
-  const cvReviewStage = sortedStages.find(
-    (s) => s.recruitment_stages?.stage_type === "cv_review",
-  );
-  let resumeScore = null;
-  let aiMatchScore = null;
-  let hasAppScore = false;
-  const cvDimKeys = [
-    "technical_skills",
-    "experience_match",
-    "education",
-    "soft_skills",
-  ];
-  if (cvReviewStage?.ai_feedback) {
-    try {
-      const feedback = JSON.parse(cvReviewStage.ai_feedback);
-      const dims = feedback.dimension_scores;
-      if (dims) {
-        hasAppScore = "application_score" in dims;
-        const cvValues = cvDimKeys
-          .map((k) => dims[k])
-          .filter((v) => typeof v === "number");
-        if (cvValues.length === cvDimKeys.length) {
-          resumeScore = Math.round(
-            cvValues.reduce((a, b) => a + b, 0) / cvDimKeys.length,
-          );
-        }
-        const allValues = Object.values(dims).filter(
-          (v) => typeof v === "number",
-        );
-        if (allValues.length > 0) {
-          aiMatchScore = Math.round(
-            allValues.reduce((a, b) => a + b, 0) / allValues.length,
-          );
-        }
-      }
-    } catch {}
-  }
+  
+
 
   const currentStageIndex = sortedStages.findIndex(
     (s) => s.recruitment_stages?.id === candidate.currentStageId,
@@ -158,10 +109,54 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
     nextStageType !== "offer" &&
     nextStageType !== "shortlist";
 
+  // const handleReject = async () => {
+  //   console.log("Reject debug:", {
+  //   id: candidate.id,
+  //   job_id: candidate.job_id,
+  //   email: answers?.info?.email,
+  //   name: candidate.name,
+  //   });
+  //   setActionLoading(true);
+  //   setActionError("");
+  //   try {
+  //     await rejectApplication(candidate.id, currentEval?.reasoning || "");
+  //     onUpdate?.(candidate.id, { is_rejected: true });
+  //   } catch (err) {
+  //     setActionError(err.message || "Failed to reject candidate");
+  //   } finally {
+  //     setActionLoading(false);
+  //   }
+  // };
+
   const handleReject = async () => {
     setActionLoading(true);
     setActionError("");
     try {
+      const candidateEmail = answers?.info?.email;
+      if (candidateEmail) {
+        supabase.functions
+          .invoke("send-offer-email", {
+            body: {
+              to: candidateEmail,
+              fromName: recruiterName || "Hiring Team",
+              fromEmail: recruiterEmail || "",
+              subject: `Update on Your Application - ${companyName || "Our Company"}`,
+              body:
+                `Dear ${candidate.name || "Candidate"},\n\n` +
+                `Thank you for your interest in joining ${companyName || "our company"} and for taking the time to go through our hiring process.\n\n` +
+                `After careful consideration, we have decided to move forward with other candidates whose qualifications more closely match the requirements of the role.\n` +
+                (currentEval?.reasoning ? `\nFeedback: ${currentEval.reasoning}\n` : "") +
+                `\nWe appreciate your effort and wish you the very best in your future endeavors.\n\n` +
+                `Sincerely,\n${recruiterName || "The Hiring Team"}`,
+              applicationId: candidate.id,
+              action: "reject",
+            },
+          })
+          .catch((err) =>
+            console.warn("[Rejection email] failed silently:", err?.message)
+          );
+      }
+
       await rejectApplication(candidate.id, currentEval?.reasoning || "");
       onUpdate?.(candidate.id, { is_rejected: true });
     } catch (err) {
@@ -304,33 +299,7 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
           className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-8 bg-background/40"
         >
           {/* Top Section */}
-          <div className="flex flex-col gap-6">
-            {/* Metric Cards */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "-30px" }}
-              transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-              className="flex gap-3"
-            >
-              <MetricCard
-                title={t("candidate_sidebar.metrics.resume")}
-                score={resumeScore}
-                colorClass="bg-muted-foreground/60"
-              />
-              {hasAppScore && (
-                <MetricCard
-                  title={t("candidate_sidebar.metrics.ai_match")}
-                  score={aiMatchScore}
-                  colorClass="bg-primary"
-                />
-              )}
-              <MetricCard
-                title={t("candidate_sidebar.metrics.stage")}
-                score={candidate.score}
-                colorClass="bg-accent"
-              />
-            </motion.div>
+          <div className="flex flex-col gap-6">            
 
             {/* AI Recommendation Card */}
             <motion.div
