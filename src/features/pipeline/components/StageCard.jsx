@@ -53,11 +53,11 @@ export default function StageCard({
       </div>
 
       {/* Weight badge */}
-      {stage.weight != null && (
+      {/* {stage.weight != null && (
         <span className="text-xs text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 rounded-md px-2 py-0.5 shrink-0">
           {Math.round(stage.weight * 100)}% wt
         </span>
-      )}
+      )} */}
 
       {/* Delete button — visible on hover or when selected (only if not locked) */}
       {!stage.is_locked && (

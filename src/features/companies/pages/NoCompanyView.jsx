@@ -177,14 +177,14 @@ export default function NoCompanyView({ onCompanyJoined }) {
                 className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground mb-6 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Back
+                {t("apply_job.buttons.back")}
               </button>
               <div className="text-center mb-8">
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  Choose your plan
+                  {t("subscription.title")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Start with a free plan and upgrade anytime
+                  {t("subscription.subtitle")}
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -198,31 +198,31 @@ export default function NoCompanyView({ onCompanyJoined }) {
                       <Check className="w-6 h-6 text-primary" />
                     </div>
                     <h3 className="text-lg font-bold text-foreground">
-                      Free
+                      {t("subscription.free.name")}
                     </h3>
                     <p className="text-3xl font-extrabold text-foreground mt-2">
-                      $0
+                      {t("subscription.free.price")}
                       <span className="text-xs font-normal text-muted-foreground">
-                        /forever
+                        {t("subscription.free.period")}
                       </span>
                     </p>
                   </div>
                   <ul className="space-y-3 text-xs text-muted-foreground mb-8 flex-1">
                     <li className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-success shrink-0" />
-                      Up to 10 active job postings
+                      {t("subscription.free.feature1")}
                     </li>
-                    <li className="flex items-center gap-3">
+                    <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-success shrink-0" />
-                      Basic candidate management
+                      {t("subscription.free.feature2")}
                     </li>
-                    <li className="flex items-center gap-3">
+                    <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-success shrink-0" />
-                      Team collaboration (up to 5 members)
+                      {t("subscription.free.feature3")}
                     </li>
-                    <li className="flex items-center gap-3">
+                    <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-success shrink-0" />
-                      Email support
+                      {t("subscription.free.feature4")}
                     </li>
                   </ul>
                   <button
@@ -232,7 +232,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
                     }}
                     className="w-full py-3 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-sm"
                   >
-                    Get Started Free
+                    {t("subscription.free.button")}
                   </button>
                 </motion.div>
 
@@ -242,42 +242,42 @@ export default function NoCompanyView({ onCompanyJoined }) {
                   className="bg-gradient-to-b from-primary/5 to-background rounded-2xl border border-primary/30 p-6 shadow-sm flex flex-col justify-between relative overflow-hidden"
                 >
                   <div className="absolute top-4 right-4 bg-warning text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                    One-time
+                    {t("subscription.premium.badge")}
                   </div>
                   <div className="mb-6">
                     <div className="w-12 h-12 bg-warning/20 rounded-xl flex items-center justify-center mb-4">
                       <Crown className="w-6 h-6 text-warning" />
                     </div>
                     <h3 className="text-lg font-bold text-foreground">
-                      Premium
+                      {t("subscription.premium.name")}
                     </h3>
                     <p className="text-3xl font-extrabold text-foreground mt-2">
-                      $29
+                      {t("subscription.premium.price")}
                       <span className="text-xs font-normal text-muted-foreground">
-                        /one-time
+                        {t("subscription.premium.period")}
                       </span>
                     </p>
                   </div>
                   <ul className="space-y-3 text-xs text-muted-foreground mb-8 flex-1">
                     <li className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-success shrink-0" />
-                      Unlimited job postings
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      {t("subscription.premium.feature1")}
                     </li>
                     <li className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-success shrink-0" />
-                      AI-powered candidate screening
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      {t("subscription.premium.feature2")}
                     </li>
                     <li className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-success shrink-0" />
-                      Advanced analytics & reports
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      {t("subscription.premium.feature3")}
                     </li>
                     <li className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-success shrink-0" />
-                      Priority support
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      {t("subscription.premium.feature4")}
                     </li>
                     <li className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-success shrink-0" />
-                      Custom branding
+                      <Check className="w-3.5 h-3.5 text-success shrink-0" />
+                      {t("subscription.premium.feature5")}
                     </li>
                   </ul>
                   <button
@@ -287,7 +287,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
                     }}
                     className="w-full py-3 bg-warning text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-sm"
                   >
-                    Buy Premium
+                    {t("subscription.premium.button")}
                   </button>
                 </motion.div>
               </div>
@@ -506,7 +506,6 @@ export default function NoCompanyView({ onCompanyJoined }) {
                 </div>
                 <div className="pt-4 flex items-center justify-end gap-3 border-t border-border/60">
                   <button
-                    type="button"
                     onClick={() => {
                       setIsCreating(false);
                       setSelectedPlan(null);
@@ -523,8 +522,226 @@ export default function NoCompanyView({ onCompanyJoined }) {
                   >
                     {isSubmitting ? "Creating..." : "Create Company"}
                   </button>
+                  <h2 className="text-base font-bold text-foreground">
+                    {t("no_company_view.create.title")}
+                  </h2>
                 </div>
-              </form>
+                <form
+                  onSubmit={handleCreateCompany}
+                  className="p-5 space-y-3.5"
+                >
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newCompany.name}
+                      onChange={(e) =>
+                        setNewCompany({ ...newCompany, name: e.target.value })
+                      }
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                      placeholder="Acme Corp"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Industry
+                    </label>
+                    <input
+                      type="text"
+                      value={newCompany.industry}
+                      onChange={(e) =>
+                        setNewCompany({
+                          ...newCompany,
+                          industry: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                      placeholder="e.g. Technology, Healthcare"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        Company Size
+                      </label>
+                      <input
+                        type="number"
+                        value={newCompany.size}
+                        onChange={(e) =>
+                          setNewCompany({ ...newCompany, size: e.target.value })
+                        }
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                        placeholder="Number of employees"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        value={newCompany.location}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            location: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                        placeholder="City, Country"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        Founded
+                      </label>
+                      <input
+                        type="date"
+                        value={newCompany.founding_date}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            founding_date: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        Website
+                      </label>
+                      <input
+                        type="url"
+                        value={newCompany.website_url}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            website_url: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      About
+                    </label>
+                    <textarea
+                      value={newCompany.description}
+                      onChange={(e) =>
+                        setNewCompany({
+                          ...newCompany,
+                          description: e.target.value,
+                        })
+                      }
+                      rows={3}
+                      className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring resize-none"
+                      placeholder="Tell applicants about your company..."
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        Culture
+                      </label>
+                      <textarea
+                        value={newCompany.culture}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            culture: e.target.value,
+                          })
+                        }
+                        rows={2}
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring resize-none"
+                        placeholder="Company values, culture..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        Benefits
+                      </label>
+                      <textarea
+                        value={newCompany.benefits}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            benefits: e.target.value,
+                          })
+                        }
+                        rows={2}
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring resize-none"
+                        placeholder="Perks, benefits..."
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        LinkedIn
+                      </label>
+                      <input
+                        type="url"
+                        value={newCompany.linkedin_url}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            linkedin_url: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                        placeholder="https://linkedin.com/company/..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
+                        Twitter
+                      </label>
+                      <input
+                        type="url"
+                        value={newCompany.twitter_url}
+                        onChange={(e) =>
+                          setNewCompany({
+                            ...newCompany,
+                            twitter_url: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-1.5 bg-background border border-border rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-ring"
+                        placeholder="https://twitter.com/..."
+                      />
+                    </div>
+                  </div>
+                  <div className="pt-3 flex justify-end gap-2 border-t border-border/60 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCreating(false);
+                        setSelectedPlan(null);
+                        setShowingPricing(true);
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium text-muted-foreground bg-background border border-border rounded-md hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      {t("avatar_modal.cancel")}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-3 py-1.5 bg-primary text-white rounded-md text-xs font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSubmitting
+                        ? t("no_company_view.create.buttons.creating")
+                        : t("no_company_view.create.buttons.create")}
+                    </button>
+                  </div>
+                </form>
             </motion.div>
           )}
 
@@ -544,7 +761,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
                   {t("no_company_view.join.title")}
                 </h1>
                 <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-                  Select a company to get started with HireReadyAI or create your own
+                  {t("companySelection.description")}
                 </p>
                 {companies.length > 0 && (
                   <button
@@ -552,7 +769,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
                     className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-sm"
                   >
                     <Plus className="w-4 h-4" />
-                    Create a New Company
+                    {t("companySelection.createButton")}
                   </button>
                 )}
               </motion.div>
@@ -565,14 +782,14 @@ export default function NoCompanyView({ onCompanyJoined }) {
                   className="text-center py-12 bg-card rounded-2xl shadow-sm border border-border/60 max-w-xl mx-auto"
                 >
                   <p className="text-sm text-muted-foreground mb-6">
-                    No companies available to join.
+                    {t("companySelection.noCompanies")}
                   </p>
                   <button
                     onClick={() => setShowingPricing(true)}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-sm"
                   >
                     <Plus className="w-4 h-4" />
-                    Create a Company
+                    {t("no_company_view.create.buttons.create")}
                   </button>
                 </motion.div>
               ) : (
@@ -622,7 +839,9 @@ export default function NoCompanyView({ onCompanyJoined }) {
                         disabled={joining === company.id}
                         className="w-full mt-2 px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
                       >
-                        {joining === company.id ? "Joining..." : "Join"}
+                        {joining === company.id
+                          ? t("no_company_view.join.joining")
+                          : t("no_company_view.join.join")}
                       </button>
                     </motion.div>
                   ))}
