@@ -1,6 +1,7 @@
 // src/features/landing-page/components/ContactUs.jsx
 import { useState } from "react";
 import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import { supabase } from "@/shared/services/supabase";
 
 export default function ContactUs() {
     const [formData, setFormData] = useState({ name: "", email: "", company: "", message: "" });
@@ -12,16 +13,28 @@ export default function ContactUs() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
-        setTimeout(() => {
-            setIsSubmitting(false);
+        try {
+            const { error } = await supabase.functions.invoke("send-contact-email", {
+                body: {
+                    name: formData.name,
+                    email: formData.email,
+                    company: formData.company,
+                    message: formData.message,
+                },
+            });
+            if (error) throw new Error(error.message);
             setSubmitted(true);
             setFormData({ name: "", email: "", company: "", message: "" });
             setTimeout(() => setSubmitted(false), 5000);
-        }, 1500);
+        } catch (err) {
+            console.error("Contact form error:", err);
+            alert("Failed to send message. Please try again or email us directly.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -79,7 +92,6 @@ export default function ContactUs() {
                                     placeholder="Acme Inc."
                                     value={formData.company}
                                     onChange={handleChange}
-                                    required
                                 />
                             </div>
 
@@ -144,7 +156,7 @@ export default function ContactUs() {
                                     <div>
                                         <h4 className="text-[10px] text-muted-foreground font-medium">EMAIL</h4>
                                         <a href="mailto:hello@hirereadyai.com" className="text-xs font-semibold text-foreground hover:underline mt-0.5 block">
-                                            hello@hirereadyai.com
+                                            hirereadyaiplatform@gmail.com
                                         </a>
                                     </div>
                                 </div>
@@ -157,7 +169,7 @@ export default function ContactUs() {
                                     <div>
                                         <h4 className="text-[10px] text-muted-foreground font-medium">PHONE</h4>
                                         <a href="tel:+201227541128" className="text-xs font-semibold text-foreground hover:underline mt-0.5 block">
-                                            +20 122 754 1128
+                                            +20 10 13767382
                                         </a>
                                     </div>
                                 </div>
@@ -174,10 +186,7 @@ export default function ContactUs() {
                                 </div>
                             </div>
 
-                            <div className="border-t border-border/60 pt-4 mt-4">
-                                <h5 className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold">Support Hours</h5>
-                                <p className="text-[10px] text-foreground font-medium mt-0.5">Mon – Fri · 9:00 – 18:00 (GMT+2)</p>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>

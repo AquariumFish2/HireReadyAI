@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { rejectApplication, unrejectApplication } from "../../shortlist/services/shortlist.service";
 import { moveToStage } from "../services/candidatesPipline.service";
+import { supabase } from "@/shared/services/supabase";
 
 function getInitials(name = "") {
   return (
@@ -72,7 +73,7 @@ const StatusBadge = ({ status, isRejected }) => {
   );
 };
 
-export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
+export default function CandidateSidebar({ candidate, onClose, onUpdate, recruiterName = "", recruiterEmail = "", companyName = "" }) {
   const navigate = useNavigate();
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -142,10 +143,54 @@ export default function CandidateSidebar({ candidate, onClose, onUpdate }) {
     nextStageType !== "offer" &&
     nextStageType !== "shortlist";
 
+  // const handleReject = async () => {
+  //   console.log("Reject debug:", {
+  //   id: candidate.id,
+  //   job_id: candidate.job_id,
+  //   email: answers?.info?.email,
+  //   name: candidate.name,
+  //   });
+  //   setActionLoading(true);
+  //   setActionError("");
+  //   try {
+  //     await rejectApplication(candidate.id, currentEval?.reasoning || "");
+  //     onUpdate?.(candidate.id, { is_rejected: true });
+  //   } catch (err) {
+  //     setActionError(err.message || "Failed to reject candidate");
+  //   } finally {
+  //     setActionLoading(false);
+  //   }
+  // };
+
   const handleReject = async () => {
     setActionLoading(true);
     setActionError("");
     try {
+      const candidateEmail = answers?.info?.email;
+      if (candidateEmail) {
+        supabase.functions
+          .invoke("send-offer-email", {
+            body: {
+              to: candidateEmail,
+              fromName: recruiterName || "Hiring Team",
+              fromEmail: recruiterEmail || "",
+              subject: `Update on Your Application - ${companyName || "Our Company"}`,
+              body:
+                `Dear ${candidate.name || "Candidate"},\n\n` +
+                `Thank you for your interest in joining ${companyName || "our company"} and for taking the time to go through our hiring process.\n\n` +
+                `After careful consideration, we have decided to move forward with other candidates whose qualifications more closely match the requirements of the role.\n` +
+                (currentEval?.reasoning ? `\nFeedback: ${currentEval.reasoning}\n` : "") +
+                `\nWe appreciate your effort and wish you the very best in your future endeavors.\n\n` +
+                `Sincerely,\n${recruiterName || "The Hiring Team"}`,
+              applicationId: candidate.id,
+              action: "reject",
+            },
+          })
+          .catch((err) =>
+            console.warn("[Rejection email] failed silently:", err?.message)
+          );
+      }
+
       await rejectApplication(candidate.id, currentEval?.reasoning || "");
       onUpdate?.(candidate.id, { is_rejected: true });
     } catch (err) {
