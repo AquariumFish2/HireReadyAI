@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "@/features/auth/context/user.context";
+import { supabase } from "@/shared/services/supabase";
 import Navbar from "@/shared/ui/Navbar";
 import JobPostings from "./JobPostings";
 import CompanyProfile from "./CompanyProfile";
@@ -9,6 +10,7 @@ import NoCompanyView from "./NoCompanyView";
 import PendingApprovalPage from "./PendingApprovalPage";
 import RecruiterDashboardPage from "../../recruiter/pages/RecruiterDashboardPage";
 import LoadingSpinner from "@/shared/ui/LoadingSpinner";
+import CompanySuspended from "@/shared/ui/CompanySuspended";
 import PipelineCandidatesPage from "../../recruiter/pages/PipelineCandidatesPage";
 import CandidateProfilePage from "../../recruiter/pages/CandidateProfilePage";
 import CandidateAssessmentsPage from "../../recruiter/pages/CandidateAssessmentsPage";
@@ -80,6 +82,33 @@ function CompanyLayout() {
     fetchCompanyData();
   }, [profile?.id]);
 
+  useEffect(() => {
+    if (!company?.id) return;
+    const channel = supabase
+      .channel(`company-status-layout-${company.id}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "companies", filter: `id=eq.${company.id}` }, (payload) => {
+        setCompany((prev) => (prev ? { ...prev, ...payload.new } : prev));
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [company?.id]);
+
+  useEffect(() => {
+    if (!profile?.id) return;
+    const channel = supabase
+      .channel(`membership-${profile.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "company_memberships", filter: `profile_id=eq.${profile.id}` }, (payload) => {
+        if (!payload.new) {
+          setCompany(null);
+          setPermission(null);
+        } else {
+          setPermission(payload.new.recruiter_permissions);
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [profile?.id]);
+
   const handleInviteMember = async () => {
     try {
       if (!company?.id) return;
@@ -130,7 +159,11 @@ function CompanyLayout() {
   }
 
   if (permission === MEMBERSHIP_PERMISSION.pending) {
-    return <PendingApprovalPage companyName={company?.name} />;
+    return <PendingApprovalPage companyName={company?.name} companyId={company?.id} />;
+  }
+
+  if (company?.account_status === "banned") {
+    return <CompanySuspended company={company} membershipPermission={permission} />;
   }
 
   return (

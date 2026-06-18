@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/features/auth/context/user.context";
 import { useTranslation } from "react-i18next";
 import { getReports, resolveReport, getQuestionWithAnswer, getStageWithEvaluation } from "../services/admin.service";
+import { supabase } from "@/shared/services/supabase";
 import { X, Check, ExternalLink } from "lucide-react";
 
 const severityColors = {
@@ -45,6 +46,15 @@ export default function AdminReportsPage() {
 
   useEffect(() => {
     loadReports();
+    const channel = supabase
+      .channel(`admin-reports-${Date.now()}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "reports" },
+        loadReports
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   async function loadReports() {

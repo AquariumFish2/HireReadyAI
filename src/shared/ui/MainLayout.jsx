@@ -72,15 +72,27 @@ export default function MainLayout() {
     getUnreadCount(profile.id).then(setUnreadCount);
   }, [profile?.id]);
 
-  // Fetch pending report count for admin
+  // Fetch + realtime subscription for pending report count
   useEffect(() => {
     if (!isAdmin) return;
-    supabase
-      .from("reports")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "pending")
-      .then(({ count }) => setPendingReports(count || 0))
-      .catch(() => {});
+    const fetchCount = () => {
+      supabase
+        .from("reports")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending")
+        .then(({ count }) => setPendingReports(count || 0))
+        .catch(() => {});
+    };
+    fetchCount();
+    const channel = supabase
+      .channel(`admin-report-count-${Date.now()}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "reports" },
+        fetchCount
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [isAdmin]);
 
   // Process expired deadlines on mount

@@ -1,12 +1,30 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Clock, ArrowLeft, LogOut } from "lucide-react";
+import { Clock, ArrowLeft, LogOut, XCircle, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "@/features/auth/services/auth.service";
 import { useTranslation } from "react-i18next";
+import { useUser } from "@/features/auth/context/user.context";
+import { removeCompanyMember } from "@/features/admin/services/admin.service";
 
-export default function PendingApprovalPage({ companyName }) {
+export default function PendingApprovalPage({ companyName, companyId }) {
   const { t } = useTranslation();
+  const { profile } = useUser();
   const navigate = useNavigate();
+  const [dismissing, setDismissing] = useState(false);
+
+  async function handleDismiss() {
+    if (!profile?.id || !companyId) return;
+    setDismissing(true);
+    try {
+      await removeCompanyMember(profile.id, companyId);
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Failed to dismiss membership:", err);
+    } finally {
+      setDismissing(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background font-sans flex flex-col">
@@ -54,13 +72,27 @@ export default function PendingApprovalPage({ companyName }) {
           <p className="text-xs text-muted-foreground/70 mb-6">
             {t("pending_approval.contact_hr")}
           </p>
-          <button
-            onClick={() => navigate("/")}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-md text-xs font-medium hover:bg-primary/90 transition-colors cursor-pointer shadow-xs"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            {t("pending_approval.back_to_home")}
-          </button>
+          <div className="flex flex-col items-center gap-3">
+            <button
+              onClick={() => navigate("/")}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-md text-xs font-medium hover:bg-primary/90 transition-colors cursor-pointer shadow-xs"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              {t("pending_approval.back_to_home")}
+            </button>
+            <button
+              onClick={handleDismiss}
+              disabled={dismissing}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-destructive/10 text-destructive rounded-md text-xs font-medium hover:bg-destructive/20 transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {dismissing ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <XCircle className="w-3.5 h-3.5" />
+              )}
+              Dismiss Request
+            </button>
+          </div>
         </motion.div>
       </main>
     </div>

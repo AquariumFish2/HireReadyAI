@@ -49,3 +49,6 @@ ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS appeal_messages;
 ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS notifications;
 ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS profiles;
 ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS companies;
+ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS company_memberships;
+ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS reports;
+ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS technical_issues;

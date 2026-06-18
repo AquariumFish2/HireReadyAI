@@ -6,6 +6,7 @@ import {
   applyCompanyAction,
   processExpiredDeadlines,
 } from "../services/admin.service";
+import { supabase } from "@/shared/services/supabase";
 import CompanyActionDialog from "../components/CompanyActionDialog";
 import {
   Building2, Search, X, Loader2, AlertTriangle, Ban, ShieldAlert,
@@ -31,6 +32,14 @@ export default function AdminCompaniesPage() {
   useEffect(() => {
     loadCompanies();
     processExpiredDeadlines().catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-companies-rt")
+      .on("postgres_changes", { event: "*", schema: "public", table: "companies" }, () => { loadCompanies(); })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   async function loadCompanies() {

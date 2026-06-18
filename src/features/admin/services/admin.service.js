@@ -18,6 +18,18 @@ async function notifyAdmins(title, body, data = {}) {
   }
 }
 
+async function notifyAdminsInApp(title, message, type = "admin_action", data = {}) {
+  const { data: admins } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("role", "admin");
+  if (admins) {
+    for (const a of admins) {
+      createInAppNotification({ userId: a.id, title, message, type });
+    }
+  }
+}
+
 export const getUserCountsByRole = async () => {
   const { data, error } = await supabase
     .from("profiles")
@@ -226,6 +238,16 @@ export const submitReport = async ({
       message: `[Report Type: ${reportType}]\n[Target ID: ${targetId}]\n[Subject: ${subject}]\n\n${description}`,
     },
   });
+
+  notifyAdmins(
+    "New Report Submitted",
+    `${reporter?.full_name || "A user"} reported a ${reportType}: "${subject}"`,
+    { type: "report", reportType, targetId }
+  );
+  notifyAdminsInApp(
+    "New Report Submitted",
+    `${reporter?.full_name || "A user"} reported a ${reportType}: "${subject}"`
+  );
 
   return data;
 };
@@ -517,6 +539,10 @@ export const applyCompanyAction = async ({
     .insert([action]);
   if (actionError) throw actionError;
 
+  if (actionType === "ban") {
+    await closeCompanyJobs(companyId).catch(() => {});
+  }
+
   // Email for warn / ban / closing_warning / active — send to all HR managers
   if (["warn", "ban", "closing_warning", "active"].includes(actionType)) {
     const { data: company } = await supabase
@@ -586,6 +612,15 @@ export const closeCompanyJobs = async (companyId) => {
   if (error) throw error;
 };
 
+export const removeCompanyMember = async (profileId, companyId) => {
+  const { error } = await supabase
+    .from("company_memberships")
+    .delete()
+    .eq("profile_id", profileId)
+    .eq("company_id", companyId);
+  if (error) throw error;
+};
+
 // ─── Appeals ────────────────────────────────────────────────────────
 
 export const getResolvedAppeals = async () => {
@@ -640,13 +675,27 @@ export const submitAppeal = async ({ entityType, entityId, senderId, message }) 
   // Notify all admins
   const { data: userProfile } = await supabase
     .from("profiles")
-    .select("full_name")
+    .select("full_name, email")
     .eq("id", senderId)
     .single();
+
+  await supabase.functions.invoke("send-contact-email", {
+    body: {
+      name: userProfile?.full_name || "User",
+      email: userProfile?.email || "unknown@example.com",
+      company: entityType === "company" ? "Company Appeal" : "User Appeal",
+      message: `Appeal submitted by ${userProfile?.full_name || "User"}:\n\n"${message}"`,
+    },
+  }).catch(err => console.warn("Appeal email (admin) failed:", err));
+
   notifyAdmins(
     "New Appeal Submitted",
     `${userProfile?.full_name || "A user"} submitted an appeal: "${message.slice(0, 100)}"`,
     { type: "appeal", entityType, entityId }
+  );
+  notifyAdminsInApp(
+    "New Appeal Submitted",
+    `${userProfile?.full_name || "A user"} submitted an appeal: "${message.slice(0, 100)}"`
   );
 };
 
@@ -753,6 +802,10 @@ export const sendAppealMessage = async ({ entityType, entityId, senderId, messag
         "New Appeal Reply",
         `${userProfile?.full_name || "A user"} replied to their appeal: "${message.slice(0, 120)}"`,
         { type: "appeal", entityType, entityId }
+      );
+      notifyAdminsInApp(
+        "New Appeal Reply",
+        `${userProfile?.full_name || "A user"} replied to their appeal: "${message.slice(0, 120)}"`
       );
     }
   } catch (emailErr) {
@@ -870,17 +923,21 @@ export const processExpiredDeadlines = async () => {
     .limit(100);
 
   if (expiredCompanies?.length) {
-    const expiredCompanyIds = expiredCompanies.map((c) => c.id);
-    const { error: compErr } = await supabase
-      .from("companies")
-      .update({ account_status: "banned", banned_at: now, appeal_status: "none" })
-      .in("id", expiredCompanyIds);
-    if (compErr) {
-      console.error("Failed to update expired company deadlines:", compErr);
-    } else {
-      for (const c of expiredCompanyIds) {
-        await closeCompanyJobs(c).catch(() => {});
-      }
+    for (const c of expiredCompanies) {
+      const { data: actions } = await supabase
+        .from("company_actions")
+        .select("applied_by")
+        .eq("company_id", c.id)
+        .eq("action_type", "closing_warning")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      const adminId = actions?.[0]?.applied_by || null;
+      await applyCompanyAction({
+        companyId: c.id,
+        actionType: "ban",
+        reason: "Closure deadline expired",
+        adminId,
+      }).catch((err) => console.error("Failed to auto-ban company:", err));
     }
   }
 

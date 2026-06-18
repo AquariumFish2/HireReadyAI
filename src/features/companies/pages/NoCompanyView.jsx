@@ -44,7 +44,7 @@ export default function NoCompanyView({ onCompanyJoined }) {
       try {
         setLoading(true);
         const data = await fetchAllCompanies();
-        setCompanies(data || []);
+        setCompanies((data || []).filter((c) => c.account_status !== "banned"));
       } catch (err) {
         console.error("Error fetching companies:", err);
         setError(err.message);
