@@ -280,310 +280,357 @@ serve(async (req) => {
     return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
 
-  const { applicationStageId, previousAnswer } = (await req.json()) as {
-    applicationStageId: string;
-    previousAnswer?: PreviousAnswer | null;
-  };
-
-  if (!applicationStageId) {
-    return new Response(
-      JSON.stringify({ error: "applicationStageId is required" }),
-      { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
-  }
-
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SB_SERVICE_KEY") ?? "",
-  );
-
-  // ── 1. Fetch stage context ─────────────────────────────────────────────────
-  const { data: stageData, error: stageError } = await supabase
-    .from("application_stages")
-    .select(`
-      id, status,
-      recruitment_stages!inner (
-        id, name, description, stage_type, pass_score, evaluation_criteria, order_index, num_questions
-      ),
-      applications!inner (
-        id, cv_score, answers, job_id,
-        job_postings!inner (
-          title, seniority_level, description, skills, requirements
-        )
-      )
-    `)
-    .eq("id", applicationStageId)
-    .single();
-
-  if (stageError || !stageData) {
-    return new Response(
-      JSON.stringify({ error: "Stage not found", details: stageError }),
-      { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
-  }
-
-  const stage = stageData.recruitment_stages as {
-    id: string; name: string; description: string; stage_type: string;
-    pass_score: number | null; evaluation_criteria: Record<string, unknown> | null;
-    order_index: number; num_questions: number | null;
-  };
-  const application = stageData.applications as {
-    id: string; cv_score: number | null; answers: Record<string, unknown> | null; job_id: string;
-    job_postings: { title: string; seniority_level: string; skills: string[]; requirements: string[]; };
-  };
-  const job = application.job_postings;
-
-  // Use num_questions from recruitment_stages, fallback to max_questions in evaluation_criteria, then fallback to 8
-  const maxQuestions: number = stage.num_questions ?? ((stage.evaluation_criteria?.max_questions as number) ?? 8);
-
-  // ── 2. Save the incoming answer FIRST so history count is accurate ──────────
-  // We save the answer before fetching history so that answeredInDB reflects
-  // the true answered count (including the answer we just received).
-  if (previousAnswer?.questionId && previousAnswer?.answerText) {
-    // Partial upsert — score/feedback will be filled in after AI evaluation below
-    await supabase.from("application_answers").upsert(
-      {
-        question_id: previousAnswer.questionId,
-        answer_text: previousAnswer.answerText,
-      },
-      { onConflict: "question_id" }
-    );
-  }
-
-  // ── 3. Fetch question history (now includes the just-saved answer) ──────────
-  const { data: rawHistory } = await supabase
-    .from("application_questions")
-    .select(`
-      id, question_text, question_type, order_index, generation_context,
-      application_answers ( answer_text, score, feedback )
-    `)
-    .eq("application_stage_id", applicationStageId)
-    .order("order_index", { ascending: true });
-
-  // Normalise application_answers — Supabase may return object or array
-  const pickAnswer = (raw: unknown) => {
-    if (!raw) return { answer_text: null, score: null };
-    if (Array.isArray(raw)) {
-      const first = (raw as Record<string, unknown>[])[0] ?? {};
-      return { answer_text: (first.answer_text as string) ?? null, score: (first.score as number) ?? null };
-    }
-    const obj = raw as Record<string, unknown>;
-    return { answer_text: (obj.answer_text as string) ?? null, score: (obj.score as number) ?? null };
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const history = (rawHistory ?? []).map((q: any) => {
-    const { answer_text, score } = pickAnswer(q.application_answers);
-    return {
-      id: q.id as string,
-      question_text: q.question_text as string,
-      question_type: q.question_type as string,
-      order_index: q.order_index as number,
-      generation_context: q.generation_context,
-      answer_text,
-      score,
-    };
-  });
-
-  // Named type to avoid 'typeof history[0]' which Deno's TS rejects as a generic arg
-  type HistoryRow = {
-    id: string; question_text: string; question_type: string;
-    order_index: number; generation_context: unknown;
-    answer_text: string | null; score: number | null;
-  };
-
-  // Deduplicate by order_index — the DB may have duplicate rows per slot from
-  // previous broken sessions. For each slot keep the "best" row:
-  //   1. A row with an answer + score   (fully evaluated)
-  //   2. A row with an answer only      (saved but not yet scored)
-  //   3. A row with no answer           (unanswered — last resort)
-  const slotMap = new Map<number, HistoryRow>();
-  for (const q of history) {
-    const existing = slotMap.get(q.order_index);
-    if (!existing) {
-      slotMap.set(q.order_index, q);
-    } else {
-      // Prefer answered over unanswered; prefer scored over unscored
-      const qScore   = q.answer_text != null ? (q.score != null ? 2 : 1) : 0;
-      const exScore  = existing.answer_text != null ? (existing.score != null ? 2 : 1) : 0;
-      if (qScore > exScore) slotMap.set(q.order_index, q);
-    }
-  }
-  const deduped = Array.from(slotMap.values()).sort((a, b) => a.order_index - b.order_index);
-
-  // Answered = unique slots that have a non-null answer_text
-  const answeredInDB = deduped.filter((q) => q.answer_text != null).length;
-  const nextQuestionNumber = answeredInDB + 1;
-  const isFinalQuestion = answeredInDB === maxQuestions - 1;
-  const isSessionOver = answeredInDB >= maxQuestions;
-
-  // ── 4. Find the text of the previous question for prompt context ────────────
-  let previousQuestionText: string | null = null;
-  if (previousAnswer?.questionId) {
-    const prevQ = history.find((q) => q.id === previousAnswer.questionId);
-    previousQuestionText = prevQ?.question_text ?? null;
-  }
-
-  const usedTypes = deduped.map(q => q.question_type);
-  const typeCounts = usedTypes.reduce((acc, t) => {
-    acc[t] = (acc[t] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const typeConstraint = `
-  QUESTION TYPE DISTRIBUTION (so far): ${JSON.stringify(typeCounts)}
-  RULE: Do not use the same type more than ${Math.ceil(maxQuestions / 3)} times in one session.
-  If "text" has been used ${typeCounts["text"] >= 2 ? "2+ times" : "already"}, pick a different type.`;
-
-
-  // ── 5. Call AI ────────────────────────────────────────────────────────────
-  // DEBUG: log deduped history so we can trace question progression cleanly
-  console.log("=== generate-question DEBUG ===");
-  console.log("applicationStageId:", applicationStageId);
-  console.log("previousAnswer:", previousAnswer ?? "(none — first question)");
-  console.log("raw rows in DB:", history.length, "| deduped slots:", deduped.length);
-  console.log("answeredInDB:", answeredInDB, "| nextQuestionNumber:", nextQuestionNumber, "| maxQuestions:", maxQuestions);
-  console.log("isSessionOver:", isSessionOver, "| isFinalQuestion:", isFinalQuestion);
-  console.log("deduped history:");
-  deduped.forEach((q, i) => {
-    console.log(
-      `  Q${i + 1} [order_index=${q.order_index}] id=${q.id}`,
-      `| type=${q.question_type}`,
-      `| answered=${q.answer_text != null}`,
-      `| score=${q.score ?? "—"}`,
-      `| text="${q.question_text?.slice(0, 80)}${q.question_text?.length > 80 ? "…" : ""}"`
-    );
-  });
-  console.log("================================");
-  let aiResult: AIOutput;
   try {
-    const prompt = buildPrompt({
-      stageName: stage.name,
-      stageType: stage.stage_type,
-      stageDescription: stage.description,
-      evaluationCriteria: stage.evaluation_criteria ?? {},
-      jobTitle: job.title,
-      jobSeniority: job.seniority_level,
-      jobSkills: job.skills ?? [],
-      jobRequirements: job.requirements ?? [],
-      cvScore: application.cv_score,
-      history: deduped.map((q) => ({
-        question_text: q.question_text,
-        question_type: q.question_type,
-        answer_text: q.answer_text,
-        score: q.score,
-      })),
-      typeConstraint:typeConstraint,
-      previousAnswerText: previousAnswer?.answerText ?? null,
-      previousQuestionText,
-      nextQuestionNumber,
-      maxQuestions,
-      isFinalQuestion,
-      isSessionOver,
+    const { applicationStageId, previousAnswer } = (await req.json()) as {
+      applicationStageId: string;
+      previousAnswer?: PreviousAnswer | null;
+    };
+
+    if (!applicationStageId) {
+      return new Response(
+        JSON.stringify({ error: "applicationStageId is required" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SB_SERVICE_KEY") ?? "",
+    );
+
+    // ── 1. Fetch stage context ─────────────────────────────────────────────────
+    const { data: stageData, error: stageError } = await supabase
+      .from("application_stages")
+      .select(`
+        id, status,
+        recruitment_stages!inner (
+          id, name, description, stage_type, pass_score, evaluation_criteria, order_index, num_questions
+        ),
+        applications!inner (
+          id, cv_score, answers, job_id,
+          job_postings!inner (
+            title, seniority_level, description, skills, requirements
+          )
+        )
+      `)
+      .eq("id", applicationStageId)
+      .single();
+
+    if (stageError || !stageData) {
+      return new Response(
+        JSON.stringify({ error: "Stage not found", details: stageError }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const stage = stageData.recruitment_stages as {
+      id: string; name: string; description: string; stage_type: string;
+      pass_score: number | null; evaluation_criteria: Record<string, unknown> | null;
+      order_index: number; num_questions: number | null;
+    };
+    const application = stageData.applications as {
+      id: string; cv_score: number | null; answers: Record<string, unknown> | null; job_id: string;
+      job_postings: { title: string; seniority_level: string; skills: string[]; requirements: string[]; };
+    };
+    const job = application.job_postings;
+
+    // Use num_questions from recruitment_stages, fallback to max_questions in evaluation_criteria, then fallback to 8
+    const maxQuestions: number = stage.num_questions ?? ((stage.evaluation_criteria?.max_questions as number) ?? 8);
+
+    // ── 2. Save the incoming answer FIRST so history count is accurate ──────────
+    // We save the answer before fetching history so that answeredInDB reflects
+    // the true answered count (including the answer we just received).
+    if (previousAnswer?.questionId && previousAnswer?.answerText) {
+      // Partial upsert — score/feedback will be filled in after AI evaluation below
+      await supabase.from("application_answers").upsert(
+        {
+          question_id: previousAnswer.questionId,
+          answer_text: previousAnswer.answerText,
+        },
+        { onConflict: "question_id" }
+      );
+    }
+
+    // ── 3. Fetch question history (now includes the just-saved answer) ──────────
+    const { data: rawHistory } = await supabase
+      .from("application_questions")
+      .select(`
+        id, question_text, question_type, order_index, generation_context,
+        application_answers ( answer_text, score, feedback )
+      `)
+      .eq("application_stage_id", applicationStageId)
+      .order("order_index", { ascending: true });
+
+    // Normalise application_answers — Supabase may return object or array
+    const pickAnswer = (raw: unknown) => {
+      if (!raw) return { answer_text: null, score: null };
+      if (Array.isArray(raw)) {
+        const first = (raw as Record<string, unknown>[])[0] ?? {};
+        return { answer_text: (first.answer_text as string) ?? null, score: (first.score as number) ?? null };
+      }
+      const obj = raw as Record<string, unknown>;
+      return { answer_text: (obj.answer_text as string) ?? null, score: (obj.score as number) ?? null };
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const history = (rawHistory ?? []).map((q: any) => {
+      const { answer_text, score } = pickAnswer(q.application_answers);
+      return {
+        id: q.id as string,
+        question_text: q.question_text as string,
+        question_type: q.question_type as string,
+        order_index: q.order_index as number,
+        generation_context: q.generation_context,
+        answer_text,
+        score,
+      };
     });
 
-    aiResult = await callAI(prompt);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return new Response(
-      JSON.stringify({ error: `AI call failed: ${msg}` }),
-      { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
-  }
-
-  // ── 6. Update answer evaluation score + feedback (partial upsert was done earlier) ──
-  if (previousAnswer?.questionId && aiResult.answer_evaluation) {
-    const { score, feedback, strengths, weaknesses } = aiResult.answer_evaluation;
-    await supabase.from("application_answers").upsert(
-      {
-        question_id: previousAnswer.questionId,
-        answer_text: previousAnswer.answerText,
-        score,
-        feedback: feedback,
-        strengths: strengths || [],
-        weaknesses: weaknesses || [],
-      },
-      { onConflict: "question_id" }
-    );
-  }
-
-  // ── 7. Session over — save evaluation ─────────────────────────────────────
-  const shouldFinalize = isSessionOver || aiResult.is_final;
-
-  if (shouldFinalize) {
-    // Compute stage score as the average of all individually scored questions
-    const scoredQuestions = deduped.filter((q) => q.score != null);
-    const avgScore = scoredQuestions.length > 0
-      ? Math.round(scoredQuestions.reduce((sum, q) => sum + (q.score ?? 0), 0) / scoredQuestions.length)
-      : (aiResult.answer_evaluation?.score ?? 0);
-
-    const summary = aiResult.session_summary || {
-      overall_score: avgScore,
-      recommendation: "review",
-      reasoning: "Session concluded automatically. AI failed to generate a proper summary.",
-      strengths: [],
-      weaknesses: [],
+    // Named type to avoid 'typeof history[0]' which Deno's TS rejects as a generic arg
+    type HistoryRow = {
+      id: string; question_text: string; question_type: string;
+      order_index: number; generation_context: unknown;
+      answer_text: string | null; score: number | null;
     };
 
-    const { recommendation, reasoning, strengths, weaknesses } = summary;
-    const overall_score = avgScore;
+    // Deduplicate by order_index — the DB may have duplicate rows per slot from
+    // previous broken sessions. For each slot keep the "best" row:
+    //   1. A row with an answer + score   (fully evaluated)
+    //   2. A row with an answer only      (saved but not yet scored)
+    //   3. A row with no answer           (unanswered — last resort)
+    const slotMap = new Map<number, HistoryRow>();
+    for (const q of history) {
+      const existing = slotMap.get(q.order_index);
+      if (!existing) {
+        slotMap.set(q.order_index, q);
+      } else {
+        // Prefer answered over unanswered; prefer scored over unscored
+        const qScore   = q.answer_text != null ? (q.score != null ? 2 : 1) : 0;
+        const exScore  = existing.answer_text != null ? (existing.score != null ? 2 : 1) : 0;
+        if (qScore > exScore) slotMap.set(q.order_index, q);
+      }
+    }
+    const deduped = Array.from(slotMap.values()).sort((a, b) => a.order_index - b.order_index);
 
-    await supabase.from("application_stage_evaluations").upsert(
-      {
+    // Answered = unique slots that have a non-null answer_text
+    const answeredInDB = deduped.filter((q) => q.answer_text != null).length;
+    const nextQuestionNumber = answeredInDB + 1;
+    const isFinalQuestion = answeredInDB === maxQuestions - 1;
+    const isSessionOver = answeredInDB >= maxQuestions;
+
+    // ── 4. Find the text of the previous question for prompt context ────────────
+    let previousQuestionText: string | null = null;
+    if (previousAnswer?.questionId) {
+      const prevQ = history.find((q) => q.id === previousAnswer.questionId);
+      previousQuestionText = prevQ?.question_text ?? null;
+    }
+
+    const usedTypes = deduped.map(q => q.question_type);
+    const typeCounts = usedTypes.reduce((acc, t) => {
+      acc[t] = (acc[t] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const typeConstraint = `
+    QUESTION TYPE DISTRIBUTION (so far): ${JSON.stringify(typeCounts)}
+    RULE: Do not use the same type more than ${Math.ceil(maxQuestions / 3)} times in one session.
+    If "text" has been used ${typeCounts["text"] >= 2 ? "2+ times" : "already"}, pick a different type.`;
+
+
+    // ── 5. Call AI ────────────────────────────────────────────────────────────
+    // DEBUG: log deduped history so we can trace question progression cleanly
+    console.log("=== generate-question DEBUG ===");
+    console.log("applicationStageId:", applicationStageId);
+    console.log("previousAnswer:", previousAnswer ?? "(none — first question)");
+    console.log("raw rows in DB:", history.length, "| deduped slots:", deduped.length);
+    console.log("answeredInDB:", answeredInDB, "| nextQuestionNumber:", nextQuestionNumber, "| maxQuestions:", maxQuestions);
+    console.log("isSessionOver:", isSessionOver, "| isFinalQuestion:", isFinalQuestion);
+    console.log("deduped history:");
+    deduped.forEach((q, i) => {
+      console.log(
+        `  Q${i + 1} [order_index=${q.order_index}] id=${q.id}`,
+        `| type=${q.question_type}`,
+        `| answered=${q.answer_text != null}`,
+        `| score=${q.score ?? "—"}`,
+        `| text="${q.question_text?.slice(0, 80)}${q.question_text?.length > 80 ? "…" : ""}"`
+      );
+    });
+    console.log("================================");
+    let aiResult: AIOutput;
+    try {
+      const prompt = buildPrompt({
+        stageName: stage.name,
+        stageType: stage.stage_type,
+        stageDescription: stage.description,
+        evaluationCriteria: stage.evaluation_criteria ?? {},
+        jobTitle: job.title,
+        jobSeniority: job.seniority_level,
+        jobSkills: job.skills ?? [],
+        jobRequirements: job.requirements ?? [],
+        cvScore: application.cv_score,
+        history: deduped.map((q) => ({
+          question_text: q.question_text,
+          question_type: q.question_type,
+          answer_text: q.answer_text,
+          score: q.score,
+        })),
+        typeConstraint:typeConstraint,
+        previousAnswerText: previousAnswer?.answerText ?? null,
+        previousQuestionText,
+        nextQuestionNumber,
+        maxQuestions,
+        isFinalQuestion,
+        isSessionOver,
+      });
+
+      aiResult = await callAI(prompt);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return new Response(
+        JSON.stringify({ error: `AI call failed: ${msg}` }),
+        { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // ── 6. Update answer evaluation score + feedback (partial upsert was done earlier) ──
+    if (previousAnswer?.questionId && aiResult.answer_evaluation) {
+      const { score, feedback, strengths, weaknesses } = aiResult.answer_evaluation;
+      await supabase.from("application_answers").upsert(
+        {
+          question_id: previousAnswer.questionId,
+          answer_text: previousAnswer.answerText,
+          score,
+          feedback: feedback,
+          strengths: strengths || [],
+          weaknesses: weaknesses || [],
+        },
+        { onConflict: "question_id" }
+      );
+    }
+
+    // ── 7. Session over — save evaluation ─────────────────────────────────────
+    const shouldFinalize = isSessionOver || aiResult.is_final;
+
+    if (shouldFinalize) {
+      // Compute stage score as the average of all individually scored questions
+      const scoredQuestions = deduped.filter((q) => q.score != null);
+      const avgScore = scoredQuestions.length > 0
+        ? Math.round(scoredQuestions.reduce((sum, q) => sum + (q.score ?? 0), 0) / scoredQuestions.length)
+        : (aiResult.answer_evaluation?.score ?? 0);
+
+      const summary = aiResult.session_summary || {
+        overall_score: avgScore,
+        recommendation: "review",
+        reasoning: "Session concluded automatically. AI failed to generate a proper summary.",
+        strengths: [],
+        weaknesses: [],
+      };
+
+      const { recommendation, reasoning, strengths, weaknesses } = summary;
+      const overall_score = avgScore;
+
+      await supabase.from("application_stage_evaluations").upsert(
+        {
+          application_stage_id: applicationStageId,
+          ai_score: overall_score,
+          recommendation,
+          reasoning,
+          strengths: strengths || [],
+          weaknesses: weaknesses || [],
+          confidence: 0.8,
+        },
+        { onConflict: "application_stage_id" }
+      );
+
+      // Update stage status based on pass_score
+      const passScore = stage.pass_score ?? 55;
+      const stagePassed = overall_score >= passScore;
+      await supabase
+        .from("application_stages")
+        .update({ status: stagePassed ? "passed" : "failed", score: overall_score, completed_at: new Date().toISOString() })
+        .eq("id", applicationStageId);
+
+      return new Response(
+        JSON.stringify({
+          question: null,
+          answerEvaluation: aiResult.answer_evaluation,
+          isFinal: true,
+          stageSummary: summary,
+        }),
+        { headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // ── 8. Save new question (with duplicate guard) ───────────────────────────
+    if (!aiResult.next_question) {
+      return new Response(
+        JSON.stringify({ error: "AI did not return a next question" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Guard: if a question with this order_index already exists (deduped), return it
+    // (prevents duplicate questions when the user re-submits the same answer)
+    const existingAtIndex = deduped.find((q) => q.order_index === nextQuestionNumber);
+    if (existingAtIndex && existingAtIndex.answer_text == null) {
+      // An unanswered question already exists at this slot — return it instead
+      return new Response(
+        JSON.stringify({
+          question: {
+            id: existingAtIndex.id,
+            text: existingAtIndex.question_text,
+            type: existingAtIndex.question_type,
+            options: existingAtIndex.generation_context?.options ?? null,
+            language: existingAtIndex.generation_context?.language ?? null,
+            codeType: existingAtIndex.generation_context?.code_type ?? null,
+            maxTime: existingAtIndex.generation_context?.max_time ?? null,
+            orderIndex: existingAtIndex.order_index,
+          },
+          answerEvaluation: aiResult.answer_evaluation,
+          isFinal: false,
+          stageSummary: null,
+        }),
+        { headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const { data: newQuestion, error: insertError } = await supabase
+      .from("application_questions")
+      .insert({
         application_stage_id: applicationStageId,
-        ai_score: overall_score,
-        recommendation,
-        reasoning,
-        strengths: strengths || [],
-        weaknesses: weaknesses || [],
-        confidence: 0.8,
-      },
-      { onConflict: "application_stage_id" }
-    );
+        question_text: aiResult.next_question.text,
+        question_type: aiResult.next_question.type,
+        generated_by_ai: true,
+        generation_context: {
+          options: aiResult.next_question.options ?? null,
+          language: aiResult.next_question.language ?? null,
+          code_type: aiResult.next_question.code_type ?? null,
+          max_time: aiResult.next_question.max_time ?? null,
+        },
+        order_index: nextQuestionNumber,
+        generation_version: 1,
+      })
+      .select()
+      .single();
 
-    // Update stage status based on pass_score
-    const passScore = stage.pass_score ?? 55;
-    const stagePassed = overall_score >= passScore;
-    await supabase
-      .from("application_stages")
-      .update({ status: stagePassed ? "passed" : "failed", score: overall_score, completed_at: new Date().toISOString() })
-      .eq("id", applicationStageId);
+    if (insertError || !newQuestion) {
+      return new Response(
+        JSON.stringify({ error: "Failed to save question", details: insertError }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
-    return new Response(
-      JSON.stringify({
-        question: null,
-        answerEvaluation: aiResult.answer_evaluation,
-        isFinal: true,
-        stageSummary: summary,
-      }),
-      { headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
-  }
-
-  // ── 8. Save new question (with duplicate guard) ───────────────────────────
-  if (!aiResult.next_question) {
-    return new Response(
-      JSON.stringify({ error: "AI did not return a next question" }),
-      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
-  }
-
-  // Guard: if a question with this order_index already exists (deduped), return it
-  // (prevents duplicate questions when the user re-submits the same answer)
-  const existingAtIndex = deduped.find((q) => q.order_index === nextQuestionNumber);
-  if (existingAtIndex && existingAtIndex.answer_text == null) {
-    // An unanswered question already exists at this slot — return it instead
     return new Response(
       JSON.stringify({
         question: {
-          id: existingAtIndex.id,
-          text: existingAtIndex.question_text,
-          type: existingAtIndex.question_type,
-          options: existingAtIndex.generation_context?.options ?? null,
-          language: existingAtIndex.generation_context?.language ?? null,
-          codeType: existingAtIndex.generation_context?.code_type ?? null,
-          maxTime: existingAtIndex.generation_context?.max_time ?? null,
-          orderIndex: existingAtIndex.order_index,
+          id: newQuestion.id,
+          text: aiResult.next_question.text,
+          type: aiResult.next_question.type,
+          options: aiResult.next_question.options ?? null,
+          language: aiResult.next_question.language ?? null,
+          codeType: aiResult.next_question.code_type ?? null,
+          maxTime: aiResult.next_question.max_time ?? null,
+          orderIndex: nextQuestionNumber,
         },
         answerEvaluation: aiResult.answer_evaluation,
         isFinal: false,
@@ -591,50 +638,11 @@ serve(async (req) => {
       }),
       { headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  }
-
-  const { data: newQuestion, error: insertError } = await supabase
-    .from("application_questions")
-    .insert({
-      application_stage_id: applicationStageId,
-      question_text: aiResult.next_question.text,
-      question_type: aiResult.next_question.type,
-      generated_by_ai: true,
-      generation_context: {
-        options: aiResult.next_question.options ?? null,
-        language: aiResult.next_question.language ?? null,
-        code_type: aiResult.next_question.code_type ?? null,
-        max_time: aiResult.next_question.max_time ?? null,
-      },
-      order_index: nextQuestionNumber,
-      generation_version: 1,
-    })
-    .select()
-    .single();
-
-  if (insertError || !newQuestion) {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     return new Response(
-      JSON.stringify({ error: "Failed to save question", details: insertError }),
+      JSON.stringify({ error: msg }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
-
-  return new Response(
-    JSON.stringify({
-      question: {
-        id: newQuestion.id,
-        text: aiResult.next_question.text,
-        type: aiResult.next_question.type,
-        options: aiResult.next_question.options ?? null,
-        language: aiResult.next_question.language ?? null,
-        codeType: aiResult.next_question.code_type ?? null,
-        maxTime: aiResult.next_question.max_time ?? null,
-        orderIndex: nextQuestionNumber,
-      },
-      answerEvaluation: aiResult.answer_evaluation,
-      isFinal: false,
-      stageSummary: null,
-    }),
-    { headers: { "Content-Type": "application/json", ...corsHeaders } }
-  );
 });

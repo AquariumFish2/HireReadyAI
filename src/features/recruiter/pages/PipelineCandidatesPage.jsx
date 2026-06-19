@@ -15,6 +15,7 @@ import CandidateSidebar from "../components/CandidateSidebar";
 import PipelineHeader from "../components/PipelineHeader";
 import PipelineColumn from "../components/PipelineColumn";
 import ShortlistModal from "../components/ShortlistModal";
+import ShortlistResultModal from "../components/ShortlistResultModal";
 import {
   getFit,
   mapApplicationToCandidate,
@@ -49,6 +50,8 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
   const [generatingCriteria, setGeneratingCriteria] = useState(false);
   const [scoreReasoning, setScoreReasoning] = useState("");
   const [advancingToShortlist, setAdvancingToShortlist] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [shortlistResult, setShortlistResult] = useState(null);
 
   async function handleAutoGenerateCriteria() {
     if (!selectedJobId) return;
@@ -87,7 +90,9 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
         .map((c) => c.id);
 
       if (candidateIds.length === 0) {
-        alert("No candidates in the stage before Shortlist");
+        setShowShortlistModal(false);
+        setShortlistResult({ error: "No candidates in the stage before Shortlist" });
+        setShowResultModal(true);
         setAdvancingToShortlist(false);
         return;
       }
@@ -107,17 +112,17 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
 
       const results = data?.results || [];
       const passed = results.filter((r) => r.passed).length;
-      alert(
-        `Evaluation complete: ${passed}/${candidateIds.length} candidates advanced to shortlist`,
-      );
 
       setShowShortlistModal(false);
       setCriteria("");
       setMinScore(70);
-      window.location.reload();
+      setShortlistResult({ passed, total: candidateIds.length });
+      setShowResultModal(true);
     } catch (err) {
       console.error(err);
-      alert("Failed to advance to shortlist: " + err.message);
+      setShowShortlistModal(false);
+      setShortlistResult({ error: err.message });
+      setShowResultModal(true);
     } finally {
       setAdvancingToShortlist(false);
     }
@@ -531,6 +536,13 @@ export default function PipelineCandidatesPage({ company, jobs = [] }) {
           advancingToShortlist={advancingToShortlist}
           onRunEvaluation={handleAdvanceToShortlist}
           selectedJobId={selectedJobId}
+        />
+      )}
+
+      {showResultModal && shortlistResult && (
+        <ShortlistResultModal
+          result={shortlistResult}
+          onClose={() => window.location.reload()}
         />
       )}
     </div>
