@@ -14,6 +14,7 @@
   --color-card: #ffffff;
   --color-primary: #01497c;
   --color-primary-hover: #013a63;
+  --color-primary-foreground: #ffffff;
   --color-secondary: #e7f3f7;
   --color-muted: #eef7fa;
   --color-muted-foreground: #468faf;
@@ -50,6 +51,7 @@
   --color-card: #0b2336;
   --color-primary: #468faf;
   --color-primary-hover: #61a5c2;
+  --color-primary-foreground: #ffffff;
   --color-secondary: #143b56;
   --color-muted: #0e2a40;
   --color-muted-foreground: #89c2d9;

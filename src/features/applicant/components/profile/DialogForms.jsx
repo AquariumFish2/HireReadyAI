@@ -325,7 +325,7 @@ export default function DialogForms({ dialog, handleDialogChange, errors = {} })
           placeholder="https://..."
         />
         <ImageUpload
-          bucket="projects"
+          bucket="project-media"
           currentUrls={data.images || []}
           onUploaded={(url, removeIdx) => {
             const imgs = [...(data.images || [])];

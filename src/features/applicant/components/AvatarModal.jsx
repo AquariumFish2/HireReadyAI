@@ -58,7 +58,7 @@ export default function AvatarModal({
       className="fixed inset-0 bg-foreground/40 backdrop-blur-sm flex items-center justify-center z-50"
       onClick={handleOverlayClick}
     >
-      <div className="bg-card rounded-2xl border shadow-[var(--shadow-lift)] p-6 max-w-md w-full mx-4">
+      <div className="bg-card text-foreground rounded-2xl border shadow-[var(--shadow-lift)] p-6 max-w-md w-full mx-4">
         <h2 className="font-display text-xl font-semibold text-foreground mb-4">
           {t("avatar_modal.title")}
         </h2>
