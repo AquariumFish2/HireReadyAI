@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Lock } from "lucide-react";
+import { Lock, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import CandidateCard from "./CandidateCard";
+import { STAGE_LIBRARY } from "@/features/pipeline/constants/stageLibrary";
 
 export default function PipelineColumn({
   stage,
@@ -23,6 +24,8 @@ export default function PipelineColumn({
   const isLocked = stage.is_locked && stage.name !== "CV Review";
   const [openMenu, setOpenMenu] = useState(false);
   const [localMinScore, setLocalMinScore] = useState(stage.min_score ?? 70);
+  const stageLibItem = STAGE_LIBRARY.find((s) => s.key === stage.stage_type);
+  const isComingSoon = stageLibItem?.comingSoon;
 
   useEffect(() => {
     setLocalMinScore(stage.min_score ?? 70);
@@ -31,16 +34,18 @@ export default function PipelineColumn({
   return (
     <div
       className={`flex flex-col min-w-[280px] w-[280px] shrink-0 rounded-2xl transition-all duration-200 ${
-        isOver && !isLocked
-          ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-black"
-          : ""
+        isComingSoon
+          ? "opacity-40"
+          : isOver && !isLocked
+            ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-black"
+            : ""
       }`}
       onDragOver={(e) => {
         e.preventDefault();
-        if (!isLocked) onDragOver(stage.id);
+        if (!isLocked && !isComingSoon) onDragOver(stage.id);
       }}
       onDrop={() => {
-        if (!isLocked) onDrop(stage.id);
+        if (!isLocked && !isComingSoon) onDrop(stage.id);
       }}
     >
       <div className="flex items-center justify-between px-2 py-2.5 mb-2">
@@ -48,14 +53,23 @@ export default function PipelineColumn({
           <span
             className="w-2.5 h-2.5 rounded-full shrink-0"
             style={{
-              background: `hsl(${210 - stage.order_index * 12}, 80%, 45%)`,
+              background: isComingSoon ? "#d1d5db" : `hsl(${210 - stage.order_index * 12}, 80%, 45%)`,
             }}
           />
-          <span className="text-xs font-bold text-foreground font-display truncate">
+          <span className={`text-xs font-bold font-display truncate ${
+            isComingSoon ? "text-gray-300 dark:text-slate-600" : "text-foreground"
+          }`}>
             {stage.name}
           </span>
-          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-muted text-muted-foreground border border-border/80 ml-1 shrink-0">
-            {candidates.length}
+          {isComingSoon && (
+            <Clock className="w-3 h-3 text-gray-300 dark:text-slate-600 ml-1 shrink-0" />
+          )}
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold border ml-1 shrink-0 ${
+            isComingSoon
+              ? "bg-gray-50 dark:bg-slate-800 text-gray-300 dark:text-slate-600 border-gray-100 dark:border-slate-700"
+              : "bg-muted text-muted-foreground border-border/80"
+          }`}>
+            {isComingSoon ? "Soon" : candidates.length}
           </span>
           {isLocked && (
             <Lock
@@ -64,7 +78,7 @@ export default function PipelineColumn({
             />
           )}
 
-          {!isLocked && (
+          {!isLocked && !isComingSoon && (
             <button
               onClick={() => handleAdvanceAll(stage.id)}
               disabled={loadingDrop}
@@ -85,17 +99,21 @@ export default function PipelineColumn({
         {candidates.length === 0 ? (
           <div
             className={`rounded-xl border-2 border-dashed h-28 flex items-center justify-center transition-all ${
-              isLocked
-                ? "border-border/60 bg-muted/10 text-muted-foreground/30"
-                : isOver
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-border text-muted-foreground/20"
+              isComingSoon
+                ? "border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/30 text-gray-300 dark:text-slate-600"
+                : isLocked
+                  ? "border-border/60 bg-muted/10 text-muted-foreground/30"
+                  : isOver
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border text-muted-foreground/20"
             }`}
           >
             <p className="text-[11px] font-medium tracking-wide">
-              {isLocked
-                ? t("candidate_pipeline.auto_managed")
-                : t("candidate_pipeline.drop_here")}
+              {isComingSoon
+                ? "Coming soon"
+                : isLocked
+                  ? t("candidate_pipeline.auto_managed")
+                  : t("candidate_pipeline.drop_here")}
             </p>
           </div>
         ) : (

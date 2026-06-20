@@ -19,6 +19,11 @@ const AI_STAGE_TYPES = new Set([
   "assessment", "assessment_test", "coding_test",
 ]);
 
+const COMING_SOON_TYPES = new Set(
+  ["cv_screening", "ai_screening", "video_interview",
+    "manager_interview", "background_check", "offer"],
+);
+
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(
     () => window.matchMedia(query).matches,
@@ -65,6 +70,7 @@ export default function PipelineBuilder({
   // Intercept library clicks: AI stages open config dialog; others add directly
   const handleRequestAddStage = useCallback(
     (libraryItem) => {
+      if (COMING_SOON_TYPES.has(libraryItem.key)) return;
       if (AI_STAGE_TYPES.has(libraryItem.key)) {
         setPendingLibraryItem(libraryItem);
         if (!isDesktop) setLibraryOpen(false);

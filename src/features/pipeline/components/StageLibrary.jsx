@@ -55,15 +55,16 @@ export default function StageLibrary({ onRequestAddStage, isCompanyPremium }) {
         {STAGE_LIBRARY.map((item) => {
           const Icon = ICON_MAP[item.icon] || FileText;
           const locked = item.isPremium && !isCompanyPremium;
+          const disabled = locked || item.comingSoon;
 
           return (
             <button
               key={item.key}
-              disabled={locked}
+              disabled={disabled}
               onClick={() => onRequestAddStage(item)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all group text-start ${
-                locked
-                  ? "border-transparent opacity-50 cursor-not-allowed"
+                disabled
+                  ? "border-transparent opacity-40 cursor-not-allowed"
                   : "border-transparent hover:bg-primary/5 dark:hover:bg-primary/10 hover:border-primary/20 cursor-pointer"
               }`}
             >
@@ -74,13 +75,18 @@ export default function StageLibrary({ onRequestAddStage, isCompanyPremium }) {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-foreground leading-tight transition-colors flex items-center gap-1.5">
                   {item.label}
+                  {item.comingSoon && (
+                    <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-wider ml-1">
+                      Soon
+                    </span>
+                  )}
                   {locked && <Lock className="w-3 h-3 text-muted-foreground" />}
                   {item.isPremium && isCompanyPremium && (
                     <Crown className="w-3 h-3 text-warning" />
                   )}
                 </p>
-                <p className="text-xs text-muted-foreground/80 dark:text-slate-400 font-medium truncate mt-0.5">
-                  {locked ? "Upgrade to Premium" : item.subtitle}
+                <p className="text-xs text-muted-foreground/50 dark:text-slate-500 font-medium truncate mt-0.5">
+                  {item.comingSoon ? "Coming soon" : locked ? "Upgrade to Premium" : item.subtitle}
                 </p>
               </div>
             </button>

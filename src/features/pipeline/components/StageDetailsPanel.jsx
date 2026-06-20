@@ -11,6 +11,7 @@ import {
   Loader2,
   RefreshCw,
   AlertTriangle,
+  Clock,
 } from "lucide-react";
 import { generateEvaluationCriteria } from "../services/pipeline.service";
 
@@ -85,6 +86,23 @@ export default function StageDetailsPanel({
         </p>
         <p className="text-xs text-muted-foreground max-w-[220px] leading-relaxed">
           {t("stage_details.empty_description")}
+        </p>
+      </div>
+    );
+  }
+
+  const stageLibItem = STAGE_LIBRARY.find((s) => s.key === stage.stage_type);
+  if (stageLibItem?.comingSoon) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center px-6 bg-surface">
+        <div className="w-12 h-12 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mb-4 border border-gray-200 dark:border-slate-700">
+          <Clock className="text-gray-300 dark:text-slate-500 w-5 h-5" />
+        </div>
+        <p className="text-sm font-bold text-gray-400 dark:text-slate-400 mb-1">
+          {stage.name}
+        </p>
+        <p className="text-xs text-gray-300 dark:text-slate-500 max-w-[220px] leading-relaxed">
+          This stage is coming soon and cannot be configured yet.
         </p>
       </div>
     );
